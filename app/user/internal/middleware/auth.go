@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"net/http"
-	"pkg/utils"
+	"pkg/utils/jwt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func Auth() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := utils.ParseToken(parts[1])
+		claims, err := jwt.ParseToken(parts[1])
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return

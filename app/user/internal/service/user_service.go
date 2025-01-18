@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"pkg/utils"
+	"pkg/utils/jwt"
 	"user/internal/dao/user_dao"
 	"user/internal/model/user_model"
 	"user/internal/model/user_model/dto"
@@ -57,7 +57,7 @@ func (s *UserService) Login(req *dto.LoginRequest) (resp *dto.LoginResponse, err
 		return nil, errors.New("invalid email or password")
 	}
 
-	token, err := utils.GenerateToken(user.ID, user.Username, user.Role)
+	token, err := jwt.GenerateToken(user.ID, user.Username, user.Role)
 	if err != nil {
 		return nil, err
 	}

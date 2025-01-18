@@ -2,12 +2,17 @@ package main
 
 import (
 	"log"
+	"pkg/logx"
 	"user/internal/dao/user_dao"
 	"user/internal/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
+
+func init() {
+	logx.Init()
+}
 
 func main() {
 

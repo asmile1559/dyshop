@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"douyin-mall-go-template/pkg/logger"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func Logger() gin.HandlerFunc {
@@ -16,13 +16,13 @@ func Logger() gin.HandlerFunc {
 		c.Next()
 
 		// 记录请求日志
-		logger.Logger.Info("access log",
-			zap.String("path", path),
-			zap.String("query", raw),
-			zap.String("ip", c.ClientIP()),
-			zap.String("method", c.Request.Method),
-			zap.Int("status", c.Writer.Status()),
-			zap.Duration("latency", time.Since(start)),
-		)
+		logrus.WithFields(logrus.Fields{
+			"path":    path,
+			"query":   raw,
+			"ip":      c.ClientIP(),
+			"method":  c.Request.Method,
+			"status":  c.Writer.Status(),
+			"latency": time.Since(start),
+		}).Info("access log")
 	}
 }
