@@ -1,5 +1,6 @@
 # dyshop
 
+
 ## project architecture
 
 - /
@@ -48,3 +49,4 @@
     - [ ] product
     - [ ] user
 2. 后端各模块的rpc通信接口？
+```
