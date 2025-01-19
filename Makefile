@@ -8,5 +8,12 @@
 gen-backend-proto:
 	@protoc --go_out=. --proto_path=proto/backend/ proto/backend/*.proto
 	@protoc --go-grpc_out=. --proto_path=proto/backend/ proto/backend/*.proto
-	@mv github.com/dyshop/pb/* ./pb
+	@cp github.com/dyshop/pb/* ./pb -rf
+	@rm -rf github.com
+
+.PHONY: gen-frontend-proto
+gen-frontend-proto:
+	@protoc --go_out=. --proto_path=proto/frontend/ proto/frontend/*.proto
+	@protoc --go-grpc_out=. --proto_path=proto/frontend/ proto/frontend/*.proto
+	@cp github.com/dyshop/pb/* ./pb -rf
 	@rm -rf github.com

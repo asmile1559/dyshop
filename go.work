@@ -1,3 +1,7 @@
 go 1.23.4
 
-use ./pb
+use (
+	./app/auth
+	./app/frontend
+	./pb
+)
