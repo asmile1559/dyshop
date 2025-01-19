@@ -1,0 +1,38 @@
+syntax="proto3";
+
+package user_page;
+
+option go_package="github.com/dyshop/pb/frontend/user_page;user_page";
+
+service UserService {
+  rpc Register(RegisterReq) returns (RegisterResp) {};
+  rpc Login (LoginReq) returns (LoginResp) {};
+  rpc Logout (LogoutReq) returns (LogoutResp) {};
+}
+
+message RegisterReq {
+  string email = 1;
+  string password = 2;
+}
+
+message RegisterResp {
+  int32 id = 1;
+}
+
+message LoginReq {
+  string email = 1;
+  string password = 2;
+}
+
+message  LoginResp {
+  int32 id = 1;
+  string token = 2;
+}
+
+message LogoutReq {
+  int32 id = 1;
+}
+
+message LogoutResp {
+
+}
