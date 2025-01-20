@@ -16,6 +16,6 @@ func Init() {
 	}
 	logrus.SetOutput(io.MultiWriter(os.Stdout, w))
 	logrus.SetLevel(logrus.TraceLevel)
-	logrus.SetFormatter(defaultFormatter)
+	logrus.SetFormatter(DefaultFormatter)
 	logrus.SetReportCaller(true)
 }

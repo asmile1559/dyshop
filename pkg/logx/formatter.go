@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var defaultFormatter = &formatter{
+var DefaultFormatter = &formatter{
 	Role:            "DEFAULT",
 	TimestampFormat: "2006/01/02 - 15:04:05",
 	CustomCallerFormatter: func(f *runtime.Frame) string {
