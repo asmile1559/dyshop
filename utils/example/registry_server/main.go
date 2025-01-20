@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"net"
-	"utils/logx"
-	"utils/registryx"
 
-	"github.com/dyshop/pb/backend/hello"
+	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/registryx"
+
+	"github.com/asmile1559/dyshop/pb/backend/hello"
+
 	consulapi "github.com/hashicorp/consul/api"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
