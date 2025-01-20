@@ -7,17 +7,18 @@ import (
 	"utils/logx"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func init() {
 	logx.Init()
 	if err := initConfig(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	if err := initDB(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }
 
@@ -38,7 +39,7 @@ func main() {
 func initConfig() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("conf")
 	return viper.ReadInConfig()
 }
 
