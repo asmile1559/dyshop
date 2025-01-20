@@ -4,7 +4,7 @@ package order;
 
 import "cart.proto";
 
-option go_package = "github.com/dyshop/pb/backend/order;order";
+option go_package = "github.com/asmile1559/dyshop/pb/backend/order;order";
 
 service OrderService {
   rpc PlaceOrder(PlaceOrderReq) returns (PlaceOrderResp) {}

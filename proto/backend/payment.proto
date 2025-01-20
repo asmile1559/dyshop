@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package payment;
 
-option go_package = "github.com/dyshop/pb/backend/payment;payment";
+option go_package = "github.com/asmile1559/dyshop/pb/backend/payment;payment";
 
 service PaymentService {
   rpc Charge(ChargeReq) returns (ChargeResp) {}

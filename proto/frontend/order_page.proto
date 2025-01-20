@@ -1,0 +1,95 @@
+syntax="proto3";
+
+package order_page;
+
+option go_package="github.com/asmile1559/dyshop/pb/frontend/order_page;order_page";
+
+service OrderService {
+  rpc ListOrders (ListOrdersReq) returns (ListOrdersResp) {};
+  rpc PlaceOrder(PlaceOrderReq) returns (PlaceOrderResp) {};
+  rpc GetOrder (GetOrderReq) returns (GetOrderResp) {};
+  rpc ModifyOrder(ModifyOrderReq) returns (ModifyOrderResp) {};
+  rpc CancelOrder(CancelOrderReq) returns (CancelOrderResp) {};
+  rpc MarkOrderPaid (MarkOrderPaidReq) returns (MarkOrderPaidResp) {};
+}
+
+message ListOrdersReq {
+
+}
+
+message ListOrdersResp {
+
+}
+
+message OrderItem {
+  uint32 product_id = 1;
+  int32 quantity = 2;
+  float cost = 3;
+}
+
+message Address {
+  string street_address = 1;
+  string city = 2;
+  string state = 3;
+  string country = 4;
+  int32 zip_code = 5;
+}
+
+message PlaceOrderReq {
+  string user_currency = 1;
+  Address address = 2;
+  string email = 3;
+  repeated OrderItem order_items = 4;
+}
+
+message PlaceOrderResp {
+  string order_id = 1;
+}
+
+message Order {
+  repeated OrderItem order_items = 1;
+  string order_id = 2;
+  uint32 user_id = 3;
+  string user_currency = 4;
+  Address address = 5;
+  string email = 6;
+  int32 created_at = 7;
+}
+
+message GetOrderReq{
+  string order_id = 1;
+}
+
+message GetOrderResp {
+  Order order = 1;
+}
+
+message ModifyOrderReq {
+  string order_id = 1;
+  uint32 product_id = 2;
+  optional int32 quantity = 3;
+  optional float cost = 4;
+  optional string user_currency = 5;
+  optional Address address = 6;
+  optional string email = 7;
+}
+
+message ModifyOrderResp {
+
+}
+
+message CancelOrderReq {
+  uint32 order_id = 1;
+}
+
+message CancelOrderResp {
+
+}
+
+message MarkOrderPaidReq {
+  string order_id = 1;
+}
+
+message MarkOrderPaidResp {
+
+}

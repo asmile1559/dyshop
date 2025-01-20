@@ -1,4 +1,4 @@
-module github.com/dyshop/pb
+module github.com/asmile1559/dyshop/pb
 
 go 1.23.4
 
