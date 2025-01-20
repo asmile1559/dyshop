@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"net"
-	"pkg/logx"
-	"pkg/utils/registryx"
+	"utils/logx"
+	"utils/registryx"
 
 	"github.com/dyshop/pb/backend/hello"
 	consulapi "github.com/hashicorp/consul/api"
