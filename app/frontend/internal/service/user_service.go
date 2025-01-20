@@ -4,13 +4,11 @@ import (
 	"context"
 	"errors"
 
-	"github.com/asmile1559/dyshop/app/frontend/internal/model/user_model"
-	"github.com/asmile1559/dyshop/app/frontend/internal/model/user_model/dto"
-
 	"github.com/asmile1559/dyshop/utils/jwt"
 
 	"github.com/asmile1559/dyshop/app/frontend/internal/dao/user_dao"
-
+	"github.com/asmile1559/dyshop/app/frontend/internal/model/user_model"
+	"github.com/asmile1559/dyshop/app/frontend/internal/model/user_model/dto"
 	"golang.org/x/crypto/bcrypt"
 )
 
