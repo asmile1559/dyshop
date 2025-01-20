@@ -1,4 +1,4 @@
-module utils
+module github.com/asmile1559/dyshop/utils
 
 go 1.22.4
 

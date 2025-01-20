@@ -3,7 +3,8 @@ package logx
 import (
 	"io"
 	"os"
-	"utils/filex"
+
+	"github.com/asmile1559/dyshop/utils/filex"
 
 	"github.com/sirupsen/logrus"
 )
