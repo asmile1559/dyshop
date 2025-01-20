@@ -8,5 +8,4 @@ import (
 
 func RegisterRoutes(e *gin.Engine) {
 	user_router.RegisterUserRoute(e)
-
 }
