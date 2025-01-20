@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"pkg/logx"
+	"utils/logx"
 
 	"github.com/sirupsen/logrus"
 )

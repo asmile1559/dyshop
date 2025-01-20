@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"pkg/logx"
-	"pkg/utils/registryx"
 	"time"
+	"utils/logx"
+	"utils/registryx"
 
 	"github.com/dyshop/pb/backend/hello"
 	"github.com/sirupsen/logrus"
