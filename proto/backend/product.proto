@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package product;
 
-option go_package = "github.com/dyshop/pb/backend/product;product";
+option go_package = "github.com/asmile1559/dyshop/pb/backend/product;product";
 
 service ProductCatalogService {
   rpc ListProducts(ListProductsReq) returns (ListProductsResp) {}

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cart;
 
-option go_package = 'github.com/dyshop/pb/backend/cart;cart';
+option go_package = 'github.com/asmile1559/dyshop/pb/backend/cart;cart';
 
 service CartService {
   rpc AddItem(AddItemReq) returns (AddItemResp) {}

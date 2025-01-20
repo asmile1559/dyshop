@@ -1,0 +1,33 @@
+syntax="proto3";
+
+package checkout_page;
+
+import "payment_page.proto";
+
+option go_package="github.com/asmile1559/dyshop/pb/frontend/checkout_page;checkout_page";
+
+service CheckoutService {
+  rpc Checkout(CheckoutReq) returns (CheckoutResp) {}
+}
+
+message Address {
+  string street_address = 1;
+  string city = 2;
+  string state = 3;
+  string country = 4;
+  string zip_code = 5;
+}
+
+
+message CheckoutReq {
+  string firstname = 1;
+  string lastname = 2;
+  string email = 3;
+  Address address = 4;
+  payment_page.CreditCardInfo credit_card = 5;
+}
+
+message CheckoutResp {
+  string order_id = 1;
+  string transaction_id = 2;
+}

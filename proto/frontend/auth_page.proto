@@ -1,0 +1,26 @@
+syntax="proto3";
+
+package auth_page;
+
+option go_package="github.com/asmile1559/dyshop/pb/frontend/auth_page;auth_page";
+
+service AuthService {
+  rpc DeliverToken(DeliverTokenReq) returns (DeliveryResp) {}
+  rpc VerifyToken(VerifyTokenReq) returns (VerifyResp) {}
+}
+
+message DeliverTokenReq {
+  int32  user_id= 1;
+}
+
+message VerifyTokenReq {
+  string token = 1;
+}
+
+message DeliveryResp {
+  string token = 1;
+}
+
+message VerifyResp {
+  bool res = 1;
+}

@@ -1,4 +1,4 @@
-module github.com/dyshop/app/frontend
+module github.com/asmile1559/dyshop/app/frontend
 
 go 1.23.4
 

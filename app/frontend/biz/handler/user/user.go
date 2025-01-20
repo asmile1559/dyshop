@@ -1,12 +1,32 @@
 package user
 
 import (
-	"github.com/dyshop/app/frontend/biz/service"
-	"github.com/dyshop/pb/frontend/user_page"
+	"github.com/asmile1559/dyshop/app/frontend/biz/service"
+	"github.com/asmile1559/dyshop/pb/frontend/user_page"
 
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
+
+func Register(c *gin.Context) {
+	var err error
+	var req user_page.RegisterReq
+
+	err = c.Bind(&req)
+	if err != nil {
+		c.String(http.StatusOK, "An error occurred: %v", err)
+		return
+	}
+
+	resp, err := service.NewRegisterService(c).Run(&req)
+
+	if err != nil {
+		c.String(http.StatusOK, "An error occurred: %v", err)
+		return
+	}
+
+	c.String(http.StatusOK, "%v", resp)
+}
 
 func Login(c *gin.Context) {
 	var err error
@@ -18,19 +38,19 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	_, err = service.NewLoginService(c).Run(&req)
+	resp, err := service.NewLoginService(c).Run(&req)
+
 	if err != nil {
 		c.String(http.StatusOK, "%v", err)
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/ping")
+	c.String(http.StatusOK, "%v", resp)
+
+	//c.Redirect(http.StatusFound, "/")
 }
 
-func Logout(c *gin.Context) {
-
-}
-
-func Register(c *gin.Context) {
-
-}
+// optional function
+//func Logout(c *gin.Context) {
+//
+//}

@@ -2,7 +2,7 @@ syntax="proto3";
 
 package user;
 
-option go_package="github.com/dyshop/pb/backend/user;user";
+option go_package="github.com/asmile1559/dyshop/pb/backend/user;user";
 
 service UserService {
   rpc Register(RegisterReq) returns (RegisterResp) {}

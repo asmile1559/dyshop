@@ -1,0 +1,28 @@
+syntax="proto3";
+
+package payment_page;
+
+
+
+option go_package="github.com/asmile1559/dyshop/pb/frontend/payment_page;payment_page";
+
+service PaymentService {
+  rpc Charge(ChargeReq) returns (ChargeResp) {}
+}
+
+message CreditCardInfo {
+  string credit_card_number = 1;
+  int32 credit_card_cvv = 2;
+  int32 credit_card_expiration_year = 3;
+  int32 credit_card_expiration_month = 4;
+}
+
+message ChargeReq {
+  float amount = 1;
+  CreditCardInfo credit_card = 2;
+  string order_id = 3;
+}
+
+message ChargeResp {
+  string transaction_id = 1;
+}

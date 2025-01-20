@@ -1,18 +1,25 @@
 package main
 
 import (
-	bizrouter "github.com/dyshop/app/frontend/biz/router"
+	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
+	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
+	"log"
 	"net/http"
+	"pkg/logx"
 )
 
-type RegisterInfo struct {
-	Email      string `form:"email" binding:"required"`
-	Password   string `form:"password" binding:"required"`
-	RePassword string `form:"re_password" binding:"required,eqfield=Password"`
-}
-
 func main() {
+
+	if err := initConfig(); err != nil {
+		log.Fatal(err)
+	}
+
+	initLog()
+
+	rpcclient.InitRPCClient()
+
 	router := gin.Default()
 
 	router.LoadHTMLGlob("templates/**")
@@ -26,20 +33,20 @@ func main() {
 	})
 
 	bizrouter.RegisterRouters(router)
-	//router.GET("/register", func(c *gin.Context) {
-	//	c.HTML(http.StatusOK, "register.html", gin.H{})
-	//})
-	//
-	//router.POST("/register", func(c *gin.Context) {
-	//	registerInfo := RegisterInfo{}
-	//	err := c.Bind(&registerInfo)
-	//	if err != nil {
-	//		c.JSON(http.StatusOK, gin.H{
-	//			"err": err,
-	//		})
-	//		return
-	//	}
-	//	c.String(http.StatusOK, "congratulation! you have registered! your email is %v", registerInfo.Email)
-	//})
+
+	//if err := router.Run(":" + viper.GetString("port")); err != nil {
+	//	log.Fatal(err)
+	//}
 	router.Run(":10166")
+}
+
+func initConfig() error {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("conf")
+	return viper.ReadInConfig()
+}
+
+func initLog() {
+	logx.Init()
 }

@@ -2,7 +2,7 @@ syntax="proto3";
 
 package user_page;
 
-option go_package="github.com/dyshop/pb/frontend/user_page;user_page";
+option go_package="github.com/asmile1559/dyshop/pb/frontend/user_page;user_page";
 
 service UserService {
   rpc Register(RegisterReq) returns (RegisterResp) {};
@@ -13,6 +13,7 @@ service UserService {
 message RegisterReq {
   string email = 1;
   string password = 2;
+  string confirm_password = 3;
 }
 
 message RegisterResp {
