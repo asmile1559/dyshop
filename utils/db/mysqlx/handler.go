@@ -17,7 +17,7 @@ type DbConfig struct {
 }
 
 func New(conf DbConfig) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%dd)/%s?charset=utf8mb4&parseTime=True&loc=Local", conf.User, conf.Password, conf.Host, conf.Port, conf.DbName)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", conf.User, conf.Password, conf.Host, conf.Port, conf.DbName)
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		return nil, err
