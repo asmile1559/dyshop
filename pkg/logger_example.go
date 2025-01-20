@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/asmile1559/dyshop/utils/logx"
+	"utils/logx"
 
 	"github.com/sirupsen/logrus"
 )
