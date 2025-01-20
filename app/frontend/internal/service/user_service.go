@@ -3,10 +3,10 @@ package service
 import (
 	"context"
 	"errors"
+	"pkg/utils/jwt"
 	"user/internal/dao/user_dao"
 	"user/internal/model/user_model"
 	"user/internal/model/user_model/dto"
-	"utils/jwt"
 
 	"golang.org/x/crypto/bcrypt"
 )
