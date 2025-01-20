@@ -4,7 +4,7 @@ package  checkout;
 
 import "payment.proto";
 
-option go_package = "github.com/dyshop/pb/backend/checkout;checkout";
+option go_package = "github.com/asmile1559/dyshop/pb/backend/checkout;checkout";
 
 service CheckoutService {
   rpc Checkout(CheckoutReq) returns (CheckoutResp) {}

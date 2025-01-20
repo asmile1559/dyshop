@@ -1,0 +1,71 @@
+syntax="proto3";
+
+package product_page;
+
+option go_package="github.com/asmile1559/dyshop/pb/frontend/product_page;product_page";
+
+service ProductService {
+  rpc ListProducts(ListProductsReq) returns (ListProductsResp) {};
+  rpc GetProduct(GetProductReq) returns (GetProductResp) {};
+  rpc SearchProducts(SearchProductsReq) returns (SearchProductsResp) {};
+  rpc CreateProduct(CreateProductReq) returns (CreateProductResp) {};
+  rpc ModifyProduct(ModifyProductReq) returns (ModifyProductResp) {};
+  rpc DeleteProduct(DeleteProductReq) returns (DeleteProductResp) {};
+}
+
+message ListProductsReq {
+  int32 page = 1;
+  int64 pageSize = 2;
+
+  string categoryName = 3;
+}
+
+message ListProductsResp {
+
+}
+
+message GetProductReq {
+  uint32 id = 1;
+}
+
+message GetProductResp {
+}
+
+message SearchProductsReq {
+  string q = 1;
+}
+
+message SearchProductsResp {
+}
+
+message CreateProductReq {
+  string name = 1;
+  string description = 2;
+  string picture = 3;
+  float price = 4;
+  uint32 amount = 5;
+}
+
+message CreateProductResp {
+}
+
+message ModifyProductReq {
+  uint32 id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional string picture = 4;
+  optional float price = 5;
+  optional uint32 amount = 6;
+}
+
+message ModifyProductResp {
+}
+
+message DeleteProductReq {
+  int64 id = 1;
+}
+
+message DeleteProductResp {
+
+}
+

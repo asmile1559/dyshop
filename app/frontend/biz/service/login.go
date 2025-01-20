@@ -2,27 +2,35 @@ package service
 
 import (
 	"context"
-	"github.com/dyshop/pb/frontend/user_page"
+	"github.com/asmile1559/dyshop/pb/frontend/user_page"
+	"github.com/gin-gonic/gin"
 )
+
+//rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
+//pbbackend "github.com/asmile1559/dyshop/pb/backend/user"
 
 type LoginService struct {
 	ctx context.Context
 }
 
-func NewLoginService(ctx context.Context) *LoginService {
-	return &LoginService{ctx: ctx}
+func NewLoginService(c context.Context) *LoginService {
+	return &LoginService{ctx: c}
 }
 
-func (s *LoginService) Run(req *user_page.LoginReq) (resp *user_page.LoginResp, err error) {
-	//loginResp, err := rpcclient.UserClient.Login(s.ctx, &backenduser.LoginReq{
+func (s *LoginService) Run(req *user_page.LoginReq) (map[string]interface{}, error) {
+	//loginResp, err := rpcclient.UserClient.Login(s.ctx, &pbbackend.LoginReq{
 	//	Email:    req.Email,
 	//	Password: req.Password,
 	//})
 	//if err != nil {
 	//	return nil, err
 	//}
+	//
+	//return gin.H{
+	//	"resp": resp,
+	//}, nil
 
-	return &user_page.LoginResp{
-		Id: 1001,
+	return gin.H{
+		"status": "login ok!",
 	}, nil
 }
