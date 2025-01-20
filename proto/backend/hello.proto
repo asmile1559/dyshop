@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package hello;
 
-option go_package = "github.com/dyshop/pb/backend/hello;hello";
+option go_package = "github.com/asmile1559/dyshop/pb/backend/hello;hello";
 
 
 // The greeter service definition.

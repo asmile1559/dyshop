@@ -13,7 +13,7 @@ gen-backend-proto:
 
 .PHONY: gen-frontend-proto
 gen-frontend-proto:
-	@protoc --go_out=. --proto_path=proto/frontend/ proto/frontend/*.proto
-	@protoc --go-grpc_out=. --proto_path=proto/frontend/ proto/frontend/*.proto
+	@protoc --go_out=. --experimental_allow_proto3_optional --proto_path=proto/frontend/ proto/frontend/*.proto
+	@protoc --go-grpc_out=. --experimental_allow_proto3_optional --proto_path=proto/frontend/ proto/frontend/*.proto
 	@cp github.com/asmile1559/dyshop/pb/* ./pb -rf
 	@rm -rf github.com
