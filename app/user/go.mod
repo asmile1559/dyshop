@@ -1,4 +1,4 @@
-module user
+module github.com/asmile1559/dyshop/app/user
 
 go 1.22.4
 

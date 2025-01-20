@@ -1,13 +1,14 @@
 package main
 
 import (
-	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
-	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
-	"pkg/logx"
+
+	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
+	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
+	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func main() {

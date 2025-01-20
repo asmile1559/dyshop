@@ -3,10 +3,13 @@ package service
 import (
 	"context"
 	"errors"
-	"pkg/utils/jwt"
-	"user/internal/dao/user_dao"
-	"user/internal/model/user_model"
-	"user/internal/model/user_model/dto"
+
+	"github.com/asmile1559/dyshop/app/frontend/internal/model/user_model"
+	"github.com/asmile1559/dyshop/app/frontend/internal/model/user_model/dto"
+
+	"github.com/asmile1559/dyshop/utils/jwt"
+
+	"github.com/asmile1559/dyshop/app/frontend/internal/dao/user_dao"
 
 	"golang.org/x/crypto/bcrypt"
 )
