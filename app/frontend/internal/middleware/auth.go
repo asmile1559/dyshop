@@ -3,7 +3,8 @@ package middleware
 import (
 	"net/http"
 	"strings"
-	"utils/jwt"
+
+	"github.com/asmile1559/dyshop/utils/jwt"
 
 	"github.com/gin-gonic/gin"
 )

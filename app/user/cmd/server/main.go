@@ -1,49 +1,50 @@
 package main
 
-import (
-	"log"
-	"user/internal/dao/user_dao"
-	"user/internal/routes"
-	"utils/logx"
+// import (
+// 	"log"
 
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-)
+// 	"github.com/asmile1559/dyshop/app/frontend/internal/dao/user_dao"
+// 	"github.com/asmile1559/dyshop/app/frontend/internal/routes"
+// 	"github.com/asmile1559/dyshop/utils/logx"
 
-func init() {
-	logx.Init()
-	if err := initConfig(); err != nil {
-		logrus.Fatal(err)
-	}
+// 	"github.com/gin-gonic/gin"
+// 	"github.com/sirupsen/logrus"
+// 	"github.com/spf13/viper"
+// )
 
-	if err := initDB(); err != nil {
-		logrus.Fatal(err)
-	}
-}
+// func init() {
+// 	logx.Init()
+// 	if err := initConfig(); err != nil {
+// 		logrus.Fatal(err)
+// 	}
 
-func main() {
-	router := gin.Default()
+// 	if err := initDB(); err != nil {
+// 		logrus.Fatal(err)
+// 	}
+// }
 
-	router.LoadHTMLGlob("static/pages/**")
+// func main() {
+// 	router := gin.Default()
 
-	routes.RegisterRoutes(router)
+// 	router.LoadHTMLGlob("static/pages/**")
 
-	//router.Run(":10166")
-	port := viper.GetString("server.port")
-	if err := router.Run(":" + port); err != nil {
-		log.Fatalf("start server failed: %v", err)
-	}
-}
+// 	routes.RegisterRoutes(router)
 
-func initConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("conf")
-	return viper.ReadInConfig()
-}
+// 	//router.Run(":10166")
+// 	port := viper.GetString("server.port")
+// 	if err := router.Run(":" + port); err != nil {
+// 		log.Fatalf("start server failed: %v", err)
+// 	}
+// }
 
-// need to be separate to microservices
-func initDB() error {
-	return user_dao.InitDB()
-}
+// func initConfig() error {
+// 	viper.SetConfigName("config")
+// 	viper.SetConfigType("yaml")
+// 	viper.AddConfigPath("conf")
+// 	return viper.ReadInConfig()
+// }
+
+// // need to be separate to microservices
+// func initDB() error {
+// 	return user_dao.InitDB()
+// }

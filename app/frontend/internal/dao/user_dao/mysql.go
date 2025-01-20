@@ -1,8 +1,8 @@
 package user_dao
 
 import (
-	"user/internal/model/user_model"
-	"utils/db/mysqlx"
+	"github.com/asmile1559/dyshop/app/frontend/internal/model/user_model"
+	"github.com/asmile1559/dyshop/utils/db/mysqlx"
 
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
