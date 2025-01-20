@@ -2,10 +2,20 @@ package middleware
 
 import (
 	"time"
+	"utils/logx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
+
+var log *logrus.Logger
+
+func init() {
+	log = logrus.StandardLogger()
+	defaultFormatter := logx.DefaultFormatter
+	defaultFormatter.Role = "USER"
+	log.SetFormatter(defaultFormatter)
+}
 
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -16,7 +26,7 @@ func Logger() gin.HandlerFunc {
 		c.Next()
 
 		// 记录请求日志
-		logrus.WithFields(logrus.Fields{
+		log.WithFields(logrus.Fields{
 			"path":    path,
 			"query":   raw,
 			"ip":      c.ClientIP(),

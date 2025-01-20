@@ -1,25 +1,28 @@
 package user_dao
 
 import (
-	"fmt"
+	"user/internal/model/user_model"
+	"utils/db/mysqlx"
 
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
 func InitDB() error {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		viper.GetString("database.username"),
-		viper.GetString("database.password"),
-		viper.GetString("database.host"),
-		viper.GetInt("database.port"),
-		viper.GetString("database.dbname"),
-	)
+	dbconf := mysqlx.DbConfig{
+		User:     viper.GetString("database.username"),
+		Password: viper.GetString("database.password"),
+		Host:     viper.GetString("database.host"),
+		Port:     viper.GetInt("database.port"),
+		DbName:   viper.GetString("database.dbname"),
+		Models: []any{
+			user_model.User{},
+		},
+	}
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := mysqlx.New(dbconf)
 	if err != nil {
 		return err
 	}
