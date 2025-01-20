@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	"pkg/logx"
 	"user/internal/dao/user_dao"
 	"user/internal/routes"
+	"utils/logx"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -12,10 +12,6 @@ import (
 
 func init() {
 	logx.Init()
-}
-
-func main() {
-
 	if err := initConfig(); err != nil {
 		log.Fatal(err)
 	}
@@ -23,7 +19,9 @@ func main() {
 	if err := initDB(); err != nil {
 		log.Fatal(err)
 	}
+}
 
+func main() {
 	router := gin.Default()
 
 	router.LoadHTMLGlob("static/pages/**")
