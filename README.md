@@ -62,6 +62,7 @@ git add .
 git commit -m "example commit"
 git push origin feat/example 
 ```
+7. 发起一个PR请求
 
 # How to Run
 ```bash
