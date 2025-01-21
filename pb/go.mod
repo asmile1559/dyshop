@@ -1,6 +1,6 @@
 module github.com/asmile1559/dyshop/pb
 
-go 1.23.4
+go 1.23.5
 
 require (
 	google.golang.org/grpc v1.69.4
