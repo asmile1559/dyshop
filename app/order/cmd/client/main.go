@@ -1,32 +1,35 @@
 package main
 
 import (
-	pbcheckout "github.com/asmile1559/dyshop/pb/backend/checkout"
+	"fmt"
+	pborder "github.com/asmile1559/dyshop/pb/backend/order"
 	"github.com/asmile1559/dyshop/utils/logx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
-	"net"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
-
 	if err := loadConfig(); err != nil {
 		logrus.Fatal(err)
 	}
 
 	initLog()
 
-	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
+	cc, err := grpc.NewClient("localhost:"+viper.GetString("server.port"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logrus.Fatal(err)
 	}
-	s := grpc.NewServer()
 
-	pbcheckout.RegisterCheckoutServiceServer(s, &CheckoutServiceServer{})
-	if err = s.Serve(cc); err != nil {
+	cli := pborder.NewOrderServiceClient(cc)
+	resp, err := cli.ListOrder(context.TODO(), &pborder.ListOrderReq{UserId: 1})
+	if err != nil {
 		logrus.Fatal(err)
 	}
+
+	fmt.Printf("resp: %v\n", resp)
 }
 
 func loadConfig() error {

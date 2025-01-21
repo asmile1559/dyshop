@@ -14,5 +14,7 @@ func NewEmptyService(c context.Context) *EmptyService {
 }
 
 func (s *EmptyService) Run(req *pbcart.EmptyCartReq) (*pbcart.EmptyCartResp, error) {
+	// TODO: finish your business code...
+	//
 	return &pbcart.EmptyCartResp{}, nil
 }

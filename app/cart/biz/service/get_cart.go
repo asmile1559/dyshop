@@ -14,6 +14,8 @@ func NewGetCartService(c context.Context) *GetCartService {
 }
 
 func (s *GetCartService) Run(req *pbcart.GetCartReq) (*pbcart.GetCartResp, error) {
+	// TODO: finish your business code...
+	//
 	return &pbcart.GetCartResp{Cart: &pbcart.Cart{
 		UserId: 1,
 		Items: []*pbcart.CartItem{
