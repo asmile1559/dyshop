@@ -10,6 +10,7 @@
                 - dal(data access layer)/: 数据库访问
                 - service/: 具体要实现的逻辑功能, service会调用handler的代码
                 - model/: 成员结构
+            - cmd: 存放一个grpc client的测试程序，用于测试grpc是否可用
             - conf/: 存放配置文件
             - middleware/: 中间件函数，存放逻辑中间件
             - script/: 脚本

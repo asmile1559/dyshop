@@ -9,15 +9,15 @@ import (
 //	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 //	pbbackend "github.com/asmile1559/dyshop/pb/backend/cart"
 
-type AddCartService struct {
+type AddItemService struct {
 	ctx context.Context
 }
 
-func NewAddCartService(c context.Context) *AddCartService {
-	return &AddCartService{ctx: c}
+func NewAddItemService(c context.Context) *AddItemService {
+	return &AddItemService{ctx: c}
 }
 
-func (s *AddCartService) Run(req *cart_page.AddCartReq) (map[string]interface{}, error) {
+func (s *AddItemService) Run(req *cart_page.AddItemReq) (map[string]interface{}, error) {
 	//id, ok := s.ctx.Value("user_id").(uint32)
 	//if !ok {
 	//	return nil, errors.New("no user id")

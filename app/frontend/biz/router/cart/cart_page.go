@@ -11,7 +11,7 @@ func Register(e *gin.Engine) {
 		_cart := root.Group("/cart", _cartMw()...)
 		// TODO: cart front page
 		//_cart.GET("/", )
-		_cart.POST("/add", append(_addCartMw(), c.AddCart)...)
+		_cart.POST("/add", append(_addCartMw(), c.AddItem)...)
 		_cart.GET("/empty", append(_emptyCartMw(), c.EmptyCart)...)
 	}
 }

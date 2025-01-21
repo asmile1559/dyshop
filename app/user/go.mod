@@ -56,3 +56,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/asmile1559/dyshop/pb => ../../pb
+
+replace github.com/asmile1559/dyshop/utils => ../../utils

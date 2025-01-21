@@ -5,18 +5,18 @@ package cart_page;
 option go_package="github.com/asmile1559/dyshop/pb/frontend/cart_page;cart_page";
 
 service CartService {
-  rpc AddCart(AddCartReq) returns (AddCartResp) {};
+  rpc AddItem(AddItemReq) returns (AddItemResp) {};
   rpc EmptyCart(EmptyCartReq) returns (EmptyCartResp) {};
   rpc GetCart(GetCartReq) returns (GetCartResp) {};
   rpc ListCart(ListCartReq) returns (ListCartResp) {};
 }
 
-message AddCartReq {
+message AddItemReq {
   uint32 product_id = 1;
   int32 quantity = 2;
 }
 
-message AddCartResp {
+message AddItemResp {
 
 }
 
@@ -29,7 +29,7 @@ message EmptyCartResp {
 }
 
 message GetCartReq {
-  string q = 1;
+
 }
 
 message GetCartResp {

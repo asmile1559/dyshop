@@ -17,3 +17,13 @@ gen-frontend-proto:
 	@protoc --go-grpc_out=. --experimental_allow_proto3_optional --proto_path=proto/frontend/ proto/frontend/*.proto
 	@cp github.com/asmile1559/dyshop/pb/* ./pb -rf
 	@rm -rf github.com
+
+
+@APP_DIRS := $(shell find ./app -mindepth 1 -maxdepth 1 -type d)
+.PHONY: go-mod-add-replace-all
+go-mod-add-replace-all:
+	@for app in $(APP_DIRS); do \
+	    (cd $$app && \
+	    go mod edit -replace github.com/asmile1559/dyshop/pb=../../pb && \
+	    go mod edit -replace github.com/asmile1559/dyshop/utils=../../utils) \
+	done \

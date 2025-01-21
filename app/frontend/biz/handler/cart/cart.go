@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-func AddCart(c *gin.Context) {
-	var req cart_page.AddCartReq
+func AddItem(c *gin.Context) {
+	var req cart_page.AddItemReq
 
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -16,7 +16,7 @@ func AddCart(c *gin.Context) {
 		return
 	}
 
-	resp, err := service.NewAddCartService(c).Run(&req)
+	resp, err := service.NewAddItemService(c).Run(&req)
 
 	if err != nil {
 		c.String(http.StatusOK, "An error occurred: %v", err)
@@ -40,7 +40,11 @@ func EmptyCart(c *gin.Context) {
 	c.String(http.StatusOK, "GetProduct ok! your id is: %v", resp)
 }
 
-func ListCart(c *gin.Context) {
-	// ListCart API is not provided
+func GetCart(c *gin.Context) {
 	panic("DO NOT use the function! Use DeliverTokenService directly")
 }
+
+//func ListCart(c *gin.Context) {
+//	// ListCart API is not provided
+//	panic("DO NOT use the function! Use DeliverTokenService directly")
+//}

@@ -2,7 +2,12 @@ go 1.23.4
 
 use (
 	./app/auth
+	./app/cart
+	./app/checkout
 	./app/frontend
+	./app/order
+	./app/payment
+	./app/product
 	./app/user
 	./pb
 	./utils
