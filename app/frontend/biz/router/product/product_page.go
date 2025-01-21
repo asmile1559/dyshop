@@ -13,11 +13,5 @@ func Register(e *gin.Engine) {
 		//_product.GET("/", )
 		_product.GET("/:id", append(_getProductMw(), p.GetProduct)...)
 		_product.GET("/search", append(_searchProductsMw(), p.SearchProduct)...)
-
-		//_user.GET("/logout", func(c *gin.Context) {
-		// 	// clear token info in server
-		//	c.Redirect(http.StatusFound, "/")
-		//})
-		//_user.POST("/logout", append(_logoutMw(), u.Logout)...)
 	}
 }

@@ -36,15 +36,9 @@ func EmptyCart(c *gin.Context) {
 		return
 	}
 
-	// redirect to /cart
 	c.String(http.StatusOK, "GetProduct ok! your id is: %v", resp)
 }
 
 func GetCart(c *gin.Context) {
 	panic("DO NOT use the function! Use DeliverTokenService directly")
 }
-
-//func ListCart(c *gin.Context) {
-//	// ListCart API is not provided
-//	panic("DO NOT use the function! Use DeliverTokenService directly")
-//}

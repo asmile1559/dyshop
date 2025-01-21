@@ -47,7 +47,6 @@ func Login(c *gin.Context) {
 
 	c.String(http.StatusOK, "%v", resp)
 
-	//c.Redirect(http.StatusFound, "/")
 }
 
 // optional function

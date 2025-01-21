@@ -16,12 +16,7 @@ func Register(e *gin.Engine) {
 		_user.GET("/register", func(c *gin.Context) {
 			c.HTML(http.StatusOK, "register.html", gin.H{})
 		})
-		//_user.GET("/logout", func(c *gin.Context) {
-		// 	// clear token info in server
-		//	c.Redirect(http.StatusFound, "/")
-		//})
 		_user.POST("/login", append(_loginMw(), u.Login)...)
 		_user.POST("/register", append(_registerMw(), u.Register)...)
-		//_user.POST("/logout", append(_logoutMw(), u.Logout)...)
 	}
 }

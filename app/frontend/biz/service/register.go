@@ -2,12 +2,11 @@ package service
 
 import (
 	"context"
+	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
+	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/pb/frontend/user_page"
 	"github.com/gin-gonic/gin"
 )
-
-//rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
-//pbbackend "github.com/asmile1559/dyshop/pb/backend/user"
 
 type RegisterService struct {
 	ctx context.Context
@@ -18,19 +17,21 @@ func NewRegisterService(c context.Context) *RegisterService {
 }
 
 func (s *RegisterService) Run(req *user_page.RegisterReq) (map[string]interface{}, error) {
-	//resp, err := rpcclient.UserClient.Register(s.ctx, &pbbackend.RegisterReq{
-	//	Email:           req.Email,
-	//	Password:        req.Password,
-	//	ConfirmPassword: req.ConfirmPassword,
-	//})
-	//
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//return &user_page.RegisterResp{Id: resp.UserId}, nil
+	resp, err := rpcclient.UserClient.Register(s.ctx, &pbuser.RegisterReq{
+		Email:           req.Email,
+		Password:        req.Password,
+		ConfirmPassword: req.ConfirmPassword,
+	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	return gin.H{
-		"status": "register ok!",
+		"resp": resp,
 	}, nil
+
+	//return gin.H{
+	//	"status": "register ok!",
+	//}, nil
 }

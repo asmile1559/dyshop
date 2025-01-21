@@ -9,30 +9,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type MarkOrderPaidService struct {
+type ListOrdersService struct {
 	ctx context.Context
 }
 
-func NewMarkOrderPaidService(c context.Context) *MarkOrderPaidService {
-	return &MarkOrderPaidService{ctx: c}
+func NewListOrdersService(c context.Context) *ListOrdersService {
+	return &ListOrdersService{ctx: c}
 }
 
-func (s *MarkOrderPaidService) Run(req *order_page.MarkOrderPaidReq) (map[string]interface{}, error) {
+func (s *ListOrdersService) Run(_ *order_page.ListOrdersReq) (map[string]interface{}, error) {
+
 	id, ok := s.ctx.Value("user_id").(uint32)
 	if ok == false {
 		return nil, errors.New("expect user id")
 	}
 
-	_, err := rpcclient.OrderClient.MarkOrderPaid(s.ctx, &pborder.MarkOrderPaidReq{
-		UserId:  id,
-		OrderId: req.GetOrderId(),
-	})
+	resp, err := rpcclient.OrderClient.ListOrder(s.ctx, &pborder.ListOrderReq{UserId: id})
 
 	if err != nil {
 		return nil, err
 	}
 
 	return gin.H{
-		"status": "mark_order_paid ok",
+		"orders": resp.GetOrders(),
 	}, nil
+
+	//return gin.H{
+	//	"status": "list orders ok",
+	//}, nil
 }

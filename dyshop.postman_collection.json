@@ -1,0 +1,209 @@
+{
+	"info": {
+		"_postman_id": "28d8960b-17ea-4865-9d68-8fab0097aadd",
+		"name": "dyshop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "41082200"
+	},
+	"item": [
+		{
+			"name": "ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "192.168.191.130:10166/ping"
+			},
+			"response": []
+		},
+		{
+			"name": "user/register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"123@abc.com\",\r\n    \"password\": \"123456\",\r\n    \"confirm_password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/user/register"
+			},
+			"response": []
+		},
+		{
+			"name": "user/login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"123@abc.com\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/user/login"
+			},
+			"response": []
+		},
+		{
+			"name": "user/product/1",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/product/1"
+			},
+			"response": []
+		},
+		{
+			"name": "user/product/search?q=\"abc\"",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"123@abc.com\",\r\n    \"password\": \"123456\",\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "192.168.191.130:10166/product/search?q=\"123\"",
+					"host": [
+						"192",
+						"168",
+						"191",
+						"130"
+					],
+					"port": "10166",
+					"path": [
+						"product",
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "\"123\""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user/product/order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_currency\": \"CNY\",\r\n    \"address\": {\r\n        \"street_address\": \"BigStreet\",\r\n        \"city\": \"Shenyang\",\r\n        \"state\": \"Liaoning\",\r\n        \"Country\": \"China\", \r\n        \"ZipCoide\" : 123456\r\n    },\r\n    \"email\": \"123@abc.com\",\r\n    \"order_items\": [\r\n        {\"product_id\": 1, \"quantity\": 10, \"cost\": 100.00},\r\n        {\"product_id\": 2, \"quantity\": 5, \"cost\": 200.00}\r\n    ]\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/order/place"
+			},
+			"response": []
+		},
+		{
+			"name": "user/payment/charge",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amount\": 100.00,\r\n    \"credit_card\": {\r\n        \"credit_card_number\": \"123456\",\r\n        \"credit_card_cvv\": 123123,\r\n        \"credit_card_expiration_year\": 2099,\r\n        \"credit_card_expiration_month\": 12\r\n    },\r\n    \"order_id\": \"1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/payment/charge"
+			},
+			"response": []
+		},
+		{
+			"name": "user/cart/add",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 10\r\n}\r\n    \r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/cart/add"
+			},
+			"response": []
+		},
+		{
+			"name": "user/cart/empty",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 10\r\n}\r\n    \r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/cart/empty"
+			},
+			"response": []
+		},
+		{
+			"name": "user/checkout/checkout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\": \"hua\",\r\n    \"last_name\": \"li\",\r\n    \"email\": \"123@abc.com\",\r\n    \"address\": {\r\n        \"street_address\": \"BigStreet\",\r\n        \"city\": \"Shenyang\",\r\n        \"state\": \"Liaoning\",\r\n        \"Country\": \"China\", \r\n        \"ZipCoide\" : 123456\r\n    },\r\n    \"credit_card\": {\r\n        \"credit_card_number\": \"123456\",\r\n        \"credit_card_cvv\": 123123,\r\n        \"credit_card_expiration_year\": 2099,\r\n        \"credit_card_expiration_month\": 12\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "192.168.191.130:10166/checkout/checkout"
+			},
+			"response": []
+		}
+	]
+}

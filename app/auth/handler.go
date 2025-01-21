@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	service "github.com/asmile1559/dyshop/app/auth/biz/service"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
-	"golang.org/x/net/context"
 )
 
 type AuthServiceServer struct {
@@ -13,7 +13,7 @@ type AuthServiceServer struct {
 func (s *AuthServiceServer) DeliverTokenByRPC(ctx context.Context, req *pbauth.DeliverTokenReq) (*pbauth.DeliveryResp, error) {
 
 	resp, err := service.NewDeliverService(ctx).Run(req)
-	
+
 	return resp, err
 }
 func (s *AuthServiceServer) VerifyTokenByRPC(ctx context.Context, req *pbauth.VerifyTokenReq) (*pbauth.VerifyResp, error) {
