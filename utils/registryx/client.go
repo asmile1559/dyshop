@@ -1,76 +1,36 @@
 package registryx
 
 import (
+	"context"
 	"fmt"
+	"time"
 
-	consulapi "github.com/hashicorp/consul/api"
-	"google.golang.org/grpc/resolver"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-func NewConsulResolverBuilder(address string) ConsulResolverBuilder {
-	return ConsulResolverBuilder{consulAddress: address}
-}
-
-type ConsulResolverBuilder struct {
-	consulAddress string
-}
-
-func (c ConsulResolverBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
-	consulResolver, err := newConsulResolver(c.consulAddress, target, cc)
+func DiscoverService(endpoints []string, key string) ([]string, error) {
+	client, err := clientv3.New(clientv3.Config{
+		Endpoints:   endpoints,
+		DialTimeout: 5 * time.Second,
+	})
 	if err != nil {
 		return nil, err
 	}
-	consulResolver.resolve()
-	return consulResolver, nil
-}
+	defer client.Close()
 
-func (c ConsulResolverBuilder) Scheme() string {
-	return "consul"
-}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-func newConsulResolver(address string, target resolver.Target, cc resolver.ClientConn) (ConsulResolver, error) {
-	var reso ConsulResolver
-	client, err := consulapi.NewClient(&consulapi.Config{Address: address})
+	resp, err := client.Get(ctx, key, clientv3.WithPrefix())
 	if err != nil {
-		return reso, err
-	}
-	return ConsulResolver{
-		target: target,
-		cc:     cc,
-		client: client,
-	}, nil
-}
-
-type ConsulResolver struct {
-	target resolver.Target
-	cc     resolver.ClientConn
-	client *consulapi.Client
-}
-
-func (c ConsulResolver) resolve() {
-	service := c.target.URL.Opaque
-	services, _, err := c.client.Catalog().Service(service, "", nil)
-	if err != nil {
-		c.cc.ReportError(err)
-		return
-	}
-	var adds []resolver.Address
-	for _, catalogService := range services {
-		adds = append(adds, resolver.Address{Addr: fmt.Sprintf("%s:%d", catalogService.Address, catalogService.ServicePort)})
+		return nil, err
 	}
 
-	c.cc.UpdateState(resolver.State{
-		Addresses: adds,
-		// 轮询策略
-		ServiceConfig: c.cc.ParseServiceConfig(
-			`{"loadBalancingPolicy":"round_robin"}`),
-	})
-}
+	var services []string
+	for _, kv := range resp.Kvs {
+		services = append(services, string(kv.Value))
+	}
 
-func (c ConsulResolver) ResolveNow(options resolver.ResolveNowOptions) {
-	c.resolve()
-}
-
-func (c ConsulResolver) Close() {
-
+	fmt.Printf("Discovered services for key %s: %v\n", key, services)
+	return services, nil
 }
