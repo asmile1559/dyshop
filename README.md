@@ -79,7 +79,7 @@ cd app/user && go run .
 # 2. 启动一个新的终端
 cd app/frontend && go run .
 # 3. 使用 postman 或者 浏览器 或者 curl 进行访问（需要自己完成前端页面和路由逻辑）
-curl curl -X POST \
+curl -X POST \
           -H "Content-Type: application/json" \
           -d '{"email":"123@abc.com", "password": "123456", "confirm_password": "123456"}' \
           localhost:12166 
