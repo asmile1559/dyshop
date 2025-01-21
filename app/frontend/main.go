@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 
@@ -35,10 +36,10 @@ func main() {
 
 	bizrouter.RegisterRouters(router)
 
-	//if err := router.Run(":" + viper.GetString("port")); err != nil {
-	//	log.Fatal(err)
-	//}
-	router.Run(":10166")
+	if err := router.Run(":" + viper.GetString("server.port")); err != nil {
+		logrus.Fatal(err)
+	}
+	//router.Run(":10166")
 }
 
 func initConfig() error {
