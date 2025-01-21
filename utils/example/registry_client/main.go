@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"utils/logx"
-	"utils/registryx"
+	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/registryx"
 
-	pb "github.com/dyshop/pb/backend/hello" // 替换为你的实际包路径
+	pb "github.com/asmile1559/dyshop/pb/backend/hello" // 替换为你的实际包路径
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
