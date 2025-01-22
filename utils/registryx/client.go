@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
@@ -31,6 +32,16 @@ func DiscoverService(endpoints []string, key string) ([]string, error) {
 		services = append(services, string(kv.Value))
 	}
 
-	fmt.Printf("Discovered services for key %s: %v\n", key, services)
+	logrus.Infof("Discovered services for key %s: %v\n", key, services)
 	return services, nil
+}
+
+// 监听服务变化
+func WatchServiceChanges(client *clientv3.Client, prefix string) {
+	watchChan := client.Watch(context.Background(), prefix, clientv3.WithPrefix())
+	for wresp := range watchChan {
+		for _, ev := range wresp.Events {
+			fmt.Printf("Service change detected: %s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
+		}
+	}
 }
