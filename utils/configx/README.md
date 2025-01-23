@@ -3,8 +3,6 @@
 ## 概述
 如何通过 Docker Compose 部署单节点 etcd，并直接在容器内与 etcd 进行交互来管理配置。
 
----
-
 ## Docker Compose 配置
 以下是 `docker-compose.yml` 文件：
 
@@ -31,8 +29,6 @@ services:
 - **命令参数：**
   - `--advertise-client-urls` 和 `--listen-client-urls` 设置为允许容器内外访问。
 
----
-
 ## 部署步骤
 
 1. 将上述 `docker-compose.yml` 保存到工作目录。
@@ -49,8 +45,6 @@ services:
    docker ps
    ```
 
----
-
 ## 与 etcd 交互 (以hello-service为例)
 
 1. 在 `deploy/` 目录下使用 `docker-compose exec`直接执行命令：
@@ -66,8 +60,6 @@ services:
     - `utils/configx/config_store.go`: 存储配置到 etcd
     - `utils/configx/config_fetch.go`: 从 etcd 获取配置
 
----
-
 ## 验证
 
 1. 使用 `get` 命令确保键值对已存储到 etcd。
@@ -75,7 +67,5 @@ services:
 3. 测试动态更新：
    - 使用 `etcdctl` 修改键值。
    - 观察应用程序日志，确认其检测到配置更改并相应更新（参考utils/example/registry_client/main.go）。
-
----
 
 
