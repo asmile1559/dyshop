@@ -37,8 +37,15 @@ func main() {
 	key := "/services/hello"
 	value := "127.0.0.1:8080"
 
+	// 初始化 etcd 客户端
+	client, err := registryx.NewEtcdClient(endpoints)
+	if err != nil {
+		logrus.Fatalf("Failed to create etcd client: %v", err)
+	}
+	defer client.Close()
+
 	// 初始化 etcd 服务注册
-	etcdService, err := registryx.NewEtcdService(endpoints, serviceID, key, value, 10*time.Second)
+	etcdService, err := registryx.NewEtcdService(client, serviceID, key, value, 10*time.Second)
 	if err != nil {
 		logrus.Fatalf("Failed to create etcd service: %v", err)
 	}

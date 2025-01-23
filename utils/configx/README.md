@@ -53,7 +53,7 @@ services:
 
 ## 与 etcd 交互 (以hello-service为例)
 
-1. 使用 `docker-compose exec`直接执行命令：
+1. 在 `deploy/` 目录下使用 `docker-compose exec`直接执行命令：
 
    ```bash
    # 写入键值对

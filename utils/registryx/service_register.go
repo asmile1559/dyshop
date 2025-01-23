@@ -16,16 +16,8 @@ type EtcdService struct {
 	TTL       time.Duration
 }
 
-// 初始化 etcd 客户端
-func NewEtcdService(endpoints []string, serviceID, key, value string, ttl time.Duration) (*EtcdService, error) {
-	client, err := clientv3.New(clientv3.Config{
-		Endpoints:   endpoints,
-		DialTimeout: 5 * time.Second,
-	})
-	if err != nil {
-		return nil, err
-	}
-
+// 初始化 Etcd 服务实例
+func NewEtcdService(client *clientv3.Client, serviceID, key, value string, ttl time.Duration) (*EtcdService, error) {
 	return &EtcdService{
 		Client:    client,
 		ServiceID: serviceID,
