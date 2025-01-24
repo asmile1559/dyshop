@@ -14,7 +14,7 @@
   - [Framework](#framework-1)
   - [Auth](#auth)
 
-#  How to Run :thinking_face:
+#  How to Run 🤔
 ## Start a Microservice App
 `app`目录下的每一个目录都是一个微服务。微服务的运行方式都是相同的。
 1. 进入微服务目录（以auth服务为例）
