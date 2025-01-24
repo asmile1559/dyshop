@@ -17,7 +17,7 @@ message RegisterReq {
 }
 
 message RegisterResp {
-  int32 id = 1;
+  uint32 id = 1;
 }
 
 message LoginReq {
@@ -26,12 +26,12 @@ message LoginReq {
 }
 
 message  LoginResp {
-  int32 id = 1;
+  uint32 id = 1;
   string token = 2;
 }
 
 message LogoutReq {
-  int32 id = 1;
+  uint32 id = 1;
 }
 
 message LogoutResp {

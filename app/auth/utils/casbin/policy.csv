@@ -1,0 +1,23 @@
+p, admin, /*, .*, allow
+p, user, /product/*, GET, allow
+p, user, /product/*, POST, deny
+p, user, /cart/*, (GET)|(POST), allow
+p, user, /order/*, (GET)|(POST), allow
+p, user, /payment/*, (GET)|(POST), allow
+p, user, /user/*, (GET)|(POST), allow
+p, guest, /product/*, GET, allow
+p, guest, /cart/*, .*, deny
+p, guest, /order/*, .*, deny
+p, guest, /payment/*, .*, deny
+p, guest, /user/*, .*, deny
+p, merchant, /product/*, (GET)|(POST), allow
+p, merchant, /order/*, (GET), allow
+p, blacklist, /*, .*, deny
+p, .*, /*, .*, deny
+g, root, admin
+g, alice, admin
+g, bob, user
+g, candy, user
+g, candy, merchant
+g, david, guest
+g, eva, blacklist

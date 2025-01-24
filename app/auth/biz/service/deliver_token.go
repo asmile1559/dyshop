@@ -2,6 +2,7 @@ package service
 
 import (
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
+	"github.com/asmile1559/dyshop/utils/jwt"
 	"golang.org/x/net/context"
 )
 
@@ -14,7 +15,11 @@ func NewDeliverService(c context.Context) *DeliverService {
 }
 
 func (s *DeliverService) Run(req *pbauth.DeliverTokenReq) (*pbauth.DeliveryResp, error) {
-	// TODO: finish your business code...
-	//
-	return &pbauth.DeliveryResp{Token: "deliver token ok!"}, nil
+
+	token, err := jwt.GenerateJWT(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pbauth.DeliveryResp{Token: token}, nil
 }

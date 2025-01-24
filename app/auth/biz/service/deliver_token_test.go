@@ -13,14 +13,10 @@ import (
 //	}
 
 func TestDeliverTokenRun(t *testing.T) {
-	resp, err := NewDeliverService(context.Background()).Run(&pbauth.DeliverTokenReq{UserId: 123})
+	resp, err := NewDeliverService(context.Background()).Run(&pbauth.DeliverTokenReq{UserId: 1})
 	if err != nil {
 		t.Fail()
 		return
 	}
-	if resp.Token != "deliver token ok!" {
-		t.Fail()
-		return
-	}
-	t.Log(resp)
+	t.Log(resp.Token)
 }

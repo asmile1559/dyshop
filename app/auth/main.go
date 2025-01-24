@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/asmile1559/dyshop/app/auth/utils/casbin"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
 	"github.com/asmile1559/dyshop/utils/logx"
 	"github.com/sirupsen/logrus"
@@ -16,6 +17,10 @@ func main() {
 	}
 
 	initLog()
+
+	if err := initCasbin("conf/model.conf", "conf/policy.csv"); err != nil {
+		logrus.Fatal(err)
+	}
 
 	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
 	if err != nil {
@@ -38,4 +43,12 @@ func loadConfig() error {
 
 func initLog() {
 	logx.Init()
+}
+
+func initCasbin(modelConf, policyConf string) error {
+	err := casbin.InitEnforcer(modelConf, policyConf)
+	if err != nil {
+		return err
+	}
+	return nil
 }

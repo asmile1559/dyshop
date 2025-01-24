@@ -233,28 +233,16 @@ func (s *Greeter) SayHello(ctx context.Context, req *pbhello.HelloRequest) (*pbh
 9. 完善前端页面。
 
 # 进度
-## 搭建框架
-1. 前端路由
-    - [x] auth
-    - [x] cart
-    - [x] checkout
-    - [x] order
-    - [x] payment
-    - [x] product
-    - [x] user
-
-2. 后端各模块的rpc通信接口
-    - [x] auth
-    - [x] cart
-    - [x] checkout
-    - [x] order
-    - [x] payment
-    - [x] product
-    - [x] user
-
-3. 服务注册与发现？
-    - [ ] consul
-    - [ ] etcd
-
-4. 鉴权？
-    - [ ] jwt?
+- [x] 前端路由（提供的路由接口框架基本完成，缺少前端页面的配合）
+- [x] 后端各模块的rpc通信接口（提供的rpc通信接口已完成，位于handler.go文件）
+- [x] 服务注册与发现（基于etcd的服务注册模块已经完成） 
+  - [ ] <del>consul</del>
+  - [x] etcd
+- [x] 鉴权和认证
+  - [x] jwt
+  - [x] casbin
+  - [ ] <del>satoken<del>
+- [ ] 前端页面
+  - [ ] html
+  - [ ] js
+  - [ ] template

@@ -17,7 +17,7 @@ func main() {
 	}
 
 	initLog()
-	
+
 	cc, err := grpc.NewClient("localhost:"+viper.GetString("server.port"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logrus.Fatal(err)
@@ -28,8 +28,15 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-
 	fmt.Printf("resp: %v\n", resp)
+
+	resp1, _ := cli.VerifyTokenByRPC(context.TODO(), &pbauth.VerifyTokenReq{
+		Token:  resp.Token,
+		Method: "GET",
+		Uri:    "/test/access",
+	})
+
+	fmt.Printf("resp: %v\n", resp1)
 }
 
 func loadConfig() error {

@@ -10,7 +10,7 @@ service AuthService {
 }
 
 message DeliverTokenReq {
-  int32  user_id= 1;
+  uint32  user_id= 1;
 }
 
 message VerifyTokenReq {
