@@ -2,22 +2,14 @@ package registryx
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-func DiscoverService(endpoints []string, key string) ([]string, error) {
-	client, err := clientv3.New(clientv3.Config{
-		Endpoints:   endpoints,
-		DialTimeout: 5 * time.Second,
-	})
-	if err != nil {
-		return nil, err
-	}
-	defer client.Close()
-
+// 服务发现
+func DiscoverService(client *clientv3.Client, key string) ([]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -31,6 +23,6 @@ func DiscoverService(endpoints []string, key string) ([]string, error) {
 		services = append(services, string(kv.Value))
 	}
 
-	fmt.Printf("Discovered services for key %s: %v\n", key, services)
+	logrus.Infof("Discovered services for key %s: %v\n", key, services)
 	return services, nil
 }

@@ -115,6 +115,7 @@ curl -X POST \
       - frontend: 前端的proto文件
       - backend: 后端的proto文件
     - utils: 存放项目公用工具函数
+      - configx: 配置管理相关函数
       - db: 数据库函数
       - example: 工具函数的实例
       - filex: file相关函数

@@ -37,23 +37,30 @@ func main() {
 	key := "/services/hello"
 	value := "127.0.0.1:8080"
 
-	// 初始化 etcd 服务注册
-	etcdService, err := registryx.NewEtcdService(endpoints, serviceID, key, value, 10*time.Second)
+	// 初始化 etcd 客户端
+	client, err := registryx.NewEtcdClient(endpoints)
 	if err != nil {
-		logrus.Panic("Failed to create etcd service: %v", err)
+		logrus.Fatalf("Failed to create etcd client: %v", err)
+	}
+	defer client.Close()
+
+	// 初始化 etcd 服务注册
+	etcdService, err := registryx.NewEtcdService(client, serviceID, key, value, 10*time.Second)
+	if err != nil {
+		logrus.Fatalf("Failed to create etcd service: %v", err)
 	}
 
 	// 注册服务到 etcd
 	err = etcdService.Register()
 	if err != nil {
-		logrus.Panic("Failed to register service: %v", err)
+		logrus.Fatalf("Failed to register service: %v", err)
 	}
 	defer etcdService.DeRegister()
 
 	// 监听端口
 	listen, err := net.Listen("tcp", ":8080")
 	if err != nil {
-		logrus.Panic("Failed to listen: %v", err)
+		logrus.Fatalf("Failed to listen: %v", err)
 	}
 	// 创建gprc服务器
 	grpcServer := grpc.NewServer(
@@ -65,6 +72,6 @@ func main() {
 	logrus.Debug("hell server running")
 	// 运行
 	if err := grpcServer.Serve(listen); err != nil {
-		logrus.Panic("Failed to serve: %v", err)
+		logrus.Fatalf("Failed to serve: %v", err)
 	}
 }
