@@ -26,7 +26,7 @@ var DefaultHook = func() {
 	logx.Init(_level, path)
 }
 
-// 执行传入 hooks (忽略默认), 置空则执行 default hooks
+// 执行传入 hooks
 func Init(hooks ...func()) {
 	for _, f := range hooks {
 		f()
