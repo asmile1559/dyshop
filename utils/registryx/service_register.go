@@ -2,6 +2,7 @@ package registryx
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -10,24 +11,29 @@ import (
 
 type EtcdService struct {
 	Client    *clientv3.Client
-	ServiceID string
-	Key       string
-	Value     string
+	ServiceID string // 实例 ID, 比如 "hello-service-1"
+	Prefix    string // 比如 "/services/hello"
+	Address   string // 比如 "127.0.0.1:8080"
 	TTL       time.Duration
+	ConnCount int64
 }
 
 // 初始化 Etcd 服务实例
-func NewEtcdService(client *clientv3.Client, serviceID, key, value string, ttl time.Duration) (*EtcdService, error) {
+func NewEtcdService(client *clientv3.Client, serviceID, prefix, address string, ttl time.Duration) (*EtcdService, error) {
 	return &EtcdService{
 		Client:    client,
 		ServiceID: serviceID,
-		Key:       key,
-		Value:     value,
+		Prefix:    prefix,
+		Address:   address,
 		TTL:       ttl,
+		ConnCount: 0,
 	}, nil
 }
 
 // 注册服务
+//
+//	Key:   /services/hello/hello-service-1
+//	Value: 127.0.0.1:8080
 func (s *EtcdService) Register() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -39,10 +45,14 @@ func (s *EtcdService) Register() error {
 	}
 
 	// 注册服务并绑定租约
-	_, err = s.Client.Put(ctx, s.Key, s.Value, clientv3.WithLease(lease.ID))
+	key := fmt.Sprintf("%s/%s", s.Prefix, s.ServiceID) // /services/hello/hello-service-1
+	_, err = s.Client.Put(ctx, key, s.Address, clientv3.WithLease(lease.ID))
 	if err != nil {
 		return err
 	}
+
+	// 定期上报连接数
+	go s.reportConnectionCount()
 
 	// 续租协程
 	go func() {
@@ -56,16 +66,44 @@ func (s *EtcdService) Register() error {
 		}
 	}()
 
-	logrus.Infof("Service %s registered with key: %s\n", s.ServiceID, s.Key)
+	logrus.Infof("Service %s registered with key=%s, address=%s", s.ServiceID, key, s.Address)
 	return nil
 }
 
 // 注销服务
 func (s *EtcdService) DeRegister() error {
-	_, err := s.Client.Delete(context.Background(), s.Key)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	key := fmt.Sprintf("%s/%s", s.Prefix, s.ServiceID)
+	_, err := s.Client.Delete(ctx, key)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("Service %s deregistered\n", s.ServiceID)
+	logrus.Infof("Service %s deregistered, key=%s", s.ServiceID, key)
 	return nil
+}
+
+// 更新连接数到 etcd
+func (s *EtcdService) UpdateConnectionCount(connCount int64) {
+	s.ConnCount = connCount
+}
+
+// 定期上报连接数 => /services/hello/<serviceID>/connCount
+func (s *EtcdService) reportConnectionCount() {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			instanceConnKey := fmt.Sprintf("%s/%s/connCount", s.Prefix, s.ServiceID)
+			_, err := s.Client.Put(ctx, instanceConnKey, fmt.Sprintf("%d", s.ConnCount))
+			if err != nil {
+				logrus.Panicf("Failed to update connection count for %s: %v", s.ServiceID, err)
+			}
+		}()
+	}
 }
