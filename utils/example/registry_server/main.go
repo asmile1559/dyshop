@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/registryx"
 	"github.com/spf13/viper"
 
@@ -36,15 +36,10 @@ func (s *server) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloR
 }
 
 func init() {
-	logx.Init()
+	hookx.Init(hookx.DefaultHook)
 }
 
 func main() {
-	// 加载配置
-	if err := loadConfig(); err != nil {
-		logrus.Fatalf("Failed to load config: %v", err)
-	}
-
 	// 获取 Etcd 配置
 	endpoints := viper.GetStringSlice("etcd.endpoints")
 	prefix := viper.GetString("etcd.prefix")
@@ -67,11 +62,4 @@ func main() {
 			}
 		},
 	)
-}
-
-func loadConfig() error {
-	viper.SetConfigName("config") // 配置文件名，不需要扩展名
-	viper.SetConfigType("yaml")   // 配置文件类型
-	viper.AddConfigPath("conf")   // 配置文件路径
-	return viper.ReadInConfig()   // 读取配置文件
 }

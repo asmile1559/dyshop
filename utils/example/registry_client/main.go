@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/registryx"
 
 	pb "github.com/asmile1559/dyshop/pb/backend/hello"
@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	logx.Init()
+	hookx.Init(hookx.DefaultHook)
 }
 
 func main() {
