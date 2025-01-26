@@ -1,2 +1,8 @@
 server:
   port: 11166
+
+etcd:
+  endpoints:
+    - "127.0.0.1:2379"
+  prefix: "/services/auth"
+  serviceID: "auth-service-1"
