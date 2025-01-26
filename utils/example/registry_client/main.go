@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/asmile1559/dyshop/utils/balancerx"
 	"github.com/asmile1559/dyshop/utils/configx"
 	"github.com/asmile1559/dyshop/utils/logx"
 	"github.com/asmile1559/dyshop/utils/registryx"
@@ -21,7 +22,7 @@ func init() {
 func main() {
 	// etcd 配置
 	endpoints := []string{"127.0.0.1:2379"}
-	key := "/services/hello"
+	prefix := "/services/hello"
 
 	// 初始化 etcd 客户端
 	client, err := registryx.NewEtcdClient(endpoints)
@@ -31,15 +32,28 @@ func main() {
 	defer client.Close()
 
 	// 从 etcd 中发现服务
-	services, err := registryx.DiscoverService(client, key)
+	services, err := registryx.DiscoverService(client, prefix)
 	if err != nil {
 		logrus.Fatalf("Failed to discover service: %v", err)
 	}
 	if len(services) == 0 {
-		logrus.Fatalf("No services found for key: %s", key)
+		logrus.Fatalf("No services found for key: %s", prefix)
 	}
-	serviceAddress := services[0] // 选择第一个服务地址
-	logrus.Infof("Discovered gRPC service: %s", serviceAddress)
+
+	// 初始化负载均衡策略
+
+	// balancer := balancerx.NewRandomBalancer() // 随机策略
+
+	// if err := balancerx.InitRoundRobinKey(client, "/services/hello/round_robin_index"); err != nil {
+	// 	logrus.Fatalf("Failed to init round robin key: %v", err)
+	// }
+	// balancer := balancerx.NewRoundRobinBalancer(client, "/services/hello/round_robin_index") // 轮询策略
+
+	balancer := balancerx.NewLeastConnBalancer(client, prefix) // 最小连接数策略
+
+	// 使用负载均衡选择一个服务
+	serviceAddress := balancer.Select(services)
+	logrus.Infof("Selected service via balancer: %s", serviceAddress)
 
 	// 获取初始 name 配置
 	name, err := configx.GetConfig(client, "/config/hello-service/name")

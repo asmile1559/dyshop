@@ -37,7 +37,7 @@ func (s *ListOrdersService) Run(req *pborder.ListOrderReq) (*pborder.ListOrderRe
 					City:          "Shenyang",
 					State:         "Liaoning",
 					Country:       "China",
-					ZipCode:       123456,
+					ZipCode:       "123456",
 				},
 				Email:     "123@abc.com",
 				CreatedAt: 1312312,
