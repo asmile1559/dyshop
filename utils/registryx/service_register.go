@@ -58,7 +58,7 @@ func (s *EtcdService) Register() error {
 	go func() {
 		ch, kaErr := s.Client.KeepAlive(context.Background(), lease.ID)
 		if kaErr != nil {
-			logrus.Panicf("KeepAlive error: %v\n", kaErr)
+			logrus.WithError(kaErr).Panic("KeepAlive error")
 			return
 		}
 		for range ch {
@@ -66,7 +66,11 @@ func (s *EtcdService) Register() error {
 		}
 	}()
 
-	logrus.Infof("Service %s registered with key=%s, address=%s", s.ServiceID, key, s.Address)
+	logrus.WithFields(logrus.Fields{
+		"id":      s.ServiceID,
+		"key":     key,
+		"address": s.Address,
+	}).Info("Service registered")
 	return nil
 }
 
@@ -80,7 +84,10 @@ func (s *EtcdService) DeRegister() error {
 	if err != nil {
 		return err
 	}
-	logrus.Infof("Service %s deregistered, key=%s", s.ServiceID, key)
+	logrus.WithFields(logrus.Fields{
+		"id":  s.ServiceID,
+		"key": key,
+	}).Info("Service deregistered")
 	return nil
 }
 
@@ -102,7 +109,7 @@ func (s *EtcdService) reportConnectionCount() {
 			instanceConnKey := fmt.Sprintf("%s/%s/connCount", s.Prefix, s.ServiceID)
 			_, err := s.Client.Put(ctx, instanceConnKey, fmt.Sprintf("%d", s.ConnCount))
 			if err != nil {
-				logrus.Panicf("Failed to update connection count for %s: %v", s.ServiceID, err)
+				logrus.WithError(err).WithField("id", s.ServiceID).Panic("Failed to update connection count")
 			}
 		}()
 	}

@@ -11,7 +11,7 @@ import (
 
 // 服务发现, 返回 map[instanceID]address
 // 比如：{ "hello-service-1": "127.0.0.1:8080", "hello-service-2": "127.0.0.1:8081" }
-func DiscoverService(client *clientv3.Client, prefix string) (map[string]string, error) {
+func discoverService(client *clientv3.Client, prefix string) (map[string]string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

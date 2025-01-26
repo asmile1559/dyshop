@@ -34,13 +34,10 @@ func main() {
 	// 远程调用
 	for range time.Tick(time.Second) {
 		name := "world"
-		if err != nil {
-			logrus.Warnf("Failed to get name config: %v", err)
-		}
 		resp, err := client.SayHello(context.Background(), &pb.HelloRequest{Name: name})
 		if err != nil {
-			logrus.Panic(err)
+			logrus.Fatal(err)
 		}
-		logrus.Debugf("received grpc resp: %+v", resp.String())
+		logrus.WithField("msg", resp.String()).Debug("received grpc resp")
 	}
 }
