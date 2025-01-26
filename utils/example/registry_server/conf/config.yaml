@@ -1,0 +1,12 @@
+etcd:
+  endpoints:
+    - "127.0.0.1:2379"       # Etcd 节点地址
+  prefix: "/services/hello"  # 服务注册前缀
+
+services:
+  - id: "hello-service-1"     # 服务实例ID
+    address: "127.0.0.1:8080" # 服务实例地址
+  - id: "hello-service-2"
+    address: "127.0.0.1:8081"
+  - id: "hello-service-3"
+    address: "127.0.0.1:8082"

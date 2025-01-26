@@ -2,7 +2,6 @@ package registryx
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -42,20 +41,4 @@ func DiscoverService(client *clientv3.Client, prefix string) (map[string]string,
 
 	logrus.Infof("Discovered services under %s: %v\n", prefix, services)
 	return services, nil
-}
-
-// 读取 /services/hello/<instanceID>/connCount 的值
-func GetConnectionCount(client *clientv3.Client, prefix, instanceID string) int {
-	connKey := fmt.Sprintf("%s/%s/connCount", prefix, instanceID)
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-
-	resp, err := client.Get(ctx, connKey)
-	if err != nil || len(resp.Kvs) == 0 {
-		return 0
-	}
-
-	var connCount int
-	fmt.Sscanf(string(resp.Kvs[0].Value), "%d", &connCount)
-	return connCount
 }
