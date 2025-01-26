@@ -13,6 +13,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+type server struct {
+	AuthServiceServer
+	instanceID  string
+	etcdService *registryx.EtcdService
+	connCount   int64
+}
+
 func main() {
 
 	if err := loadConfig(); err != nil {
@@ -52,7 +59,11 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	pbauth.RegisterAuthServiceServer(s, &AuthServiceServer{})
+	pbauth.RegisterAuthServiceServer(s, &server{
+		instanceID:  serviceID,
+		etcdService: etcdService,
+		connCount:   0,
+	})
 	if err = s.Serve(cc); err != nil {
 		logrus.Fatal(err)
 	}
