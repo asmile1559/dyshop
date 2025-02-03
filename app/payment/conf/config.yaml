@@ -1,2 +1,5 @@
 server:
   port: 17166
+
+database:
+  dsn: "djj:et123456@tcp(127.0.0.1:3306)/payment?charset=utf8mb4&parseTime=True&loc=Local"
