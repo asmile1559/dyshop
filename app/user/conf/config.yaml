@@ -4,11 +4,11 @@ server:
 
 database:
   driver: mysql
-  host: localhost
+  host: "127.0.0.1"
   port: 3306
   username: root
-  password: root
-  dbname: user
+  password: 123456
+  dbname: dyshop
   max_idle_conns: 10
   max_open_conns: 100
   conn_max_lifetime: 3600
