@@ -14,6 +14,7 @@ func NewSearchProductService(c context.Context) *SearchProductService {
 }
 
 func (s *SearchProductService) Run(req *pbproduct.SearchProductsReq) (*pbproduct.SearchProductsResp, error) {
+
 	// TODO: finish your business code...
 	//
 	return &pbproduct.SearchProductsResp{
