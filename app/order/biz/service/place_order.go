@@ -64,6 +64,7 @@ func (s *PlaceOrderService) Run(req *pborder.PlaceOrderReq) (*pborder.PlaceOrder
 		OrderItems:   orderItems,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
+		PaidAt:       time.Now(),
 	}
 
 	err := s.DB.Transaction(func(tx *gorm.DB) error {

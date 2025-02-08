@@ -32,9 +32,14 @@ func (s *MarkOrderPaidService) Run(req *pborder.MarkOrderPaidReq) (*pborder.Mark
 		return nil, fmt.Errorf("failed to fetch order: %v", err)
 	}
 
-	// 更新订单状态
-	order.Paid = true
-	order.PaidAt = time.Now()
+	// 检查订单是否已被支付
+	if order.Paid {
+		// 如果订单已经被支付，则不需要再次更新 paid_at 字段
+	} else {
+		// 更新订单状态
+		order.Paid = true
+		order.PaidAt = time.Now()
+	}
 
 	if err := s.DB.Save(&order).Error; err != nil {
 		logrus.Error("Failed to update order status:", err)
