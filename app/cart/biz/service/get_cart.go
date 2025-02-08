@@ -1,8 +1,10 @@
 package service
 
 import (
+	"context"
+
+	"github.com/asmile1559/dyshop/app/cart/biz/dal"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
-	"golang.org/x/net/context"
 )
 
 type GetCartService struct {
@@ -14,12 +16,22 @@ func NewGetCartService(c context.Context) *GetCartService {
 }
 
 func (s *GetCartService) Run(req *pbcart.GetCartReq) (*pbcart.GetCartResp, error) {
-	// TODO: finish your business code...
-	//
-	return &pbcart.GetCartResp{Cart: &pbcart.Cart{
-		UserId: 1,
-		Items: []*pbcart.CartItem{
-			{ProductId: 1, Quantity: 100},
+	cart := dal.GetCartByUserID(req.UserId)
+
+	// 转换到 proto 定义的 CartItem
+	items := make([]*pbcart.CartItem, 0, len(cart.Items))
+	for _, i := range cart.Items {
+		items = append(items, &pbcart.CartItem{
+			ProductId: i.ProductID,
+			Quantity:  i.Quantity,
+		})
+	}
+
+	// 返回给客户端
+	return &pbcart.GetCartResp{
+		Cart: &pbcart.Cart{
+			UserId: cart.UserID,
+			Items:  items,
 		},
-	}}, nil
+	}, nil
 }
