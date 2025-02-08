@@ -3,14 +3,12 @@ package service
 import (
 	"github.com/asmile1559/dyshop/app/product/biz/model"
 	"github.com/asmile1559/dyshop/app/product/dao"
-	pbproduct "
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	"google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/asmile1559/dyshop/app/product/dao"
+	"gorm.io/gorm"
 )
 
 type GetProductService struct {
