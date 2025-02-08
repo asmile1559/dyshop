@@ -6,7 +6,6 @@ import (
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	pborder "github.com/asmile1559/dyshop/pb/backend/order"
 	"github.com/asmile1559/dyshop/utils/hookx"
-	"github.com/asmile1559/dyshop/utils/logx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
@@ -25,14 +24,9 @@ func main() {
 	}
 
 	cli := pborder.NewOrderServiceClient(cc)
-	/*resp, err := cli.ListOrder(context.TODO(), &pborder.ListOrderReq{UserId: 1})
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	fmt.Printf("resp: %v\n", resp)*/
 
 	// 测试 ListOrder
-	resp, err := cli.ListOrder(context.TODO(), &pborder.ListOrderReq{UserId: 1})
+	resp, err := cli.ListOrder(context.TODO(), &pborder.ListOrderReq{UserId: 123})
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -53,6 +47,10 @@ func main() {
 			Cost: 49.98,
 		},
 		// 可以添加更多的OrderItem实例...
+		{
+			Item: &pbcart.CartItem{ProductId: 102, Quantity: 12},
+			Cost: 11.12,
+		},
 	}
 	placeOrderReq := &pborder.PlaceOrderReq{
 		UserId:       123,   // 假设用户ID是123
@@ -69,22 +67,11 @@ func main() {
 
 	// 测试 MarkOrderPaid
 	markOrderPaidResp, err := cli.MarkOrderPaid(context.TODO(), &pborder.MarkOrderPaidReq{
-		UserId:  1,     // 示例用户ID
-		OrderId: "123", // 示例订单ID
+		UserId:  123,                   // 示例用户ID
+		OrderId: "1739000420646373757", // 示例订单ID
 	})
 	if err != nil {
 		logrus.Fatal(err)
 	}
 	fmt.Printf("MarkOrderPaid resp: %v\n", markOrderPaidResp)
-}
-
-func loadConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("conf")
-	return viper.ReadInConfig()
-}
-
-func initLog() {
-	logx.Init()
 }

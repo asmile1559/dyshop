@@ -1,4 +1,4 @@
 server:
   port: 15166
 database:
-  dsn: "root:123@tcp(127.0.0.1:3306)/order?charset=utf8mb4&parseTime=True&loc=Local"
+  dsn: "root:123@tcp(127.0.0.1:3306)/orders_db?charset=utf8mb4&parseTime=True&loc=Local"
