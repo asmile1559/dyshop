@@ -14,16 +14,16 @@ import (
 // 启动多个服务实例并注册到 Etcd
 func StartEtcdServices[T any](
 	endpoints []string,
-	services []any,
+	services []interface{},
 	prefix string,
 	registerFunc func(grpc.ServiceRegistrar, T),
 	serverFactory func(instanceID string, etcdService *EtcdService) T,
 ) {
 	var wg sync.WaitGroup
 	for _, raw := range services {
-		serviceMap := raw.(map[string]string)
-		id := serviceMap["id"]
-		address := serviceMap["address"]
+		serviceMap := raw.(map[string]interface{})
+		id := serviceMap["id"].(string)
+		address := serviceMap["address"].(string)
 
 		wg.Add(1)
 		go func(id, addr string) {
