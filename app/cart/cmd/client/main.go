@@ -51,7 +51,7 @@ func main() {
 	}
 	logrus.Infof("Added item to user %d cart", userID)
 
-	// 3. 再次获取购物车查
+	// 3. 再次获取购物车
 	resp, err := client.GetCart(context.Background(), &pbcart.GetCartReq{UserId: userID})
 	if err != nil {
 		logrus.Fatalf("GetCart err: %v", err)

@@ -2,8 +2,6 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Cart struct {
@@ -11,8 +9,7 @@ type Cart struct {
 	UserId    uint64 `gorm:"index"`      // 用户ID
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`             // 支持软删除
-	CartItems []CartItem     `gorm:"foreignKey:CartId"` // 一对多关系：Cart.id -> CartItem.cart_id
+	CartItems []CartItem `gorm:"foreignKey:CartId"` // 一对多关系：Cart.id -> CartItem.cart_id
 }
 
 type CartItem struct {
