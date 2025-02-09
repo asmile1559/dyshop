@@ -4,58 +4,85 @@ import (
 	"context"
 	"testing"
 
-	"github.com/asmile1559/dyshop/app/cart/biz/dal"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 )
 
-// TestAddItemService 测试添加商品到购物车功能
 func TestAddItemService(t *testing.T) {
-	userID := uint32(9999)
-
-	// 开始前先清空，避免受其他测试影响
-	dal.ClearCart(userID)
-
 	ctx := context.Background()
-	srv := NewAddItemService(ctx)
+	userID := uint32(1001)
 
-	// 1) 测试给空购物车添加一条商品
-	req1 := &pbcart.AddItemReq{
+	// 先清空用户的购物车，确保不受其他测试干扰
+	_, _ = NewEmptyCartService(ctx).Run(&pbcart.EmptyCartReq{
+		UserId: userID,
+	})
+
+	addSrv := NewAddItemService(ctx)
+	getSrv := NewGetCartService(ctx)
+
+	// 1) 第一次添加商品
+	_, err := addSrv.Run(&pbcart.AddItemReq{
 		UserId: userID,
 		Item: &pbcart.CartItem{
 			ProductId: 123,
 			Quantity:  5,
 		},
-	}
-	if _, err := srv.Run(req1); err != nil {
-		t.Fatalf("AddItemService.Run() error: %v", err)
-	}
-
-	cart := dal.GetCartByUserID(userID)
-	if len(cart.Items) != 1 {
-		t.Fatalf("expected 1 item in cart, got %d", len(cart.Items))
-	}
-	if cart.Items[0].ProductID != 123 || cart.Items[0].Quantity != 5 {
-		t.Fatalf("expected (productID=123, quantity=5), got (productID=%d, quantity=%d)",
-			cart.Items[0].ProductID, cart.Items[0].Quantity)
+	})
+	if err != nil {
+		t.Fatalf("AddItemService Run error: %v", err)
 	}
 
-	// 2) 测试再次添加同一个商品，数量应累加
-	req2 := &pbcart.AddItemReq{
+	resp1, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
+	if err != nil {
+		t.Fatalf("GetCartService Run error after add 123: %v", err)
+	}
+	if len(resp1.Cart.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(resp1.Cart.Items))
+	}
+	if resp1.Cart.Items[0].ProductId != 123 || resp1.Cart.Items[0].Quantity != 5 {
+		t.Fatalf("expected product=123, quantity=5, got product=%d, quantity=%d",
+			resp1.Cart.Items[0].ProductId, resp1.Cart.Items[0].Quantity)
+	}
+
+	// 2) 再添加相同的商品
+	_, err = addSrv.Run(&pbcart.AddItemReq{
 		UserId: userID,
 		Item: &pbcart.CartItem{
 			ProductId: 123,
 			Quantity:  3,
 		},
-	}
-	if _, err := srv.Run(req2); err != nil {
-		t.Fatalf("AddItemService.Run() error on second add: %v", err)
+	})
+	if err != nil {
+		t.Fatalf("AddItemService second run error: %v", err)
 	}
 
-	cart2 := dal.GetCartByUserID(userID)
-	if len(cart2.Items) != 1 {
-		t.Fatalf("expected still 1 item in cart, got %d", len(cart2.Items))
+	resp2, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
+	if err != nil {
+		t.Fatalf("GetCartService Run error after second add: %v", err)
 	}
-	if cart2.Items[0].Quantity != 8 {
-		t.Fatalf("expected quantity to be 8 (5+3), got %d", cart2.Items[0].Quantity)
+	if len(resp2.Cart.Items) != 1 {
+		t.Fatalf("expected still 1 item, got %d", len(resp2.Cart.Items))
+	}
+	if resp2.Cart.Items[0].Quantity != 8 {
+		t.Fatalf("expected quantity=8 (5+3), got %d", resp2.Cart.Items[0].Quantity)
+	}
+
+	// 3) 再添加另一个商品
+	_, err = addSrv.Run(&pbcart.AddItemReq{
+		UserId: userID,
+		Item: &pbcart.CartItem{
+			ProductId: 999,
+			Quantity:  2,
+		},
+	})
+	if err != nil {
+		t.Fatalf("AddItemService third run error: %v", err)
+	}
+
+	resp3, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
+	if err != nil {
+		t.Fatalf("GetCartService Run error after third add: %v", err)
+	}
+	if len(resp3.Cart.Items) != 2 {
+		t.Fatalf("expected 2 items, got %d", len(resp3.Cart.Items))
 	}
 }

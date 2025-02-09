@@ -4,54 +4,51 @@ import (
 	"context"
 	"testing"
 
-	"github.com/asmile1559/dyshop/app/cart/biz/dal"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 )
 
-// TestGetCartService 测试获取购物车功能
 func TestGetCartService(t *testing.T) {
-	userID := uint32(6666)
+	ctx := context.Background()
+	userID := uint32(1003)
 
-	// 开始前先清空，避免受其他测试影响
-	dal.ClearCart(userID)
+	emptySrv := NewEmptyCartService(ctx)
+	addSrv := NewAddItemService(ctx)
+	getSrv := NewGetCartService(ctx)
 
-	// 1) 先获取一个空购物车
-	getSrv := NewGetCartService(context.Background())
-	resp, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
+	// 先清空，确保没有残留
+	_, _ = emptySrv.Run(&pbcart.EmptyCartReq{UserId: userID})
+
+	// 第一次获取，应该为空
+	resp1, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
 	if err != nil {
-		t.Fatalf("GetCartService.Run() error: %v", err)
+		t.Fatalf("GetCart error: %v", err)
 	}
-	if resp.Cart == nil {
-		t.Fatal("GetCartService.Run() returned nil cart")
-	}
-	if resp.Cart.UserId != userID {
-		t.Fatalf("expected cart.UserId = %d, got %d", userID, resp.Cart.UserId)
-	}
-	if len(resp.Cart.Items) != 0 {
-		t.Fatalf("expected empty cart, got %d item(s)", len(resp.Cart.Items))
+	if len(resp1.Cart.Items) != 0 {
+		t.Fatalf("expected empty cart, got %d items", len(resp1.Cart.Items))
 	}
 
-	// 2) 添加一条商品后，再获取
-	addSrv := NewAddItemService(context.Background())
-	_, _ = addSrv.Run(&pbcart.AddItemReq{
+	// 添加一条商品
+	_, err = addSrv.Run(&pbcart.AddItemReq{
 		UserId: userID,
 		Item: &pbcart.CartItem{
-			ProductId: 101,
-			Quantity:  1,
+			ProductId: 999,
+			Quantity:  10,
 		},
 	})
+	if err != nil {
+		t.Fatalf("AddItem error: %v", err)
+	}
 
+	// 再次获取，应该有1条商品
 	resp2, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
 	if err != nil {
-		t.Fatalf("GetCartService.Run() second call error: %v", err)
+		t.Fatalf("GetCart error: %v", err)
 	}
 	if len(resp2.Cart.Items) != 1 {
 		t.Fatalf("expected 1 item, got %d", len(resp2.Cart.Items))
 	}
-	if resp2.Cart.Items[0].ProductId != 101 || resp2.Cart.Items[0].Quantity != 1 {
-		t.Fatalf(
-			"expected {productId=101, quantity=1}, got {productId=%d, quantity=%d}",
-			resp2.Cart.Items[0].ProductId, resp2.Cart.Items[0].Quantity,
-		)
+	if resp2.Cart.Items[0].ProductId != 999 || resp2.Cart.Items[0].Quantity != 10 {
+		t.Fatalf("expected (productId=999, quantity=10), got (productId=%d, quantity=%d)",
+			resp2.Cart.Items[0].ProductId, resp2.Cart.Items[0].Quantity)
 	}
 }

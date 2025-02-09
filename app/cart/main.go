@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/asmile1559/dyshop/app/cart/biz/dal"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/registryx"
@@ -83,6 +84,13 @@ func init() {
 }
 
 func main() {
+	// 初始化数据库
+	dsn := viper.GetString("mysql.dsn")
+	if err := dal.InitDB(dsn); err != nil {
+		logrus.Fatalf("failed to init db: %v", err)
+	}
+	logrus.Info("DB initialized successfully.")
+
 	endpoints := viper.GetStringSlice("etcd.endpoints")
 	prefix := viper.GetString("etcd.prefix")
 	services := viper.Get("services").([]interface{})

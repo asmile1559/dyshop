@@ -4,49 +4,57 @@ import (
 	"context"
 	"testing"
 
-	"github.com/asmile1559/dyshop/app/cart/biz/dal"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 )
 
-// TestEmptyCartService 测试清空购物车功能
 func TestEmptyCartService(t *testing.T) {
-	userID := uint32(7777)
+	ctx := context.Background()
+	userID := uint32(1002)
 
-	// 开始前先清空，避免受其他测试影响
-	dal.ClearCart(userID)
+	emptySrv := NewEmptyCartService(ctx)
+	addSrv := NewAddItemService(ctx)
+	getSrv := NewGetCartService(ctx)
 
-	// 先给购物车添加几条商品
-	addSrv := NewAddItemService(context.Background())
-	_, _ = addSrv.Run(&pbcart.AddItemReq{
+	// 先清空保证干净
+	_, _ = emptySrv.Run(&pbcart.EmptyCartReq{UserId: userID})
+
+	// 添加两条商品
+	_, err := addSrv.Run(&pbcart.AddItemReq{
 		UserId: userID,
-		Item: &pbcart.CartItem{
-			ProductId: 111,
-			Quantity:  2,
-		},
+		Item:   &pbcart.CartItem{ProductId: 100, Quantity: 1},
 	})
-	_, _ = addSrv.Run(&pbcart.AddItemReq{
+	if err != nil {
+		t.Fatalf("AddItem error: %v", err)
+	}
+	_, err = addSrv.Run(&pbcart.AddItemReq{
 		UserId: userID,
-		Item: &pbcart.CartItem{
-			ProductId: 222,
-			Quantity:  3,
-		},
+		Item:   &pbcart.CartItem{ProductId: 200, Quantity: 2},
 	})
+	if err != nil {
+		t.Fatalf("AddItem error: %v", err)
+	}
 
-	// 此时确认购物车不为空
-	c := dal.GetCartByUserID(userID)
-	if len(c.Items) == 0 {
-		t.Fatal("expected cart to have items, but it is empty")
+	// 验证现在购物车有2条
+	beforeResp, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
+	if err != nil {
+		t.Fatalf("GetCart error before empty: %v", err)
+	}
+	if len(beforeResp.Cart.Items) != 2 {
+		t.Fatalf("expected 2 items, got %d", len(beforeResp.Cart.Items))
 	}
 
 	// 调用 EmptyCart
-	srv := NewEmptyCartService(context.Background())
-	if _, err := srv.Run(&pbcart.EmptyCartReq{UserId: userID}); err != nil {
-		t.Fatalf("EmptyCartService.Run() error: %v", err)
+	_, err = emptySrv.Run(&pbcart.EmptyCartReq{UserId: userID})
+	if err != nil {
+		t.Fatalf("EmptyCart error: %v", err)
 	}
 
-	// 再次检查购物车，应该已清空
-	c2 := dal.GetCartByUserID(userID)
-	if len(c2.Items) != 0 {
-		t.Fatalf("expected empty cart, got %v", c2.Items)
+	// 再次检查，应该变空
+	afterResp, err := getSrv.Run(&pbcart.GetCartReq{UserId: userID})
+	if err != nil {
+		t.Fatalf("GetCart error after empty: %v", err)
+	}
+	if len(afterResp.Cart.Items) != 0 {
+		t.Fatalf("expected 0 items, got %d", len(afterResp.Cart.Items))
 	}
 }

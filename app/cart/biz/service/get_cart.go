@@ -16,22 +16,33 @@ func NewGetCartService(c context.Context) *GetCartService {
 }
 
 func (s *GetCartService) Run(req *pbcart.GetCartReq) (*pbcart.GetCartResp, error) {
-	cart := dal.GetCartByUserID(req.UserId)
+	cart, err := dal.GetCartByUserID(uint64(req.UserId))
+	if err != nil {
+		return nil, err
+	}
+	if cart == nil {
+		// 用户还没有 cart，返回空
+		return &pbcart.GetCartResp{
+			Cart: &pbcart.Cart{
+				UserId: req.UserId,
+				Items:  []*pbcart.CartItem{},
+			},
+		}, nil
+	}
 
-	// 转换到 proto 定义的 CartItem
-	items := make([]*pbcart.CartItem, 0, len(cart.Items))
-	for _, i := range cart.Items {
-		items = append(items, &pbcart.CartItem{
-			ProductId: i.ProductID,
-			Quantity:  i.Quantity,
+	// 将 CartItems 转成 protobuf 里的 repeated CartItem
+	pbItems := make([]*pbcart.CartItem, 0, len(cart.CartItems))
+	for _, it := range cart.CartItems {
+		pbItems = append(pbItems, &pbcart.CartItem{
+			ProductId: uint32(it.ProductId),
+			Quantity:  int32(it.Quantity),
 		})
 	}
 
-	// 返回给客户端
 	return &pbcart.GetCartResp{
 		Cart: &pbcart.Cart{
-			UserId: cart.UserID,
-			Items:  items,
+			UserId: uint32(cart.UserId),
+			Items:  pbItems,
 		},
 	}, nil
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"time"
 
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	"github.com/asmile1559/dyshop/utils/hookx"
@@ -16,11 +15,6 @@ func init() {
 }
 
 func main() {
-	viper.SetConfigFile("conf/config.yaml")
-	if err := viper.ReadInConfig(); err != nil {
-		logrus.Fatalf("failed to read config: %v", err)
-	}
-
 	endpoints := viper.GetStringSlice("etcd.endpoints")
 	prefix := viper.GetString("etcd.prefix")
 
@@ -57,13 +51,10 @@ func main() {
 	}
 	logrus.Infof("Added item to user %d cart", userID)
 
-	// 3. 再次获取购物车看看
+	// 3. 再次获取购物车查
 	resp, err := client.GetCart(context.Background(), &pbcart.GetCartReq{UserId: userID})
 	if err != nil {
 		logrus.Fatalf("GetCart err: %v", err)
 	}
 	logrus.Infof("Cart for user %d => %v", userID, resp.Cart)
-
-	// 让程序稍作等待方便查看日志
-	time.Sleep(2 * time.Second)
 }

@@ -16,8 +16,9 @@ func NewEmptyCartService(c context.Context) *EmptyCartService {
 }
 
 func (s *EmptyCartService) Run(req *pbcart.EmptyCartReq) (*pbcart.EmptyCartResp, error) {
-	// 清空购物车
-	dal.ClearCart(req.UserId)
-
+	err := dal.ClearCart(uint64(req.UserId))
+	if err != nil {
+		return nil, err
+	}
 	return &pbcart.EmptyCartResp{}, nil
 }
