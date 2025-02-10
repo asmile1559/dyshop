@@ -1,152 +1,190 @@
-package service
+package service_test
 
 import (
-	"context"
-	"errors"
-	"testing"
+    "context"
+    
+    "testing"
 
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
-
-	pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
-	"github.com/asmile1559/dyshop/app/payment/biz/dal"
-	"github.com/asmile1559/dyshop/app/payment/biz/model"
-	"github.com/asmile1559/dyshop/app/payment/mocks"
+    "github.com/asmile1559/dyshop/app/payment/biz/dal"
+    pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
+    "github.com/asmile1559/dyshop/app/payment/biz/service"
+    "github.com/stretchr/testify/assert"
+    "gorm.io/driver/mysql"
+    "gorm.io/gorm"
+    "github.com/DATA-DOG/go-sqlmock"
 )
 
-func TestChargeRun(t *testing.T) {
-	// 初始化上下文
-	ctx := context.Background()
+// 测试 validateRequest 方法
+func TestValidateRequest(t *testing.T) {
+    // 使用 sqlmock 模拟数据库连接
+    mockDB, mock, err := sqlmock.New()
+    assert.NoError(t, err)
+    defer mockDB.Close()
 
-	// 创建 gomock 控制器
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+    // 初始化 gorm.DB
+    db, err := gorm.Open(mysql.New(mysql.Config{
+        Conn:                      mockDB,
+        SkipInitializeWithVersion: true,
+    }), &gorm.Config{})
+    assert.NoError(t, err)
 
-	// 创建模拟的 DB 对象
-	mockDB := mocks.NewMockDB(ctrl)
+    // 替换全局 DB（注意：实际项目中建议使用依赖注入）
+    oldDB := dal.DB
+    dal.DB = db
+    defer func() { dal.DB = oldDB }()
 
-	// 替换全局的 dal.DB 为模拟对象
-	oldDB := dal.DB
-	dal.DB = mockDB
-	defer func() { dal.DB = oldDB }()
+    tests := []struct {
+        name       string
+        req        *pbpayment.ChargeReq
+        wantErr    string
+        expectExec bool // 是否期望执行插入操作
+    }{
+        {
+            name:    "空请求",
+            req:     nil,
+            wantErr: "请求不能为空",
+            expectExec: false,
+        },
+        {
+            name: "金额为0",
+            req: &pbpayment.ChargeReq{
+                Amount:   0,
+                OrderId:  "order123",
+                UserId:   1,
+                CreditCard: &pbpayment.CreditCardInfo{
+                    CreditCardNumber:          "4111111111111111",
+                    CreditCardCvv:             123,
+                    CreditCardExpirationYear:  2025,
+                    CreditCardExpirationMonth: 12,
+                },
+            },
+            wantErr: "支付金额必须大于0",
+            expectExec: false,
+        },
+        {
+            name: "订单号为空",
+            req: &pbpayment.ChargeReq{
+                Amount:   100,
+                OrderId:  "",
+                UserId:   1,
+                CreditCard: &pbpayment.CreditCardInfo{
+                    CreditCardNumber:          "4111111111111111",
+                    CreditCardCvv:             123,
+                    CreditCardExpirationYear:  2025,
+                    CreditCardExpirationMonth: 12,
+                },
+            },
+            wantErr: "订单号不能为空",
+            expectExec: false,
+        },
+        {
+            name: "用户ID为0",
+            req: &pbpayment.ChargeReq{
+                Amount:   100,
+                OrderId:  "order123",
+                UserId:   0,
+                CreditCard: &pbpayment.CreditCardInfo{
+                    CreditCardNumber:          "4111111111111111",
+                    CreditCardCvv:             123,
+                    CreditCardExpirationYear:  2025,
+                    CreditCardExpirationMonth: 12,
+                },
+            },
+            wantErr: "用户ID不能为空",
+            expectExec: false,
+        },
+        {
+            name: "信用卡号长度不足",
+            req: &pbpayment.ChargeReq{
+                Amount:  100,
+                OrderId: "order123",
+                UserId:  1,
+                CreditCard: &pbpayment.CreditCardInfo{
+                    CreditCardNumber:          "411111", // 6位
+                    CreditCardCvv:             123,
+                    CreditCardExpirationYear:  2025,
+                    CreditCardExpirationMonth: 12,
+                },
+            },
+            wantErr: "无效的信用卡号码",
+            expectExec: false,
+        },
+        {
+            name: "信用卡CVV长度错误",
+            req: &pbpayment.ChargeReq{
+                Amount:  100,
+                OrderId: "order123",
+                UserId:  1,
+                CreditCard: &pbpayment.CreditCardInfo{
+                    CreditCardNumber:          "4111111111111111",
+                    CreditCardCvv:             12, // CVV长度不对
+                    CreditCardExpirationYear:  2025,
+                    CreditCardExpirationMonth: 12,
+                },
+            },
+            wantErr: "无效的信用卡CVV",
+            expectExec: false,
+        },
+        {
+            name: "信用卡已过期",
+            req: &pbpayment.ChargeReq{
+                Amount:  100,
+                OrderId: "order123",
+                UserId:  1,
+                CreditCard: &pbpayment.CreditCardInfo{
+                    CreditCardNumber:          "4111111111111111",
+                    CreditCardCvv:             123,
+                    CreditCardExpirationYear:  2022, // 已经过期
+                    CreditCardExpirationMonth: 12,
+                },
+            },
+            wantErr: "信用卡已过期",
+            expectExec: false,
+        },
+        {
+            name: "有效请求",
+            req: validRequest(),
+            wantErr: "",
+            expectExec: true,
+        },
+    }
 
-	// 初始化 ChargeService
-	service := NewChargeService(ctx)
+    svc := service.NewChargeService(context.Background())
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if tt.expectExec {
+                // 设置期望的 SQL 操作
+                mock.ExpectBegin()
+                mock.ExpectExec(`INSERT INTO .*`).WillReturnResult(sqlmock.NewResult(1, 1))
+                mock.ExpectCommit()
+            } else {
+                mock.ExpectBegin()
+                mock.ExpectRollback()
+            }
 
-	// 定义测试用例
-	tests := []struct {
-		name        string
-		req         *pbpayment.ChargeReq
-		mockDBSetup func()
-		wantResp    *pbpayment.ChargeResp
-		wantErr     bool
-	}{
-		{
-			name: "成功支付",
-			req: &pbpayment.ChargeReq{
-				Amount:  100,
-				OrderId: "order123",
-				UserId:  1,
-				CreditCard: &pbpayment.CreditCard{
-					CreditCardNumber:     "4111111111111111",
-					CreditCardExpirationMonth: 12,
-					CreditCardExpirationYear:  2025,
-					CreditCardCvv:             123,
-				},
-			},
-			mockDBSetup: func() {
-				// 模拟数据库插入成功
-				mockDB.EXPECT().Create(gomock.Any()).Return(nil)
-			},
-			wantResp: &pbpayment.ChargeResp{
-				TransactionId: gomock.Any().String(),
-			},
-			wantErr: false,
-		},
-		{
-			name: "支付金额无效",
-			req: &pbpayment.ChargeReq{
-				Amount:  0,
-				OrderId: "order123",
-				UserId:  1,
-				CreditCard: &pbpayment.CreditCard{
-					CreditCardNumber:     "4111111111111111",
-					CreditCardExpirationMonth: 12,
-					CreditCardExpirationYear:  2025,
-					CreditCardCvv:             123,
-				},
-			},
-			mockDBSetup: func() {
-				// 不需要模拟数据库调用，因为会在校验阶段失败
-			},
-			wantResp: nil,
-			wantErr:  true,
-		},
-		{
-			name: "支付平台失败",
-			req: &pbpayment.ChargeReq{
-				Amount:  100,
-				OrderId: "order123",
-				UserId:  1,
-				CreditCard: &pbpayment.CreditCard{
-					CreditCardNumber:     "4111111111111111",
-					CreditCardExpirationMonth: 12,
-					CreditCardExpirationYear:  2025,
-					CreditCardCvv:             123,
-				},
-			},
-			mockDBSetup: func() {
-				// 不需要模拟数据库调用，因为支付平台会失败
-			},
-			wantResp: nil,
-			wantErr:  true,
-		},
-		{
-			name: "数据库插入失败",
-			req: &pbpayment.ChargeReq{
-				Amount:  100,
-				OrderId: "order123",
-				UserId:  1,
-				CreditCard: &pbpayment.CreditCard{
-					CreditCardNumber:     "4111111111111111",
-					CreditCardExpirationMonth: 12,
-					CreditCardExpirationYear:  2025,
-					CreditCardCvv:             123,
-				},
-			},
-			mockDBSetup: func() {
-				// 模拟数据库插入失败
-				mockDB.EXPECT().Create(gomock.Any()).Return(errors.New("数据库错误"))
-			},
-			wantResp: nil,
-			wantErr:  true,
-		},
-	}
+            resp, err := svc.Run(tt.req)
+            if tt.wantErr != "" {
+                assert.Contains(t, err.Error(), tt.wantErr)
+            } else {
+                assert.NoError(t, err)
+                assert.NotNil(t, resp)
+            }
+            assert.NoError(t, mock.ExpectationsWereMet())
+        })
+    }
+}
 
-	// 运行测试用例
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// 设置模拟对象的行为
-			if tt.mockDBSetup != nil {
-				tt.mockDBSetup()
-			}
-
-			// 调用 Run 方法
-			resp, err := service.Run(tt.req)
-
-			// 检查错误
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-
-			// 检查返回值
-			if tt.wantResp != nil {
-				assert.NotEmpty(t, resp.TransactionId)
-			} else {
-				assert.Nil(t, resp)
-			}
-		})
-	}
+// 辅助函数：生成有效请求
+func validRequest() *pbpayment.ChargeReq {
+    return &pbpayment.ChargeReq{
+        Amount:  100,
+        OrderId: "order123",
+        UserId:  1,
+        CreditCard: &pbpayment.CreditCardInfo{
+            CreditCardNumber:          "4111111111111111",
+            CreditCardCvv:             123,
+            CreditCardExpirationYear:  2025,
+            CreditCardExpirationMonth: 12,
+        },
+    }
 }

@@ -4,85 +4,168 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
 	"time"
 
+	"github.com/asmile1559/dyshop/app/checkout/biz/dal"
+	"github.com/asmile1559/dyshop/app/checkout/biz/model"
 	pbcheckout "github.com/asmile1559/dyshop/pb/backend/checkout"
-	payment "github.com/asmile1559/dyshop/pb/backend/payment" 
-	"github.com/google/uuid"
+	pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
+	pborder "github.com/asmile1559/dyshop/pb/backend/order"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
-// validateEmail 使用简单的正则表达式校验 Email 格式
-func validateEmail(email string) bool {
-	re := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
-	return re.MatchString(email)
+// CheckoutService 结算服务
+type CheckoutService struct {
+	ctx        context.Context
+	paymentCli pbpayment.PaymentServiceClient
+	orderCli   pborder.OrderServiceClient
 }
 
-// validateAddress 校验地址信息是否完整
-func validateAddress(addr *pbcheckout.Address) error {
-	if addr == nil {
-		return errors.New("address is nil")
+// NewCheckoutService 创建结算服务实例
+func NewCheckoutService(c context.Context) *CheckoutService {
+	// 连接支付服务
+	paymentViper, err := initViper("/home/djj/devel/dyshop/app/payment/conf/config.yaml")
+    if err != nil {
+        logrus.Fatalf("Error reading order service config file, %s", err)
+    }
+
+    paymentPort := paymentViper.GetString("server.port")
+	conn, err := grpc.Dial("localhost:"+paymentPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic("Failed to connect to payment service: " + err.Error())
 	}
-	if addr.StreetAddress == "" || addr.City == "" || addr.State == "" ||
-		addr.Country == "" || addr.ZipCode == "" {
-		return errors.New("incomplete address fields")
+
+	return &CheckoutService{
+		ctx:        c,
+		paymentCli: pbpayment.NewPaymentServiceClient(conn),
+	}
+}
+
+// Run 处理结算请求
+func (s *CheckoutService) Run(req *pbcheckout.CheckoutReq) (*pbcheckout.CheckoutResp, error) {
+	// 校验请求
+	if err := validateCheckoutRequest(req); err != nil {
+		return nil, err
+	}
+
+	// 获取订单
+	orderResp, err := getOrderFromOrderService()
+	if err != nil {
+		return nil, fmt.Errorf("获取订单失败: %v", err)
+	}
+
+	// 取出订单
+	if len(orderResp.Orders) == 0 {
+		return nil, errors.New("未找到订单")
+	}
+	order := orderResp.Orders[0] // 取第一笔订单
+	orderID := order.OrderId
+
+	// 计算订单金额
+	totalAmount, err := calculateTotalAmount(order.OrderItems)
+	fmt.Println("订单金额：", totalAmount)
+	if err != nil {
+		return nil, err
+	}
+
+	// 调用支付服务
+	paymentResp, err := s.paymentCli.Charge(context.TODO(), &pbpayment.ChargeReq{
+		Amount: float32(totalAmount),
+		CreditCard: &pbpayment.CreditCardInfo{
+			CreditCardNumber:          req.CreditCard.CreditCardNumber,
+			CreditCardCvv:             req.CreditCard.CreditCardCvv,
+			CreditCardExpirationYear:  req.CreditCard.CreditCardExpirationYear,
+			CreditCardExpirationMonth: req.CreditCard.CreditCardExpirationMonth,
+		},
+		OrderId: orderID,
+		UserId:  req.UserId,
+	})
+	if err != nil || paymentResp.TransactionId == "" {
+		return nil, errors.New("支付失败")
+	}
+
+	// 存储订单信息到数据库
+	record := model.OrderRecord{
+		OrderID:       orderID,
+		UserID:        req.UserId,
+		Amount:        totalAmount,
+		TransactionID: paymentResp.TransactionId,
+		Status:        "SUCCESS",
+		CreatedAt:     time.Now(),
+	}
+	if err := dal.DB.Create(&record).Error; err != nil {
+		return nil, fmt.Errorf("保存订单失败: %v", err)
+	}
+
+	// 返回订单信息
+	return &pbcheckout.CheckoutResp{
+		OrderId:       orderID,
+		TransactionId: paymentResp.TransactionId,
+	}, nil
+}
+
+// validateCheckoutRequest 校验结算请求
+func validateCheckoutRequest(req *pbcheckout.CheckoutReq) error {
+	if req.UserId == 0 || req.Firstname == "" || req.Lastname == "" || req.Email == "" {
+		return errors.New("缺少必要字段")
+	}
+	if req.Address.StreetAddress == "" || req.Address.City == "" || req.Address.ZipCode == "" {
+		return errors.New("地址无效")
+	}
+	if req.CreditCard.CreditCardNumber == "" || req.CreditCard.CreditCardCvv == 0 {
+		return errors.New("信用卡信息无效")
 	}
 	return nil
 }
 
-// simulatePayment 模拟支付处理，实际场景中应调用支付网关
-func simulatePayment(creditCard *payment.CreditCardInfo, amount float64) (string, error) {
-	// 检查信用卡信息是否存在
-	if creditCard == nil {
-		return "", errors.New("credit card information is missing")
+// calculateTotalAmount 计算订单总金额
+func calculateTotalAmount(items []*pborder.OrderItem) (float64, error) {
+	var total float64
+
+	for _, item := range items {
+		total += float64(item.Cost) // Cost 大写，float32 转 float64
 	}
-	// 此处可以添加更多校验逻辑，如校验卡号格式、有效期等
 
-	// 模拟支付处理时间
-	time.Sleep(500 * time.Millisecond)
-
-	// 模拟支付成功，返回一个新的交易 ID
-	transactionID := uuid.New().String()
-	return transactionID, nil
+	return total, nil
 }
 
-type CheckoutService struct {
-	ctx context.Context
+// getOrderFromOrderService 获取订单信息
+func getOrderFromOrderService() (*pborder.ListOrderResp, error) {
+	orderViper, err := initViper("/home/djj/devel/dyshop/app/order/conf/config.yaml")
+    if err != nil {
+        logrus.Fatalf("Error reading order service config file, %s", err)
+    }
+
+    orderPort := orderViper.GetString("server.port")
+
+	cc, err := grpc.Dial("localhost:"+orderPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+    if err != nil {
+        logrus.Fatalf("连接 OrderService 失败: %v", err)
+    }
+    defer cc.Close() // 确保在 main 结束时关闭连接
+
+    // 创建 OrderService 客户端
+    cli := pborder.NewOrderServiceClient(cc)
+
+    // 发送请求获取订单列表
+    resp, err := cli.ListOrder(context.TODO(), &pborder.ListOrderReq{UserId: 1})
+    if err != nil {
+		return nil, fmt.Errorf("获取订单数据失败: %v", err)
+	}	
+
+    fmt.Printf("订单列表: %+v\n", resp)
+	return resp, nil
 }
 
-func NewCheckoutService(c context.Context) *CheckoutService {
-	return &CheckoutService{ctx: c}
+func initViper(configPath string) (*viper.Viper, error) {
+    v := viper.New()
+    v.SetConfigFile(configPath)
+    if err := v.ReadInConfig(); err != nil {
+        return nil, err
+    }
+    return v, nil
 }
 
-func (s *CheckoutService) Run(req *pbcheckout.CheckoutReq) (*pbcheckout.CheckoutResp, error) {
-	// 1. 校验用户信息
-	if req.UserId == 0 {
-		return nil, errors.New("invalid user id")
-	}
-	if req.Email == "" || !validateEmail(req.Email) {
-		return nil, errors.New("invalid email format")
-	}
-
-	// 2. 校验地址信息
-	if err := validateAddress(req.Address); err != nil {
-		return nil, fmt.Errorf("address validation failed: %v", err)
-	}
-
-	// 3. 模拟支付处理（此处假设订单金额为 100.00）
-	amount := 100.00
-	transactionID, err := simulatePayment(req.CreditCard, amount)
-	if err != nil {
-		return nil, fmt.Errorf("payment processing failed: %v", err)
-	}
-
-	// 4. 生成订单号（使用 UUID 生成）
-	orderID := uuid.New().String()
-
-	// 5. (可选) 将订单信息保存到数据库，此处略过
-
-	// 6. 返回订单结算响应
-	return &pbcheckout.CheckoutResp{
-		OrderId:       orderID,
-		TransactionId: transactionID,
-	}, nil
-}

@@ -1,2 +1,5 @@
 server:
   port: 16166
+
+database:
+  dsn: "djj:et123456@tcp(127.0.0.1:3306)/checkout?charset=utf8mb4&parseTime=True&loc=Local"
