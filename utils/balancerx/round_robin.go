@@ -14,7 +14,7 @@ import (
 // 全局轮询负载均衡（依赖 Etcd 存储一个 round_robin_index）
 type RoundRobinBalancer struct {
 	client *clientv3.Client
-	// 存放全局索引的 Etcd 路径，例如 "/services/hello/round_robin_index"
+	// 存放全局索引的 Etcd 路径，例如 "/config/hello-service/round_robin_index"
 	indexKey string
 
 	// 为了避免并发时生成过多 txn 请求，这里可以做一个互斥锁

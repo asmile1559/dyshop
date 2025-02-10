@@ -1,20 +1,25 @@
 package service
 
 import (
+	"context"
+
+	"github.com/asmile1559/dyshop/app/cart/biz/dal"
+	"github.com/asmile1559/dyshop/app/cart/biz/model"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
-	"golang.org/x/net/context"
 )
 
-type EmptyService struct {
+type EmptyCartService struct {
 	ctx context.Context
 }
 
-func NewEmptyService(c context.Context) *EmptyService {
-	return &EmptyService{ctx: c}
+func NewEmptyCartService(c context.Context) *EmptyCartService {
+	return &EmptyCartService{ctx: c}
 }
 
-func (s *EmptyService) Run(req *pbcart.EmptyCartReq) (*pbcart.EmptyCartResp, error) {
-	// TODO: finish your business code...
-	//
+func (s *EmptyCartService) Run(req *pbcart.EmptyCartReq) (*pbcart.EmptyCartResp, error) {
+	err := model.ClearCart(dal.DB, uint64(req.UserId))
+	if err != nil {
+		return nil, err
+	}
 	return &pbcart.EmptyCartResp{}, nil
 }

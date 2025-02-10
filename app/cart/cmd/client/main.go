@@ -1,44 +1,67 @@
 package main
 
 import (
-	"fmt"
+	"context"
+
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
-	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/hookx"
+	"github.com/asmile1559/dyshop/utils/registryx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
+func init() {
+	hookx.Init(hookx.DefaultHook)
+}
+
 func main() {
-	if err := loadConfig(); err != nil {
-		logrus.Fatal(err)
-	}
+	endpoints := viper.GetStringSlice("etcd.endpoints")
+	prefix := viper.GetString("etcd.prefix")
 
-	initLog()
-
-	cc, err := grpc.NewClient("localhost:"+viper.GetString("server.port"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// 通过 etcd 发现 CartService，并返回客户端对象
+	client, conn, err := registryx.DiscoverEtcdServices(
+		endpoints,
+		prefix,
+		pbcart.NewCartServiceClient,
+	)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Fatalf("Failed to discover CartService: %v", err)
 	}
+	defer conn.Close()
 
-	cli := pbcart.NewCartServiceClient(cc)
-	resp, err := cli.GetCart(context.TODO(), &pbcart.GetCartReq{UserId: 1})
+	userID := uint32(1001)
+
+	// 1. 先清空购物车
+	_, err = client.EmptyCart(context.Background(), &pbcart.EmptyCartReq{UserId: userID})
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Fatalf("EmptyCart err: %v", err)
 	}
+	logrus.Infof("Emptied cart for user %d", userID)
 
-	fmt.Printf("resp: %v\n", resp)
-}
+	// 2. 加一个商品
+	_, err = client.AddItem(context.Background(), &pbcart.AddItemReq{
+		UserId: userID,
+		Item: &pbcart.CartItem{
+			ProductId: 123,
+			Quantity:  5,
+		},
+	})
+	if err != nil {
+		logrus.Fatalf("AddItem err: %v", err)
+	}
+	logrus.Infof("Added item to user %d cart", userID)
 
-func loadConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("conf")
-	return viper.ReadInConfig()
-}
+	// 3. 再次获取购物车
+	resp, err := client.GetCart(context.Background(), &pbcart.GetCartReq{UserId: userID})
+	if err != nil {
+		logrus.Fatalf("GetCart err: %v", err)
+	}
+	logrus.Infof("Cart for user %d => %v", userID, resp.Cart)
 
-func initLog() {
-	logx.Init()
+	// 1. 先清空购物车
+	_, err = client.EmptyCart(context.Background(), &pbcart.EmptyCartReq{UserId: userID})
+	if err != nil {
+		logrus.Fatalf("EmptyCart err: %v", err)
+	}
+	logrus.Infof("Emptied cart for user %d", userID)
 }

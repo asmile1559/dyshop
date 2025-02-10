@@ -1,25 +1,24 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/asmile1559/dyshop/app/frontend/middleware"
+	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/jwt"
 	"github.com/sirupsen/logrus"
-	"log"
-	"net/http"
 
 	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
-	"github.com/asmile1559/dyshop/utils/logx"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
-func main() {
-	initLog()
-	if err := initConfig(); err != nil {
-		log.Fatal(err)
-	}
+func init() {
+	hookx.Init(hookx.DefaultHook)
+}
 
+func main() {
 	rpcclient.InitRPCClient()
 
 	router := gin.Default()
@@ -48,17 +47,6 @@ func main() {
 		logrus.Fatal(err)
 	}
 	//router.Run(":10166")
-}
-
-func initConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("conf")
-	return viper.ReadInConfig()
-}
-
-func initLog() {
-	logx.Init()
 }
 
 func registerTestRouter(e *gin.Engine) {
