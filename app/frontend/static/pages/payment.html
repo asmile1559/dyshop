@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抖音商城-支付</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="../css/style.css" />
+
+    <style>
+        .order-info,
+        .payment-info {
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            margin-inline: 5px;
+        }
+
+
+        .order-info-title,
+        .payment-info-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .order-info-content div {
+            margin-top: 10px;
+            margin-inline: 10px;
+        }
+
+        .payment-info-content>div {
+            margin-block: 10px;
+            margin-inline: 10px;
+        }
+
+        .order-info-content div span:first-child {
+            font-weight: bold;
+        }
+
+        .order-info-details {
+            margin-top: 10px;
+            margin-inline: 10px;
+        }
+
+        .order-info-table {
+            text-align: center;
+            vertical-align: middle;
+            margin-bottom: 0px;
+        }
+
+        .order-info-table thead th {
+            background-color: #f8f9fa;
+        }
+
+        .order-info-table tbody td:first-child {
+            width: 5%;
+        }
+
+        .order-info-table tbody td:nth-child(2) {
+            text-overflow: ellipsis;
+            width: 50%;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .order-info-table tbody td:nth-child(4) {
+            width: 10%;
+        }
+
+        .order-info-table tbody td:nth-child(3),
+        .order-info-table tbody td:nth-child(5) {
+            width: 20%;
+        }
+
+        .price {
+            color: orangered !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container top-layer">
+        <nav class="navbar navbar-expand-lg bg-body-white top-nav-fs-sm">
+            <div class="" style="width: 80%;">
+                <a class="navbar-brand" href="#">抖音商城</a>
+            </div>
+            <div class="text-end" style="width: 20%;">
+                <span style="white-space: nowrap;">您好,</span>
+                <span class="dropdown">
+                    <button id="nav-user-name" class="btn btn-white dropdown-toggle top-nav-fs-sm1" style="width: 70%;"
+                        type="button" data-bs-toggle="dropdown">
+                        <span class="d-inline-block text-truncate" style="width: 90%; white-space: nowrap;">Lorem ipsum
+                            dolor sit amet.</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">个人设置</a></li>
+                        <li><a class="dropdown-item" href="#">购物车</a></li>
+                        <li><a class="dropdown-item" href="#">订单</a></li>
+                        <li><a class="dropdown-item" href="#">支付</a></li>
+                        <li><button class="dropdown-item">退出登录</button></li>
+                    </ul>
+                </span>
+            </div>
+        </nav>
+    </div>
+
+    <div class="p-3 second-layer">
+        <div class="container">
+            <div class="row justify-content-between align-items-center">
+                <div class="col-8">
+                    <h1>支付</h1>
+                </div>
+
+                <div class="col-4 countdown text-end sticky-top">
+                    <span>支付剩余时间</span>
+                    <span id="countdown">10:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-3 second-layer">
+        <div class="container">
+            <div class="order-info">
+                <div class="order-info-title">
+                    订单信息
+                </div>
+                <div class="order-info-content">
+                    <div>
+                        <span>订单号: </span>
+                        <span>12345678901234</span>
+                    </div>
+                    <div>
+                        <span>收货人: </span>
+                        <span>张三</span>
+                    </div>
+                    <div>
+                        <span>联系电话: </span>
+                        <span>1234567890</span>
+                    </div>
+                    <div>
+                        <span>收货地址: </span>
+                        <span>中国</span>
+                    </div>
+                </div>
+                <div class=" order-info-details justify-content-center">
+                    <span style="font-weight: bold;">商品详情: </span>
+                    <table class="table table-hover mt-3 order-info-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>商品名称</th>
+                                <th>商品价格</th>
+                                <th>商品数量</th>
+                                <th>小计</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Lorem, ipsum dolor sit amet consectetur </td>
+                                <td>￥100.00</td>
+                                <td>1</td>
+                                <td class="price">￥100.00</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis vitae
+                                    adipisci
+                                    blanditiis eum molestiae, amet hic asperiores provident rerum assumenda.
+                                </td>
+                                <td>￥200.00</td>
+                                <td>3</td>
+                                <td class="price">￥600.00</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>#</td>
+                                <td colspan="2" style="font-weight: bold;">总计</td>
+                                <td>4</td>
+                                <td class="price" style="font-size: 1.2rem;">￥700.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-3 second-layer">
+        <div class="container">
+            <div class="payment-info">
+                <div class="payment-info-title">
+                    支付信息
+                </div>
+                <div class="payment-info-content">
+                    <div>
+                        信用卡支付
+                    </div>
+                    <div class="credit-type d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <input class="form-check-input" type="radio" name="creditype" id="creditype1" checked>
+                                <label class="form-check-label ms-1" for="creditype1">
+                                    <img src="../src/visa-logo-800x450.webp" alt="" height="50px">
+                                </label>
+                                <span>Visa</span>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <input class="form-check-input" type="radio" name="creditype" id="creditype2">
+                                <label class="form-check-label ms-2" for="creditype2">
+                                    <img src="../src/mc-logo-52.jpg" alt="" height="50px">
+                                </label>
+                                <span>Mastercard</span>
+                            </div>
+                        </div>
+
+                        <div class="form-check d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <input class="form-check-input" type="radio" name="creditype" id="creditype3">
+                                <label class="form-check-label ms-2" for="creditype3">
+                                    <img src="../src/amex.png" alt="" height="50px" style="border-radius: 5px;">
+                                </label>
+                                <span>Amex</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="credit-card-info">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group mt-3">
+                                    <label for="card-number">卡号</label>
+                                    <input type="password" class="form-control" id="card-number" placeholder="请输入卡号">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group mt-3">
+                                    <label for="card-holder">持卡人</label>
+                                    <input type="text" class="form-control" id="card-holder" placeholder="请输入持卡人姓名">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="form-group mt-3">
+                                    <label for="card-expiration-month">过期月份</label>
+                                    <select class="form-control" id="card-expiration-month">
+                                        <option value="" selected>选择月份</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                        <option value="04">04</option>
+                                        <option value="05">05</option>
+                                        <option value="06">06</option>
+                                        <option value="07">07</option>
+                                        <option value="08">08</option>
+                                        <option value="09">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="col-5">
+                                <div class="form-group mt-3">
+                                    <label for="card-expiration-year">过期年份</label>
+                                    <select class="form-control" id="card-expiration-year">
+                                        <option value="" disabled selected>选择年份</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                        <option value="2028">2028</option>
+                                        <option value="2029">2029</option>
+                                        <option value="2030">2030</option>
+                                        <option value="2031">2031</option>
+                                        <option value="2032">2032</option>
+                                        <option value="2033">2033</option>
+                                        <option value="2034">2034</option>
+                                        <option value="2035">2035</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group mt-3">
+                                    <label for="card-cvv">CVV</label>
+                                    <input type="text" class="form-control" id="card-cvv" placeholder="请输入CVV">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end align-items-center gap-3">
+                        <button class="btn btn-outline-success mt-3">支付</button>
+                        <button class="btn btn-outline-secondary mt-3">取消支付</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="content"></div>
+    <footer class="p-3 bg-white text-dark text-center">
+        <div class="container">
+            <span class="">Copyright &copy; 166-队就是队</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+    <script>
+        !function () {
+            const countdown = document.getElementById('countdown')
+
+            const cardNumber = document.getElementById('card-number')
+            const cvv = document.getElementById('card-cvv')
+            cardNumber.addEventListener('focus', function () {
+                this.type = 'text';
+            });
+            cvv.addEventListener('focus', function () {
+                this.type = 'text';
+            });
+            cardNumber.addEventListener('blur', function () {
+                this.type = 'password';
+            });
+            cvv.addEventListener('blur', function () {
+                this.type = 'password';
+            });
+        }()
+    </script>
+</body>
+
+</html>

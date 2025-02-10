@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抖音商城-登录注册</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        .nav-link.active {
+            color: #0d6efd !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-white top-nav-fs-sm">
+        <div class="container d-flex justify-content-start">
+            <a class="navbar-brand" href="#">抖音商城</a><span class="fs-3">登录注册</span>
+        </div>
+    </nav>
+
+
+    <div class="d-flex justify-content-center align-items-center d-none"
+        style="background-size: cover; background-image: url('../src/img4.jpg');" id="loginWidget">
+        <div class="login-content row">
+            <div class="col-2">
+
+            </div>
+            <div class="col-8 d-flex align-items-center justify-content-center">
+                <div class="card mb-3">
+                    <div class=" row">
+                        <div class="col-6">
+                            <img src="../src/product3.jpg" class="img-fluid rounded-start" alt="product3"
+                                style="object-fit: cover;">
+                        </div>
+                        <div class=" col-6 ">
+                            <ul class=" nav nav-underline mt-5 justify-content-center text-center">
+                                <li class="nav-item">
+                                    <a class="nav-link active link-blue" href="#">邮箱密码登录</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link link-dark" href="#">手机号登录</a>
+                                </li>
+                            </ul>
+
+                            <div class="row justify-content-center">
+                                <div class="col-12 input-group" style="max-width: 80%; margin-top: 35px;">
+                                    <input type="text" class="form-control" placeholder="请输入邮箱">
+                                </div>
+
+                                <div class="col-12 input-group mt-3" style="max-width: 80%;">
+                                    <input type="password" class="form-control" placeholder="请输入登陆密码">
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 col-10 mx-auto mt-5">
+                                <button class="btn btn-primary" type="button">登录</button>
+                            </div>
+
+                            <div class="d-grid gap-2 col-10 mx-auto mt-3">
+                                <a href="#" id="registerLink">还没有账号? 点此注册</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center align-items-center"
+        style="background-size: cover; background-image: url('../src/img5.jpg');" id="registerWidget">
+        <div class="login-content row">
+            <div class="col-2">
+
+            </div>
+            <div class="col-8 d-flex align-items-center justify-content-center">
+                <div class="card mb-3">
+                    <div class=" row">
+                        <div class=" col-6 ">
+                            <ul class=" nav nav-underline mt-5 justify-content-center text-center">
+                                <li class="nav-item">
+                                    <a class="nav-link active link-blue" href="#">邮箱密码注册</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link link-dark" href="#">手机号注册</a>
+                                </li>
+                            </ul>
+
+                            <div class="row justify-content-center">
+                                <div class="col-12 input-group" style="max-width: 80%; margin-top: 35px;">
+                                    <input type="text" class="form-control" placeholder="请输入邮箱">
+                                </div>
+
+                                <div class="col-12 input-group mt-3" style="max-width: 80%;">
+                                    <input type="password" class="form-control" placeholder="请输入登陆密码">
+                                </div>
+
+                                <div class="col-12 input-group mt-3" style="max-width: 80%;">
+                                    <input type="password" class="form-control" placeholder="再次输入登陆密码">
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 col-10 mx-auto mt-3" style="max-width: 80%;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
+                                    <label class="form-check-label" for="invalidCheck" style="font-size: smaller;">
+                                        我已阅读并同意<span class="text-primary">用户协议、隐私政策、产品服务协议</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 col-10 mx-auto mt-3">
+                                <button class="btn btn-primary" type="button">注册</button>
+                            </div>
+
+                            <div class="d-grid gap-2 col-10 mx-auto mt-2">
+                                <a href="#" id="loginLink">已有账号? 点此登录</a>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <img src="../src/product4.jpg" class="img-fluid rounded-start" alt="product3"
+                                style="object-fit: cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container content text-center"></div>
+    <footer class="p-3 bg-white text-dark text-center">
+        <div class="container">
+            <span class="">Copyright &copy; 166-队就是队</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+    <script>
+        !function () {
+            const registerLink = document.getElementById('registerLink')
+            const loginLink = document.getElementById('loginLink')
+            const registerWidget = document.getElementById('registerWidget')
+            const loginWidget = document.getElementById('loginWidget')
+            registerLink.addEventListener('click', (e) => {
+                registerWidget.classList.remove('d-none')
+                loginWidget.classList.add('d-none')
+            })
+
+            loginLink.addEventListener('click', (e) => {
+                registerWidget.classList.add(['d-none'])
+                loginWidget.classList.remove('d-none')
+            })
+        }()
+    </script>
+</body>
+
+</html>
