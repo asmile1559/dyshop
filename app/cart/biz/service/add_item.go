@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+
+	"github.com/asmile1559/dyshop/app/cart/biz/dal"
+	"github.com/asmile1559/dyshop/app/cart/biz/model"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 )
 
@@ -14,7 +17,15 @@ func NewAddItemService(c context.Context) *AddItemService {
 }
 
 func (s *AddItemService) Run(req *pbcart.AddItemReq) (*pbcart.AddItemResp, error) {
-	// TODO: finish your business code...
-	//
+	// user_id, product_id, quantity 都是 uint64/int
+	err := model.AddOrUpdateCartItem(
+		dal.DB,
+		uint64(req.UserId),
+		uint64(req.Item.ProductId),
+		int(req.Item.Quantity),
+	)
+	if err != nil {
+		return nil, err
+	}
 	return &pbcart.AddItemResp{}, nil
 }
