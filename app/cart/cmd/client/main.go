@@ -57,4 +57,11 @@ func main() {
 		logrus.Fatalf("GetCart err: %v", err)
 	}
 	logrus.Infof("Cart for user %d => %v", userID, resp.Cart)
+
+	// 1. 先清空购物车
+	_, err = client.EmptyCart(context.Background(), &pbcart.EmptyCartReq{UserId: userID})
+	if err != nil {
+		logrus.Fatalf("EmptyCart err: %v", err)
+	}
+	logrus.Infof("Emptied cart for user %d", userID)
 }

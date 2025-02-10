@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asmile1559/dyshop/app/cart/biz/dal"
+	"github.com/asmile1559/dyshop/app/cart/biz/model"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 )
 
@@ -16,7 +17,7 @@ func NewEmptyCartService(c context.Context) *EmptyCartService {
 }
 
 func (s *EmptyCartService) Run(req *pbcart.EmptyCartReq) (*pbcart.EmptyCartResp, error) {
-	err := dal.ClearCart(uint64(req.UserId))
+	err := model.ClearCart(dal.DB, uint64(req.UserId))
 	if err != nil {
 		return nil, err
 	}

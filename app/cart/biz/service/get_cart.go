@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/asmile1559/dyshop/app/cart/biz/dal"
+	"github.com/asmile1559/dyshop/app/cart/biz/model"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 )
 
@@ -16,7 +17,7 @@ func NewGetCartService(c context.Context) *GetCartService {
 }
 
 func (s *GetCartService) Run(req *pbcart.GetCartReq) (*pbcart.GetCartResp, error) {
-	cart, err := dal.GetCartByUserID(uint64(req.UserId))
+	cart, err := model.GetCartByUserID(dal.DB, uint64(req.UserId))
 	if err != nil {
 		return nil, err
 	}
