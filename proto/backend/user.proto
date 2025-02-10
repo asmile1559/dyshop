@@ -26,4 +26,5 @@ message LoginReq {
 
 message LoginResp {
   uint32 user_id = 1;
+  string token = 2;
 }

@@ -5,12 +5,12 @@ import (
 
 )
 
-type User struct {
-	
-	UserID    uint      `gorm:"primarykey"`  // 自定义主键，使用 user_id
-	Email    string `gorm:"unique;not null"` // 唯一且非空的邮箱
-	Password string `gorm:"not null"`        // 密码字段
+type User struct {	
+	UserID    uint32    `gorm:"primary_key"`
+	Email     string    `gorm:"unique"`
+	Password  string    `gorm:"not null"`
+	Name      string    `gorm:"not null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt *time.Time `gorm:"index"` // 软删除
+	DeletedAt *time.Time
 }

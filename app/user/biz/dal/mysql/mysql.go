@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/asmile1559/dyshop/app/user/biz/model"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -36,7 +35,6 @@ func initDB() (err error) {
 		return fmt.Errorf("数据库迁移失败: %v", err)
 	}
 	
-	logrus.Info("数据库连接成功!")
 	return
 }
 

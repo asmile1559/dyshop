@@ -24,12 +24,14 @@ func main() {
 	if err != nil {
 		logrus.Fatal("数据库初始化失败: ", err)
 	}
+	
 	defer mysql.Close()
 	
 	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
 	if err != nil {
 		logrus.Fatal(err)
 	}
+	
 	s := grpc.NewServer()
 
 	pbuser.RegisterUserServiceServer(s, &UserServiceServer{})

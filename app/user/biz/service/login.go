@@ -3,9 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
+
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
 	"github.com/asmile1559/dyshop/app/user/utils"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
+	"github.com/sirupsen/logrus"
+	"github.com/asmile1559/dyshop/utils/jwt"
 )
 
 // LoginService 登录服务
@@ -26,13 +29,24 @@ func (s *LoginService) Run(req *pbuser.LoginReq) (*pbuser.LoginResp, error) {
 		// 用户不存在
 		return nil, fmt.Errorf("用户不存在: %v", err)
 	}
-
+	
 	// 2. 验证密码
 	if !utils.VerifyPassword(user.Password, req.Password) {
 		// 密码不匹配
 		return nil, fmt.Errorf("密码错误")
 	}
 
-	// 3. 返回用户 ID
-	return &pbuser.LoginResp{UserId: uint32(user.UserID)}, nil
+	// 3. 生成令牌
+	token, err := jwt.GenerateJWT(user.UserID)
+	
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	
+	// 4. 返回令牌和用户 ID
+	return &pbuser.LoginResp{
+		UserId: uint32(user.UserID),
+		Token:  token, // 返回生成的令牌
+	}, nil
 }
