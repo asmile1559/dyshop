@@ -21,9 +21,9 @@ func StartEtcdServices[T any](
 ) {
 	var wg sync.WaitGroup
 	for _, raw := range services {
-		serviceMap := raw.(map[string]string)
-		id := serviceMap["id"]
-		address := serviceMap["address"]
+		serviceMap := raw.(map[string]any)
+		id := serviceMap["id"].(string)
+		address := serviceMap["address"].(string)
 
 		wg.Add(1)
 		go func(id, addr string) {
