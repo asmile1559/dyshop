@@ -8,6 +8,7 @@ import (
 	"github.com/asmile1559/dyshop/app/cart/biz/dal"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	"github.com/asmile1559/dyshop/utils/hookx"
+	"github.com/asmile1559/dyshop/utils/mtl"
 	"github.com/asmile1559/dyshop/utils/registryx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -97,6 +98,21 @@ func main() {
 	if len(services) == 0 {
 		logrus.Fatal("No services found in config.")
 	}
+
+	// 注册 Metrics
+	host := viper.GetString("metrics.host")
+	port := viper.GetInt32("metrics.port")
+	info := mtl.MetricsInfo{
+		Prefix: prefix,
+		Host:   host,
+		Port:   port,
+		Labels: map[string]string{
+			"type": "apps",
+			"app":  "cart",
+		},
+	}
+	mtl.RegisterMetrics(info)
+	defer mtl.DeregisterMetrics(info)
 
 	// 注册服务实例到 etcd
 	registryx.StartEtcdServices(

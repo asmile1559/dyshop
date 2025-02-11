@@ -28,11 +28,11 @@ log:
 
 etcd:
   endpoints:
-    - "127.0.0.1:2379"       # Etcd 节点地址
-  prefix: "/services/user"  # 服务注册前缀
+    - "127.0.0.1:2379" # Etcd 节点地址
+  prefix: "/services/user" # 服务注册前缀
 
 services:
-  - id: "user-service-1"     # 服务实例ID
+  - id: "user-service-1" # 服务实例ID
     address: "127.0.0.1:12166" # 服务实例地址
 
 prometheus: "/services/prometheus"
