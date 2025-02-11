@@ -30,7 +30,7 @@ func main() {
 		Host:     viper.GetString("database.host"),
 		Port:     viper.GetInt("database.port"),
 		DbName:   viper.GetString("database.dbname"),
-		Models:   []any{model.User{}},
+		Models:   []any{&model.User{}},
 	}
 	mysql.Init(dbconf)
 	defer mysql.Close()
@@ -38,9 +38,9 @@ func main() {
 	// 获取 Etcd 配置
 	endpoints := viper.GetStringSlice("etcd.endpoints")
 	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]interface{})
+	services := viper.Get("services").([]any)
 	if len(services) == 0 {
-		logrus.Fatalf("No services found in config")
+		logrus.Fatal("No services found in config")
 	}
 
 	// 注册 Metrics
