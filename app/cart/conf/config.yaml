@@ -1,6 +1,20 @@
 server:
   port: 14166
 
+database:
+  driver: mysql
+  host: "127.0.0.1"
+  port: 3306
+  username: root
+  password: root
+  dbname: cart_db
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600
+
+log:
+  level: debug
+
 etcd:
   endpoints:
     - "127.0.0.1:2379"       # Etcd 节点地址
@@ -10,5 +24,8 @@ services:
   - id: "cart-service-1"     # 服务实例ID
     address: "127.0.0.1:14166" # 服务实例地址
 
-mysql:
-  dsn: "root:root@tcp(127.0.0.1:3306)/cart_db?charset=utf8mb4&parseTime=True&loc=Local"
+prometheus: "/services/prometheus"
+
+metrics:
+  host: "127.0.0.1"
+  port: 14167 # 服务实例监控端口

@@ -85,15 +85,15 @@ func init() {
 
 func main() {
 	// 初始化数据库
-	dsn := viper.GetString("mysql.dsn")
-	if err := dal.InitDB(dsn); err != nil {
+	if err := dal.InitDB(); err != nil {
 		logrus.Fatalf("failed to init db: %v", err)
 	}
 	logrus.Info("DB initialized successfully.")
 
+	// 获取 Etcd 配置
 	endpoints := viper.GetStringSlice("etcd.endpoints")
 	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]interface{})
+	services := viper.Get("services").([]any)
 	if len(services) == 0 {
 		logrus.Fatal("No services found in config.")
 	}
