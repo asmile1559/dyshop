@@ -1,9 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
 	"github.com/asmile1559/dyshop/app/user/biz/model"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
@@ -47,11 +44,12 @@ func main() {
 	}
 
 	// 注册 Metrics
-	address := services[0].(map[string]any)["address"].(string)
-	host := strings.Split(address, ":")[0]
+	host := viper.GetString("metrics.host")
+	port := viper.GetInt32("metrics.port")
 	info := mtl.MetricsInfo{
 		Prefix: prefix,
-		Target: fmt.Sprintf("%s:2113", host),
+		Host:   host,
+		Port:   port,
 		Labels: map[string]string{
 			"type": "apps",
 			"app":  "user",

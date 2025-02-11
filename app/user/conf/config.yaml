@@ -7,7 +7,7 @@ database:
   host: "127.0.0.1"
   port: 3306
   username: root
-  password: 123456
+  password: root
   dbname: dyshop
   max_idle_conns: 10
   max_open_conns: 100
@@ -36,3 +36,7 @@ services:
     address: "127.0.0.1:12166" # 服务实例地址
 
 prometheus: "/services/prometheus"
+
+metrics:
+  host: "127.0.0.1"
+  port: 12167 # 服务实例监控端口
