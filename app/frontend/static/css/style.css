@@ -41,7 +41,6 @@ body {
 
 footer {
   text-align: center;
-  border-top: 1px solid var(--boder-line-gray);
   margin-top: 1rem;
   padding-block: 1rem;
 }
