@@ -1,18 +1,35 @@
 services:
-  etcd:
-    image: quay.io/coreos/etcd:latest
-    ports:
-      - "2379:2379"
-      - "2380:2380"
-    command: |
-      /usr/local/bin/etcd
-      --name etcd0
-      --data-dir /etcd-data
-      --advertise-client-urls http://0.0.0.0:2379
-      --listen-client-urls http://0.0.0.0:2379
+  # etcd:
+  #   image: quay.io/coreos/etcd:latest
+  #   ports:
+  #     - "2379:2379"
+  #     - "2380:2380"
+  #   command: |
+  #     /usr/local/bin/etcd
+  #     --name etcd0
+  #     --data-dir /etcd-data
+  #     --advertise-client-urls http://0.0.0.0:2379
+  #     --listen-client-urls http://0.0.0.0:2379
   mysql:
     image: "mysql:latest"
     ports:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/targets:/etc/prometheus/targets
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
