@@ -11,64 +11,7 @@
     <link rel="stylesheet" href="../css/style.css" />
 
     <style>
-        .cur-pagenumber {
-            color: #FF4500;
-            font-size: large;
-        }
 
-        .product-item {
-            margin-top: 2%;
-        }
-
-
-        .product-item-img {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .product-item-details {
-            margin-top: 10px;
-        }
-
-        .product-item-name {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: bold;
-        }
-
-        .product-item-price {
-            color: #FF4500;
-        }
-
-        .product-item-price .currency {
-            font-size: small;
-        }
-
-        .product-item-price .price {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-            line-clamp: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: large;
-            font-weight: bold;
-        }
-
-        .product-item-bought {
-            color: gray;
-            font-size: small;
-            margin-top: 0px;
-            margin-right: 20px;
-        }
-
-        .product-item-bought .buy-count {
-            font-size: medium;
-        }
     </style>
 </head>
 
@@ -119,192 +62,181 @@
         </div>
 
         <div class="container p-3">
-            <div class="product-title d-flex align-items-center gap-2">
-                <div class="d-flex align-items-center gap-2 hstack">
-                    <div>
-                        <button type="button" class="btn btn-outline-orangered">综合</button>
-                    </div>
-                    <div>
-                        <button type="button" class="btn">销量</button>
-                    </div>
-                    <div>
-                        <button type="button" class="btn">价格</button>
-                    </div>
-                    <div>
-                        <button type="button" class="btn">新品</button>
-                    </div>
-                    <div>
-                        <button type="button" class="btn">评分</button>
-                    </div>
+            <div class="product-list-nav gap-2">
+                <div class="product-list-tabtitle">
+                    <ul>
+                        <li><a href="#" class="implicit-link active">综合</a></li>
+                        <li><a href="#" class="implicit-link">销量</a></li>
+                        <li><a href="#" class="implicit-link">价格</a></li>
+                        <li><a href="#" class="implicit-link">新品</a></li>
+                        <li><a href="#" class="implicit-link">评分</a></li>
+                    </ul>
                 </div>
-                <div class="ms-auto vr me-3"></div>
-                <div class="">
+                <div class="product-list-pagenav">
                     <span><a href="#" class="implicit-link">&lt;</a></span>
                     <span class="cur-pagenumber">1</span><span>/</span><span class="tot-pagenumber">10</span>
                     <span class=""><a href="#" class="implicit-link">&gt;</a></span>
                 </div>
             </div>
 
-            <div class="continer p-3">
-                <div class="product-list">
-                    <div class="row justify-content-start">
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product1.jpg" alt="product-img" class="img-fluid">
+            <div class="product-list">
+                <div class="row justify-content-start">
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product1.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product2.jpg" alt="product-img" class="img-fluid">
+                    </div>
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product2.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product3.jpg" alt="product-img" class="img-fluid">
+                    </div>
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product3.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product4.jpg" alt="product-img" class="img-fluid">
+                    </div>
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product4.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
+                    </div>
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
+                    </div>
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
+                    </div>
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-2 product-item">
-                            <div class="d-flex flex-column justify-content-start align-items-center">
-                                <div class="product-item-img">
-                                    <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
+                    </div>
+                    <div class="col-2 product-item">
+                        <div class="d-flex flex-column justify-content-start align-items-center">
+                            <div class="product-item-img">
+                                <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
+                            </div>
+                            <div class="product-item-details text-start" style="width: 100%;">
+                                <div class="product-item-name">
+                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
                                 </div>
-                                <div class="product-item-details text-start" style="width: 100%;">
-                                    <div class="product-item-name">
-                                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                    </div>
-                                    <div class="product-item-price d-flex align-items-end">
-                                        <div class="currency">￥</div>
-                                        <div class="price">123.00</div>
-                                    </div>
-                                    <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                        <span class="buy-count">10</span>
-                                        <span class="buy-decl"> +人购买</span>
-                                    </div>
+                                <div class="product-item-price d-flex align-items-end">
+                                    <div class="currency">￥</div>
+                                    <div class="price">123.00</div>
+                                </div>
+                                <div class="product-item-bought d-flex justify-content-start align-items-center">
+                                    <span class="buy-count">10</span>
+                                    <span class="buy-decl"> +人购买</span>
                                 </div>
                             </div>
                         </div>
