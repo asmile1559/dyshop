@@ -1,3 +1,6 @@
+log:
+  level: "debug"              # 日志级别
+
 etcd:
   endpoints:
     - "127.0.0.1:2379"       # Etcd 节点地址
@@ -10,3 +13,5 @@ services:
     address: "127.0.0.1:8081"
   - id: "hello-service-3"
     address: "127.0.0.1:8082"
+
+prometheus: "/services/prometheus"

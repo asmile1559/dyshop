@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/asmile1559/dyshop/utils/hookx"
+	"github.com/asmile1559/dyshop/utils/mtl"
 	"github.com/asmile1559/dyshop/utils/registryx"
 	"github.com/spf13/viper"
 
@@ -43,10 +44,21 @@ func main() {
 	// 获取 Etcd 配置
 	endpoints := viper.GetStringSlice("etcd.endpoints")
 	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]interface{})
+	services := viper.Get("services").([]any)
 	if len(services) == 0 {
 		logrus.Fatalf("No services found in config")
 	}
+
+	info := mtl.MetricsInfo{
+		Prefix: prefix,
+		Target: "127.0.0.1:2112",
+		Labels: map[string]string{
+			"type": "apps",
+			"app":  "hello",
+		},
+	}
+	mtl.RegisterMetrics(info)
+	defer mtl.DeregisterMetrics(info)
 
 	// 启动多个服务实例并注册到 Etcd
 	registryx.StartEtcdServices(
