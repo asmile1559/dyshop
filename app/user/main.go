@@ -1,52 +1,59 @@
 package main
 
 import (
-	"net"
-
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
+	"github.com/asmile1559/dyshop/app/user/biz/model"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
-	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/db/mysqlx"
+	"github.com/asmile1559/dyshop/utils/hookx"
+	"github.com/asmile1559/dyshop/utils/registryx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
 
+type userServer struct {
+	UserServiceServer
+	instanceID  string
+	etcdService *registryx.EtcdService
+	connCount   int64
+}
+
+func init() {
+	hookx.Init(hookx.DefaultHook)
+}
+
 func main() {
-
-	if err := loadConfig(); err != nil {
-		logrus.Fatal(err)
+	dbconf := mysqlx.DbConfig{
+		User:     viper.GetString("database.username"),
+		Password: viper.GetString("database.password"),
+		Host:     viper.GetString("database.host"),
+		Port:     viper.GetInt("database.port"),
+		DbName:   viper.GetString("database.dbname"),
+		Models:   []any{model.User{}},
 	}
-
-	initLog()
-
-	// 初始化MYSQL
-	err := mysql.Init()
-	if err != nil {
-		logrus.Fatal("数据库初始化失败: ", err)
-	}
-	
+	mysql.Init(dbconf)
 	defer mysql.Close()
-	
-	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
-	if err != nil {
-		logrus.Fatal(err)
+
+	// 获取 Etcd 配置
+	endpoints := viper.GetStringSlice("etcd.endpoints")
+	prefix := viper.GetString("etcd.prefix")
+	services := viper.Get("services").([]interface{})
+	if len(services) == 0 {
+		logrus.Fatalf("No services found in config")
 	}
-	
-	s := grpc.NewServer()
 
-	pbuser.RegisterUserServiceServer(s, &UserServiceServer{})
-	if err = s.Serve(cc); err != nil {
-		logrus.Fatal(err)
-	}
-}
-
-func loadConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("conf")
-	return viper.ReadInConfig()
-}
-
-func initLog() {
-	logx.Init(logrus.InfoLevel)
+	// 启动服务实例并注册到 Etcd
+	registryx.StartEtcdServices(
+		endpoints,
+		services,
+		prefix,
+		pbuser.RegisterUserServiceServer,
+		func(instanceID string, etcdSvc *registryx.EtcdService) pbuser.UserServiceServer {
+			return &userServer{
+				instanceID:  instanceID,
+				etcdService: etcdSvc,
+				connCount:   0,
+			}
+		},
+	)
 }
