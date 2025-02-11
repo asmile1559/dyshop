@@ -42,9 +42,10 @@ func (s *server) RegisterMetrics(ctx context.Context, req *pbmtl.MetricsRequest)
 		strLabels[label.Key] = label.Value
 	}
 
-	s.currentMetrics[req.Prefix][req.Target] = mtl.MetricsInfo{
+	s.currentMetrics[req.Prefix][fmt.Sprintf("%s:%d", req.Host, req.Port)] = mtl.MetricsInfo{
 		Prefix: req.Prefix,
-		Target: req.Target,
+		Host:   req.Host,
+		Port:   req.Port,
 		Labels: strLabels,
 	}
 
@@ -53,7 +54,7 @@ func (s *server) RegisterMetrics(ctx context.Context, req *pbmtl.MetricsRequest)
 
 	logrus.WithFields(logrus.Fields{
 		"instanceID": s.instanceID,
-		"target":     req.Target,
+		"target":     fmt.Sprintf("%s:%d", req.Host, req.Port),
 	}).Info("Received register request")
 	return &pbmtl.MetricsResponse{}, nil
 }
@@ -71,14 +72,14 @@ func (s *server) DeregisterMetrics(ctx context.Context, req *pbmtl.MetricsReques
 		return &pbmtl.MetricsResponse{}, nil
 	}
 
-	delete(s.currentMetrics[req.Prefix], req.Target)
+	delete(s.currentMetrics[req.Prefix], fmt.Sprintf("%s:%d", req.Host, req.Port))
 
 	// 更新json文件
 	s.Store(req.Prefix)
 
 	logrus.WithFields(logrus.Fields{
 		"instanceID": s.instanceID,
-		"target":     req.Target,
+		"target":     fmt.Sprintf("%s:%d", req.Host, req.Port),
 	}).Info("Received deregister request")
 	return &pbmtl.MetricsResponse{}, nil
 }
@@ -88,7 +89,7 @@ func (s *server) Store(prefix string) error {
 	metricsList := make([]map[string]any, 0)
 	for _, v := range s.currentMetrics[prefix] {
 		entry := make(map[string]any)
-		entry["targets"] = []string{v.Target}
+		entry["targets"] = []string{fmt.Sprintf("%s:%d", v.Host, v.Port)}
 		entry["labels"] = v.Labels
 		metricsList = append(metricsList, entry)
 	}

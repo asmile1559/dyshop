@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strings"
 
 	pbmtl "github.com/asmile1559/dyshop/pb/backend/mtl"
 	"github.com/asmile1559/dyshop/utils/registryx"
@@ -14,9 +13,10 @@ import (
 )
 
 type MetricsInfo struct {
-	Prefix string            `json:"-"`
-	Target string            `json:"targets"`
-	Labels map[string]string `json:"labels"`
+	Prefix string
+	Host   string
+	Port   int32
+	Labels map[string]string
 }
 
 func RegisterMetrics(info MetricsInfo) {
@@ -45,7 +45,8 @@ func RegisterMetrics(info MetricsInfo) {
 
 	_, err = client.RegisterMetrics(context.Background(), &pbmtl.MetricsRequest{
 		Prefix: info.Prefix,
-		Target: info.Target,
+		Host:   info.Host,
+		Port:   info.Port,
 		Labels: reqLabels,
 	})
 	if err != nil {
@@ -53,9 +54,8 @@ func RegisterMetrics(info MetricsInfo) {
 		return
 	}
 
-	metricsPort := strings.Split(info.Target, ":")[1]
 	http.Handle("/metrics", promhttp.Handler())
-	go http.ListenAndServe(fmt.Sprintf(":%s", metricsPort), nil)
+	go http.ListenAndServe(fmt.Sprintf(":%d", info.Port), nil)
 }
 
 func DeregisterMetrics(info MetricsInfo) {
@@ -85,7 +85,8 @@ func DeregisterMetrics(info MetricsInfo) {
 
 	_, err = client.DeregisterMetrics(context.Background(), &pbmtl.MetricsRequest{
 		Prefix: info.Prefix,
-		Target: info.Target,
+		Host:   info.Host,
+		Port:   info.Port,
 		Labels: reqLabels,
 	})
 	if err != nil {
