@@ -14,25 +14,9 @@ import (
 
 func init() {
 	hookx.Init(hookx.DefaultHook)
-
-	//自动迁移数据库模型
-	db.InitDB()
-	if err := db.DB.AutoMigrate(&model.Cart{}, &model.CartItem{}, &model.Order{}, &model.Address{},
-		&model.OrderItem{}); err != nil {
-		logrus.Fatal("failed to migrate order database:", err)
-	}
-	logrus.Info("successfully migrate order database")
 }
 
 func main() {
-	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	s := grpc.NewServer()
-
-	pborder.RegisterOrderServiceServer(s, &OrderServiceServer{})
-	if err = s.Serve(cc); err != nil {
-		logrus.Fatal(err)
-	}
+	db.InitDB()
+	logrus.Info("database connect success")
 }

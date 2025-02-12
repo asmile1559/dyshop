@@ -1,20 +1,30 @@
 package db
 
 import (
+	"github.com/asmile1559/dyshop/app/order/biz/model"
+	"github.com/asmile1559/dyshop/utils/db/mysqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
 func InitDB() {
-	dsn := viper.GetString("database.dsn")
-	var err error
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		logrus.Fatal("failed to connect database:", err)
+	conf := mysqlx.DbConfig{
+		User:     viper.GetString("database.username"),
+		Password: viper.GetString("database.password"),
+		Host:     viper.GetString("database.host"),
+		Port:     viper.GetInt("database.port"),
+		DbName:   viper.GetString("database.dbname"),
+		Models: []any{&model.Cart{}, &model.CartItem{}, &model.Order{}, &model.Address{},
+			&model.OrderItem{}},
 	}
-	logrus.Info("database connect success")
+
+	db, err := mysqlx.New(conf)
+	if err != nil {
+		logrus.WithError(err).Fatal("database conn fail")
+		return
+	}
+	DB = db
 }
