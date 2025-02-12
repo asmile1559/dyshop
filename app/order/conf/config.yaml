@@ -1,4 +1,31 @@
 server:
   port: 15166
+
 database:
-  dsn: "root:123@tcp(127.0.0.1:3306)/orders_db?charset=utf8mb4&parseTime=True&loc=Local"
+  driver: mysql
+  host: "127.0.0.1"
+  port: 3306
+  username: root
+  password: root
+  dbname: cart_db
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600
+
+log:
+  level: debug
+
+etcd:
+  endpoints:
+    - "127.0.0.1:2379"       # Etcd 节点地址
+  prefix: "/services/order"  # 服务注册前缀
+
+services:
+  - id: "order-service-1"     # 服务实例ID
+    address: "127.0.0.1:15166" # 服务实例地址
+
+prometheus: "/services/prometheus"
+
+metrics:
+  host: "127.0.0.1"
+  port: 15167 # 服务实例监控端口
