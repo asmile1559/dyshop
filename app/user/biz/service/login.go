@@ -50,7 +50,7 @@ func (s *LoginService) Run(req *pbuser.LoginReq) (*pbuser.LoginResp, error) {
 	logrus.Info("login success")
 	// 4. 返回令牌和用户 ID
 	return &pbuser.LoginResp{
-		UserId: uint32(user.UserID),
+		UserId: user.UserID,
 		Token:  resp.Token, // 返回生成的令牌
 	}, nil
 }

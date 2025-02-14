@@ -45,6 +45,10 @@ func Auth() gin.HandlerFunc {
 			Method: method,
 			Uri:    uri,
 		})
+		logrus.WithFields(logrus.Fields{
+			"success": resp.Res,
+			"userid": resp.UserId,
+		}).Debug("verify token resp")
 		if err != nil {
 			logrus.WithError(err).Debug("AuthClient.VerifyTokenByRPC err")
 		}

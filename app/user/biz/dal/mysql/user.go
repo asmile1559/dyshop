@@ -17,7 +17,7 @@ func GetUserByEmail(email string) (*model.User, error) {
 }
 
 // GetUserByID 根据ID查询用户
-func GetUserByID(userID uint32) (*model.User, error) {
+func GetUserByID(userID int64) (*model.User, error) {
 	var user model.User
 	err := db.Where("user_id = ?", userID).First(&user).Error
 	if err != nil {
@@ -40,7 +40,7 @@ func UpdateUser(user *model.User) error {
 }
 
 // DeleteUserByID 根据用户ID删除用户
-func DeleteUserByID(userID uint32) error {
+func DeleteUserByID(userID int64) error {
 	var user model.User
 	// 删除用户
 	if err := db.Where("user_id = ?", userID).Delete(&user).Error; err != nil {

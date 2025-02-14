@@ -1,6 +1,8 @@
 server:
   port: 12166
   mode: development
+  start_time: "2025-02-14"
+  machine_id: 1
 
 database:
   driver: mysql

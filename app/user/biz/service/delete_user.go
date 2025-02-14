@@ -22,7 +22,7 @@ func NewDeleteUserService(c context.Context) *DeleteUserService {
 // Run 执行删除用户逻辑
 func (s *DeleteUserService) Run(req *pbuser.DeleteUserReq) (*pbuser.DeleteUserResp, error) {
 	// 1. 查找用户
-    user, err := mysql.GetUserByID(uint32(req.UserId))
+    user, err := mysql.GetUserByID(req.UserId)
     if err != nil {
         logrus.WithField("userId",req.UserId).WithError(err).Error("用户不存在")
         return nil, fmt.Errorf("用户不存在: %v", err)

@@ -9,6 +9,8 @@ import (
 	"github.com/asmile1559/dyshop/utils/db/mysqlx"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	"google.golang.org/grpc"
+	"github.com/asmile1559/dyshop/app/user/utils"
+
 
 	//"github.com/asmile1559/dyshop/utils/mtl"
 	"github.com/asmile1559/dyshop/utils/registryx"
@@ -31,7 +33,9 @@ func init() {
 
 func main() {
 	rpcclient.InitRPCClient()
-	
+
+	utils.Init(viper.GetString("server.start_time"), int64(viper.GetInt("server.machine_id")))
+
 	dbconf := mysqlx.DbConfig{
 		User:     viper.GetString("database.username"),
 		Password: viper.GetString("database.password"),

@@ -21,7 +21,7 @@ message RegisterReq {
 }
 
 message RegisterResp {
-  uint32 id = 1;
+  int64 id = 1;
 }
 
 message LoginReq {
@@ -30,12 +30,12 @@ message LoginReq {
 }
 
 message  LoginResp {
-  uint32 id = 1;
+  int64 id = 1;
   string token = 2;
 }
 
 message LogoutReq {
-  uint32 id = 1;
+  int64 id = 1;
 }
 
 message LogoutResp {
@@ -43,7 +43,7 @@ message LogoutResp {
 }
 
 message UpdateUserReq {
-  uint32 user_id = 1;          
+  int64 user_id = 1;          
   string email = 2;             
   string password = 3;         
 }
@@ -53,17 +53,16 @@ message UpdateUserResp {
 }
 
 message GetUserInfoReq {
-  uint32 user_id = 1;
+  int64 user_id = 1;
 }
 
 message GetUserInfoResp {
-  uint32 user_id = 1;
-  string email = 2;
-  string password = 3; 
+  int64 user_id = 1;
+  string email = 2; 
 }
 
 message DeleteUserReq {
-  uint32 user_id = 1;
+  int64 user_id = 1;
 }
 
 message DeleteUserResp {

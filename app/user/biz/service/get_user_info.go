@@ -23,7 +23,7 @@ func NewGetUserInfoService(c context.Context) *GetUserInfoService {
 // Run 执行获取用户信息逻辑
 func (s *GetUserInfoService) Run(req *pbuser.GetUserInfoReq) (*pbuser.GetUserInfoResp, error) {
 	// 1. 查找用户
-	user, err := mysql.GetUserByID(uint32(req.UserId))
+	user, err := mysql.GetUserByID(req.UserId)
 	if err != nil {
 		logrus.WithField("userid",req.UserId).WithError(err).Error("用户不存在")
 		return nil, fmt.Errorf("用户不存在: %v", err)
@@ -34,6 +34,5 @@ func (s *GetUserInfoService) Run(req *pbuser.GetUserInfoReq) (*pbuser.GetUserInf
 	return &pbuser.GetUserInfoResp{
 		UserId:  user.UserID,
 		Email:   user.Email,
-		Password: user.Password, 
 	}, nil
 }

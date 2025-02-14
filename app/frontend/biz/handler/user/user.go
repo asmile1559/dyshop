@@ -3,8 +3,11 @@ package user
 import (
 	"strconv"
 
+	"github.com/asmile1559/dyshop/app/frontend/biz/model"
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
 	"github.com/asmile1559/dyshop/pb/frontend/user_page"
+	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 
 	"net/http"
 
@@ -14,13 +17,32 @@ import (
 func Register(c *gin.Context) {
 	var err error
 	var req user_page.RegisterReq
-
-	err = c.Bind(&req)
-	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+	var p model.ParamRegister
+	
+	// 参数校验
+	if err := c.Bind(&p); err != nil {
+		//请求参数有误，返回响应
+		logrus.WithError(err).Error("register with invalid param")
+		// 获取validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			logrus.WithError(err)
+			c.String(http.StatusOK, "An error occurred: %v", err)
+			return
+		}
+		// validator.ValidationErrors类型错误则进行翻译
+		logrus.Error(errs.Translate(trans))
+		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
 		return
 	}
 
+	// 业务逻辑
+	req = user_page.RegisterReq{
+		Email:           p.Email,
+		Password:        p.Password,
+		ConfirmPassword: p.ConfirmPassword,
+	}
 	resp, err := service.NewRegisterService(c).Run(&req)
 
 	if err != nil {
@@ -34,11 +56,30 @@ func Register(c *gin.Context) {
 func Login(c *gin.Context) {
 	var err error
 	var req user_page.LoginReq
-
-	err = c.Bind(&req)
-	if err != nil {
-		c.String(http.StatusOK, "%v", err)
+	var p model.ParamLogin
+	
+	// 参数校验
+	if err := c.Bind(&p); err != nil {
+		//请求参数有误，返回响应
+		logrus.WithError(err).Error("register with invalid param")
+		// 获取validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			logrus.WithError(err)
+			c.String(http.StatusOK, "An error occurred: %v", err)
+			return
+		}
+		// validator.ValidationErrors类型错误则进行翻译
+		logrus.Error(errs.Translate(trans))
+		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
 		return
+	}
+
+	// 业务逻辑
+	req = user_page.LoginReq{
+		Email:    p.Email,
+		Password: p.Password,
 	}
 
 	resp, err := service.NewLoginService(c).Run(&req)
@@ -55,12 +96,31 @@ func Login(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	var err error
 	var req user_page.UpdateUserReq
-
-	// 绑定请求数据
-	err = c.Bind(&req)
-	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+	var p model.ParamUpdateUser
+	
+	// 参数校验
+	if err := c.Bind(&p); err != nil {
+		//请求参数有误，返回响应
+		logrus.WithError(err).Error("register with invalid param")
+		// 获取validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			logrus.WithError(err)
+			c.String(http.StatusOK, "An error occurred: %v", err)
+			return
+		}
+		// validator.ValidationErrors类型错误则进行翻译
+		logrus.Error(errs.Translate(trans))
+		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
 		return
+	}
+
+	// 业务逻辑
+	req = user_page.UpdateUserReq{
+		UserId:   p.UserID,
+		Email:    p.Email,
+		Password: p.Password,
 	}
 
 	// 调用 Service 层的业务逻辑
@@ -91,7 +151,7 @@ func GetUserInfo(c *gin.Context){
 		c.String(http.StatusOK, "An error occurred: %v", err)
 		return
 	}
-	req.UserId = uint32(i)
+	req.UserId = int64(i)
 	
 	resp, err := service.NewGetUserInfoService(c).Run(&req)
 
@@ -106,13 +166,30 @@ func GetUserInfo(c *gin.Context){
 func Delete(c *gin.Context){
 	var err error
 	var req user_page.DeleteUserReq
-
-	err = c.Bind(&req)
-	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+	var p model.ParamDeleteUser
+	
+	// 参数校验
+	if err := c.Bind(&p); err != nil {
+		//请求参数有误，返回响应
+		logrus.WithError(err).Error("register with invalid param")
+		// 获取validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			logrus.WithError(err)
+			c.String(http.StatusOK, "An error occurred: %v", err)
+			return
+		}
+		// validator.ValidationErrors类型错误则进行翻译
+		logrus.Error(errs.Translate(trans))
+		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
 		return
 	}
 
+	// 业务逻辑
+	req = user_page.DeleteUserReq{
+		UserId: p.UserID,
+	}
 	resp, err := service.NewDeleteUserService(c).Run(&req)
 
 	if err != nil {

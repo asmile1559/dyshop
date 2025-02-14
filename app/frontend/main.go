@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/asmile1559/dyshop/app/frontend/middleware"
+	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/jwt"
 	"github.com/sirupsen/logrus"
@@ -21,6 +22,11 @@ func init() {
 
 func main() {
 	rpcclient.InitRPCClient()
+
+	//初始化gin框架内置的校验器翻译器
+	if err := user.InitTrans("zh"); err != nil {
+		logrus.Fatal(err)
+	}
 
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -103,7 +109,7 @@ func registerTestRouter(e *gin.Engine) {
 			})
 			return
 		}
-		token, err := jwt.GenerateJWT(uint32(1))
+		token, err := jwt.GenerateJWT(int64(1))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"code":    http.StatusInternalServerError,

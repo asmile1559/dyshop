@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/asmile1559/dyshop/app/frontend/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,7 +18,7 @@ func _loginMw() []gin.HandlerFunc {
 }
 
 func _logoutMw() []gin.HandlerFunc {
-	return nil
+	return []gin.HandlerFunc{middleware.Auth()}
 }
 
 func _registerMw() []gin.HandlerFunc {
@@ -25,13 +26,13 @@ func _registerMw() []gin.HandlerFunc {
 }
 
 func _updateMw() []gin.HandlerFunc {
-	return nil
+	return []gin.HandlerFunc{middleware.Auth()}
 }
 
 func _infoMw() []gin.HandlerFunc {
-	return nil
+	return []gin.HandlerFunc{middleware.Auth()}
 }
 
 func _deleteMw() []gin.HandlerFunc {
-	return nil
+	return []gin.HandlerFunc{middleware.Auth()}
 }
