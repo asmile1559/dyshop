@@ -7,7 +7,11 @@ option go_package="github.com/asmile1559/dyshop/pb/frontend/user_page;user_page"
 service UserService {
   rpc Register(RegisterReq) returns (RegisterResp) {};
   rpc Login (LoginReq) returns (LoginResp) {};
-  rpc Logout (LogoutReq) returns (LogoutResp) {};
+  rpc Logout (LogoutReq) returns (LogoutResp) {}; 
+  rpc UpdateUser(UpdateUserReq) returns (UpdateUserResp) {};
+  rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp) {};
+  rpc DeleteUser(DeleteUserReq) returns (DeleteUserResp) {};
+
 }
 
 message RegisterReq {
@@ -35,5 +39,33 @@ message LogoutReq {
 }
 
 message LogoutResp {
+  bool success = 1;            
+}
 
+message UpdateUserReq {
+  uint32 user_id = 1;          
+  string email = 2;             
+  string password = 3;         
+}
+
+message UpdateUserResp {
+  bool success = 1;         
+}
+
+message GetUserInfoReq {
+  uint32 user_id = 1;
+}
+
+message GetUserInfoResp {
+  uint32 user_id = 1;
+  string email = 2;
+  string password = 3; 
+}
+
+message DeleteUserReq {
+  uint32 user_id = 1;
+}
+
+message DeleteUserResp {
+  bool success = 1;
 }

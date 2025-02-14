@@ -1,9 +1,10 @@
 package user
 
 import (
+	"net/http"
+
 	u "github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func Register(e *gin.Engine) {
@@ -18,5 +19,8 @@ func Register(e *gin.Engine) {
 		})
 		_user.POST("/login", append(_loginMw(), u.Login)...)
 		_user.POST("/register", append(_registerMw(), u.Register)...)
+		_user.PUT("/update", append(_updateMw(),u.UpdateUser)...)
+		_user.GET("/info/:id", append(_infoMw(),u.GetUserInfo)...)
+		_user.DELETE("/delete", append(_deleteMw(),u.Delete)...)
 	}
 }
