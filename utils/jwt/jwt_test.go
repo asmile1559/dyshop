@@ -7,7 +7,7 @@ import (
 
 func TestJWT(t *testing.T) {
 
-	id := uint32(math.MaxUint32)
+	id := int64(math.MaxInt64)
 
 	jwt, err := GenerateJWT(id)
 	if err != nil {
@@ -28,7 +28,7 @@ func TestJWT(t *testing.T) {
 
 func TestParseToken(t *testing.T) {
 
-	id := uint32(123)
+	id := int64(123)
 
 	jwt, err := GenerateJWT(id)
 	if err != nil {
