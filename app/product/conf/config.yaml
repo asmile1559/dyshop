@@ -1,2 +1,12 @@
 server:
   port: 13166
+mysql:
+    dsn: "user:123456@tcp(127.0.0.1:3308)/dyshop?charset=utf8mb4&parseTime=True&loc=Local"
+etcd:
+    endpoints:
+        - "127.0.0.1:2379"       # Etcd 节点地址
+    prefix: "/services/Product"  # 服务注册前缀
+
+services:
+    - id: "prodcut-service-1"     # 服务实例ID
+      address: "127.0.0.1:13166" # 服务实例地址

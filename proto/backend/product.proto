@@ -58,7 +58,7 @@ message CreateProductReq {
 }
 
 message CreateProductResp {
-  Product product = 1;
+  bool success = 1;
 }
 
 message ModifyProductReq {
@@ -71,7 +71,7 @@ message ModifyProductReq {
 }
 
 message ModifyProductResp {
-  Product product = 1;
+  bool success = 1;
 }
 
 message DeleteProductReq {

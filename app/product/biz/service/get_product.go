@@ -1,8 +1,8 @@
 package service
 
 import (
+	"github.com/asmile1559/dyshop/app/product/biz/dal"
 	"github.com/asmile1559/dyshop/app/product/biz/model"
-	"github.com/asmile1559/dyshop/app/product/dao"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
@@ -24,15 +24,14 @@ func (s *GetProductService) Run(req *pbproduct.GetProductReq) (*pbproduct.GetPro
 	var dbProduct model.Product
 
 	// 使用 uint 类型查询
-	if err := dao.Db.First(&dbProduct, uint(req.Id)).Error; err != nil {
+	if err, _ := model.GetProductByID(dal.DB, uint(req.Id)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "product not found")
 		}
 		return nil, status.Errorf(codes.Internal, "database error: %v", err)
 	}
-
 	return &pbproduct.GetProductResp{
-		Product: dbProduct.ToProto(), // 转换模型到 Protobuf
+		Product: dbProduct.ToProto(),
 	}, nil
 
 }
