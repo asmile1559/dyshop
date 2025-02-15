@@ -6,6 +6,8 @@ import (
 	"github.com/asmile1559/dyshop/utils/jwt"
 	"golang.org/x/net/context"
 	"net/http"
+	"github.com/sirupsen/logrus"
+
 )
 
 type VerifyTokenService struct {
@@ -20,6 +22,7 @@ func (s *VerifyTokenService) Run(req *pbauth.VerifyTokenReq) (*pbauth.VerifyResp
 
 	resp := pbauth.VerifyResp{}
 	user, err := jwt.ParseToken(req.GetToken())
+	logrus.WithError(err).WithField("userid",user.UserID).Debug("jwt.ParseToken res")
 	if err != nil {
 		resp.Res = false
 		resp.Code = http.StatusUnauthorized
@@ -32,7 +35,7 @@ func (s *VerifyTokenService) Run(req *pbauth.VerifyTokenReq) (*pbauth.VerifyResp
 		resp.Code = http.StatusInternalServerError
 		return &resp, nil
 	}
-
+	logrus.WithError(err).WithField("ok",ok).Debug("casbin.Check res")
 	if !ok {
 		resp.Res = false
 		resp.Code = http.StatusForbidden
