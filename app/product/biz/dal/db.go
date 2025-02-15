@@ -14,6 +14,7 @@ var DB *gorm.DB
 
 // InitDB 根据传入的 dsn 初始化 gorm.DB
 func InitDB(dsn string) error {
+	dsn = "user:123456@tcp(127.0.0.1:3308)/dyshop?charset=utf8mb4&parseTime=True&loc=Local"
 	newDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})

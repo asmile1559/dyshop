@@ -16,6 +16,15 @@ type CreateProductService struct {
 	ctx context.Context
 }
 
+//
+//func init() {
+//	dsn := viper.GetString("mysql.dsn")
+//	print(dsn)
+//	if err := dal.InitDB(dsn); err != nil {
+//		logrus.Fatalf("failed to init db: %v", err)
+//	}
+//}
+
 func NewCreateProductService(c context.Context) *CreateProductService {
 	return &CreateProductService{ctx: c}
 }
@@ -56,6 +65,7 @@ func NewModifyProductService(c context.Context) *ModifyProductService {
 }
 
 func (s *ModifyProductService) Run(req *pbproduct.ModifyProductReq) (*pbproduct.ModifyProductResp, error) {
+
 	if req.Id == 0 {
 		return nil, status.Error(codes.InvalidArgument, "product ID is required")
 	}

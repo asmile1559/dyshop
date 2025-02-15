@@ -66,8 +66,12 @@ func GetProductByID(db *gorm.DB, productID uint) (*Product, error) {
 }
 
 // 创建或更新产品信息（使用 Upsert 语义）
-func CreateOrUpdateProduct(db *gorm.DB, product *Product) error {
-	return db.Transaction(func(tx *gorm.DB) error {
+func CreateOrUpdateProduct(tx *gorm.DB, product *Product) error {
+	if tx == nil {
+		return errors.New("transaction object is nil")
+	}
+	return tx.Transaction(func(tx *gorm.DB) error {
+
 		// 尝试查找现有产品
 		var existingProduct Product
 		err := tx.Where("id = ?", product.ID).First(&existingProduct).Error
@@ -93,9 +97,9 @@ func CreateOrUpdateProduct(db *gorm.DB, product *Product) error {
 
 // 清空所有产品记录（谨慎使用）
 func ClearAllProducts(db *gorm.DB) error {
-	return db.Transaction(func(tx *gorm.DB) error {
+	return db.Transaction(func(db *gorm.DB) error {
 		// 执行物理删除（忽略软删除标记）
-		if err := tx.Unscoped().Where("1 = 1").Delete(&Product{}).Error; err != nil {
+		if err := db.Unscoped().Where("1 = 1").Delete(&Product{}).Error; err != nil {
 			return err
 		}
 		return nil
@@ -104,6 +108,7 @@ func ClearAllProducts(db *gorm.DB) error {
 
 // DeleteProduct 删除产品
 func DeleteProduct(db *gorm.DB, id uint32) error {
+
 	result := db.Delete(&Product{}, id)
 	if result.RowsAffected == 0 {
 		return gorm.ErrRecordNotFound

@@ -27,7 +27,12 @@ type ProductServerWrapper struct {
 }
 
 func main() {
+	err := loadConfig()
+	if err != nil {
+		return
+	}
 	dsn := viper.GetString("mysql.dsn")
+	print(dsn)
 	if err := dal.InitDB(dsn); err != nil {
 		logrus.Fatalf("failed to init db: %v", err)
 	}
