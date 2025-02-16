@@ -13,5 +13,8 @@ func Register(e *gin.Engine) {
 		//_product.GET("/", )
 		_product.GET("/:id", append(_getProductMw(), p.GetProduct)...)
 		_product.GET("/search", append(_searchProductsMw(), p.SearchProduct)...)
+		_product.POST("/create", append(_createProductsMw(), p.CreateProduct)...)
+		_product.POST("/update", append(_modifyProductsMw(), p.ModifyProduct)...)
+		_product.GET("/delete", append(_deleteProductsMw(), p.DeleteProduct)...)
 	}
 }
