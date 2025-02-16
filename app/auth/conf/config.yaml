@@ -1,11 +1,20 @@
 server:
   port: 11166
 
+log:
+  level: debug
+
 etcd:
   endpoints:
-    - "127.0.0.1:2379"       # Etcd 节点地址
-  prefix: "/services/auth"  # 服务注册前缀
+    - "127.0.0.1:2379" # Etcd 节点地址
+  prefix: "/services/auth" # 服务注册前缀
 
 services:
-  - id: "auth-service-1"     # 服务实例ID
+  - id: "auth-service-1" # 服务实例ID
     address: "127.0.0.1:11166" # 服务实例地址
+
+prometheus: "/services/prometheus"
+
+metrics:
+  host: "127.0.0.1"
+  port: 11167 # 服务实例监控端口

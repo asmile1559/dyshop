@@ -12,12 +12,12 @@ import (
 )
 
 type User struct {
-	UserID  uint32
+	UserID  int64
 	Subject string
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(userID uint32) (string, error) {
+func GenerateJWT(userID int64) (string, error) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)

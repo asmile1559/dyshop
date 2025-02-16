@@ -1,7 +1,13 @@
 package main
 
 import (
+
 	"fmt"
+
+	"net/http"
+
+	"github.com/asmile1559/dyshop/app/frontend/middleware"
+	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/jwt"
 	"github.com/sirupsen/logrus"
@@ -95,6 +101,11 @@ func addOne(n int) int {
 
 func main() {
 	rpcclient.InitRPCClient()
+
+	//初始化gin框架内置的校验器翻译器
+	if err := user.InitTrans("zh"); err != nil {
+		logrus.Fatal(err)
+	}
 
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -247,14 +258,42 @@ func registerTestRouter(e *gin.Engine) {
 					})
 					return
 				}
-
-				c.JSON(http.StatusOK, gin.H{
+        c.JSON(http.StatusOK, gin.H{
 					"code":    http.StatusOK,
 					"message": "upload ok!",
 					"url":     filepath,
 				})
 			}
 		})
+
+	_test.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", gin.H{})
+	})
+	_test.POST("/login", func(c *gin.Context) {
+		u := struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}{}
+		err := c.BindJSON(&u)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "Expect json format login information",
+			})
+			return
+		}
+		token, err := jwt.GenerateJWT(int64(1))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": "Something went wrong. Please try again later.",
+			})
+			logrus.Error(err)
+			return
+		}
+
+
+				
 		_upload.POST("/product", func(c *gin.Context) {
 			t := c.PostForm("type")
 			fmt.Println(t)

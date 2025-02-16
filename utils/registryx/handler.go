@@ -1,11 +1,14 @@
 package registryx
 
 import (
+	"context"
+	"fmt"
 	"net"
 	"sync"
 	"time"
 
 	"github.com/asmile1559/dyshop/utils/balancerx"
+	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -20,15 +23,17 @@ func StartEtcdServices[T any](
 	serverFactory func(instanceID string, etcdService *EtcdService) T,
 ) {
 	var wg sync.WaitGroup
+	ctx, cancel := context.WithCancel(context.Background())
+	go hookx.GracefulExit(cancel)
 	for _, raw := range services {
-		serviceMap := raw.(map[string]string)
-		id := serviceMap["id"]
-		address := serviceMap["address"]
+		serviceMap := raw.(map[string]any)
+		id := serviceMap["id"].(string)
+		address := serviceMap["address"].(string)
 
 		wg.Add(1)
 		go func(id, addr string) {
 			defer wg.Done()
-			startEtcdServiceInstance(endpoints, id, addr, prefix, registerFunc, serverFactory)
+			startEtcdServiceInstance(ctx, endpoints, id, addr, prefix, registerFunc, serverFactory)
 		}(id, address)
 	}
 	wg.Wait()
@@ -36,6 +41,7 @@ func StartEtcdServices[T any](
 
 // 启动单个服务实例并注册到 Etcd
 func startEtcdServiceInstance[T any](
+	ctx context.Context,
 	endpoints []string,
 	instanceID, address, prefix string,
 	registerFunc func(grpc.ServiceRegistrar, T),
@@ -75,10 +81,13 @@ func startEtcdServiceInstance[T any](
 		"instanceID": instanceID,
 		"address":    address,
 	}).Info("running...")
-	if err = grpcServer.Serve(listener); err != nil {
-		logrus.Fatalf("Failed to serve instance %s: %v", instanceID, err)
-		logrus.WithError(err).WithField("instanceID", instanceID).Fatal("Failed to serve instance")
-	}
+	go func() {
+		if err = grpcServer.Serve(listener); err != nil {
+			logrus.WithError(err).WithField("instanceID", instanceID).Error("Failed to serve instance")
+		}
+	}()
+	<-ctx.Done()
+	logrus.WithField("instanceID", instanceID).Debug("Shutting down...")
 }
 
 // 从 Etcd 中发现服务
@@ -103,8 +112,8 @@ func DiscoverEtcdServices[T any](
 		return zero, nil, err
 	}
 	if len(services) == 0 {
-		logrus.WithError(err).WithField("prefix", prefix).Error("No services found for key")
-		return zero, nil, err
+		logrus.WithField("prefix", prefix).Error("No services found for key")
+		return zero, nil, fmt.Errorf("No services found for key")
 	}
 
 	// 初始化负载均衡策略

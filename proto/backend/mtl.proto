@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package mtl;
+
+option go_package = "github.com/asmile1559/dyshop/pb/backend/mtl;mtl";
+
+message MetricsRequest {
+    string prefix = 1;
+    string Host = 2;
+    int32 Port = 3;
+    repeated Label labels = 4;
+}
+
+message Label {
+    string key = 1;
+    string value = 2;
+}
+
+// 返回的 metrics 字符串
+message MetricsResponse {
+}
+
+// 定义 Metrics gRPC 服务
+service MetricsService {
+    rpc RegisterMetrics(MetricsRequest) returns (MetricsResponse);
+    rpc DeregisterMetrics(MetricsRequest) returns (MetricsResponse);
+}

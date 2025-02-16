@@ -62,7 +62,7 @@ func FileOpen(path string) (*os.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return nil, err
 	}
