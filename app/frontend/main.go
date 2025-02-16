@@ -1,12 +1,7 @@
 package main
 
 import (
-
 	"fmt"
-
-	"net/http"
-
-	"github.com/asmile1559/dyshop/app/frontend/middleware"
 	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/jwt"
@@ -123,10 +118,18 @@ func main() {
 	router.StaticFS("/test/static", http.Dir("static"))
 
 	router.GET("/ping", func(c *gin.Context) {
+		//  1. 方式 1
+		//resp := struct {
+		//	Code int    `json:"code"`
+		//	Host string `json:"host"`
+		//	Pong string `json:"pong"`
+		//}{http.StatusOK, "192.168.191.130:10166", "Pong"}
+		//c.HTML(http.StatusOK, "pong.html", &resp)
+		// 2. 方式 2
 		c.HTML(http.StatusOK, "pong.html", gin.H{
-			"code": http.StatusOK,
-			"host": "192.168.191.130:10166",
-			"ping": "pong",
+			"Code": http.StatusOK,
+			"Host": "192.168.191.130:10166",
+			"Pong": "Pong",
 		})
 	})
 
@@ -232,6 +235,35 @@ func registerTestRouter(e *gin.Engine) {
 				},
 			},
 		})
+
+	})
+	_test.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", gin.H{})
+	})
+
+	_test.POST("/login", func(c *gin.Context) {
+		u := struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}{}
+		err := c.BindJSON(&u)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "Expect json format login information",
+			})
+			return
+		}
+		_, err = jwt.GenerateJWT(int64(1))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": "Something went wrong. Please try again later.",
+			})
+			logrus.Error(err)
+			return
+		}
+
 	})
 
 	{
@@ -258,7 +290,7 @@ func registerTestRouter(e *gin.Engine) {
 					})
 					return
 				}
-        c.JSON(http.StatusOK, gin.H{
+				c.JSON(http.StatusOK, gin.H{
 					"code":    http.StatusOK,
 					"message": "upload ok!",
 					"url":     filepath,
@@ -266,34 +298,6 @@ func registerTestRouter(e *gin.Engine) {
 			}
 		})
 
-	_test.GET("/login", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.html", gin.H{})
-	})
-	_test.POST("/login", func(c *gin.Context) {
-		u := struct {
-			Email    string `json:"email"`
-			Password string `json:"password"`
-		}{}
-		err := c.BindJSON(&u)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"code":    http.StatusBadRequest,
-				"message": "Expect json format login information",
-			})
-			return
-		}
-		token, err := jwt.GenerateJWT(int64(1))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"code":    http.StatusInternalServerError,
-				"message": "Something went wrong. Please try again later.",
-			})
-			logrus.Error(err)
-			return
-		}
-
-
-				
 		_upload.POST("/product", func(c *gin.Context) {
 			t := c.PostForm("type")
 			fmt.Println(t)
@@ -488,7 +492,7 @@ func registerTestRouter(e *gin.Engine) {
 				})
 				return
 			}
-			token, err := jwt.GenerateJWT(uint32(1))
+			token, err := jwt.GenerateJWT(int64(1))
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"code":    http.StatusInternalServerError,
