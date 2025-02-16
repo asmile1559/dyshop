@@ -1,8 +1,10 @@
+import * as router from './router.js'
+
 !function loginProcess() {
 
     axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
     axios.defaults.headers.post['Content-Type'] = 'application/json'
-    axios.defaults.baseURL = 'http://192.168.191.130:10166'
+    axios.defaults.baseURL = router.DefaultURL
 
     const loginTabtitle = document.querySelector('.login-tabtitle')
     const emailTabtitle = document.getElementById('email-tabtitle')
@@ -27,11 +29,6 @@
     let accountInputOk = false
     let passwordInputOk = false
     let loginWay = 'email'
-
-    jumpLink.addEventListener('click', function (e) {
-        e.preventDefault()
-        window.location.href = '/test/register'
-    })
 
     loginTabtitle.addEventListener('click', (e) => {
         const target = e.target
@@ -114,13 +111,14 @@
 
         axios({
             method: 'post',
-            url: '/test/login',
+            url: router.POSTReqRouters['login'],
             data: {
                 email: accountInput.value,
                 password: passwordInput.value
             }
         }).then(res => {
             if (res.data.code === 200) {
+                // cookies.set('token', res.data.token)
                 localStorage.setItem('token', res.data.token)
                 modal.style.display = 'block'
                 let count = 3
@@ -130,7 +128,7 @@
                     modalBody.innerText = `登录成功，${count}秒后跳转到首页。`
                     if (count === 0) {
                         clearInterval(timer)
-                        window.location.href = '/index.html'
+                        window.location.href = router.GETReqRouters['home']
                     }
                 }, 1000)
 
@@ -141,7 +139,7 @@
 
                 jumpNow.addEventListener('click', function () {
                     clearInterval(timer)
-                    window.location.href = '/index.html'
+                    window.location.href = router.GETReqRouters['home']
                 })
                 console.log(res.data)
             } else {
