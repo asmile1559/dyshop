@@ -369,6 +369,10 @@ func (s *Greeter) SayHello(ctx context.Context, req *pbhello.HelloRequest) (*pbh
   - [ ] <del>satoken<del>
 - [ ] 负载均衡
 - [ ] 前端页面
+- [ ] 可观测性
+  - [x] 日志（日志初始化函数）
+  - [x] Metrics：Prometheus (with auto detection service)
+  - [ ] Trace
 ## Auth
 - [x] rpc通信
 - [x] Token的生成与分发

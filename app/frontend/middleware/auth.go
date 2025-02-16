@@ -3,10 +3,12 @@ package middleware
 import (
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
+	"github.com/sirupsen/logrus"
 
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Auth() gin.HandlerFunc {
@@ -33,11 +35,23 @@ func Auth() gin.HandlerFunc {
 
 		method := c.Request.Method
 		uri := c.Request.RequestURI
-		resp, _ := rpcclient.AuthClient.VerifyTokenByRPC(c, &pbauth.VerifyTokenReq{
+		logrus.WithFields(logrus.Fields{
+			"token":  token[1],
+			"method": method,
+			"uri":    uri,
+		}).Debug("auth middleware token")
+		resp, err := rpcclient.AuthClient.VerifyTokenByRPC(c, &pbauth.VerifyTokenReq{
 			Token:  token[1],
 			Method: method,
 			Uri:    uri,
 		})
+		logrus.WithFields(logrus.Fields{
+			"success": resp.Res,
+			"userid": resp.UserId,
+		}).Debug("verify token resp")
+		if err != nil {
+			logrus.WithError(err).Debug("AuthClient.VerifyTokenByRPC err")
+		}
 
 		if !resp.GetRes() {
 			var message string
