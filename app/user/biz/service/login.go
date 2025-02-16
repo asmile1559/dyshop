@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
-	"github.com/asmile1559/dyshop/app/user/utils"
+	"github.com/asmile1559/dyshop/app/user/utils/bcrypt"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	rpcclient "github.com/asmile1559/dyshop/app/user/rpc"
 	"github.com/sirupsen/logrus"
@@ -34,7 +34,7 @@ func (s *LoginService) Run(req *pbuser.LoginReq) (*pbuser.LoginResp, error) {
 	}
 	
 	// 2. 验证密码
-	if !utils.VerifyPassword(user.Password, req.Password) {
+	if !bcrypt.VerifyPassword(user.Password, req.Password) {
 		// 密码不匹配
 		logrus.Error("密码错误")
 		return nil, fmt.Errorf("密码错误")

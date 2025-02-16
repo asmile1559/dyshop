@@ -6,7 +6,8 @@ import (
 
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
 	"github.com/asmile1559/dyshop/app/user/biz/model"
-	"github.com/asmile1559/dyshop/app/user/utils"
+	"github.com/asmile1559/dyshop/app/user/utils/bcrypt"
+	"github.com/asmile1559/dyshop/app/user/utils/snowflake"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/sirupsen/logrus"
 )
@@ -31,14 +32,14 @@ func (s *RegisterService) Run(req *pbuser.RegisterReq) (*pbuser.RegisterResp, er
 	}
 
 	// 2. 密码加密
-	hashedPassword, err := utils.HashPassword(req.Password)
+	hashedPassword, err := bcrypt.HashPassword(req.Password)
 	if err != nil {
 		logrus.WithError(err).Error("密码加密失败")
 		return nil, fmt.Errorf("密码加密失败: %v", err)
 	}
 
 	// 3. 存储用户信息到数据库
-	userID := utils.GenID()
+	userID := snowflake.GenID()
 	newUser := &model.User{
 		UserID: userID,
 		Email:    req.Email,

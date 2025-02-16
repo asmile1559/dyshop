@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
-	"github.com/asmile1559/dyshop/app/user/utils"
+	"github.com/asmile1559/dyshop/app/user/utils/bcrypt"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/sirupsen/logrus"
 
@@ -43,7 +43,7 @@ func (s *UpdateUserService) Run(req *pbuser.UpdateUserReq) (*pbuser.UpdateUserRe
 
 	// 3. 如果提供了新密码，更新密码
 	if req.Password != "" {
-		user.Password ,err = utils.HashPassword(req.Password)  // 记得对密码进行加密存储
+		user.Password ,err = bcrypt.HashPassword(req.Password)  // 记得对密码进行加密存储
 		if err != nil {
 			logrus.WithError(err).Error("密码加密失败")
 			return nil, fmt.Errorf("密码加密失败: %v", err)

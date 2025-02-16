@@ -26,13 +26,13 @@ func _registerMw() []gin.HandlerFunc {
 }
 
 func _updateMw() []gin.HandlerFunc {
-	return []gin.HandlerFunc{middleware.Auth()}
+	return nil
 }
 
 func _infoMw() []gin.HandlerFunc {
-	return []gin.HandlerFunc{middleware.Auth()}
+	return nil
 }
 
 func _deleteMw() []gin.HandlerFunc {
-	return []gin.HandlerFunc{middleware.Auth()}
+	return nil
 }
