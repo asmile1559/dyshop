@@ -51,7 +51,8 @@ func main() {
 
 	info := mtl.MetricsInfo{
 		Prefix: prefix,
-		Target: "127.0.0.1:2112",
+		Host:   "127.0.0.1",
+		Port:   2112,
 		Labels: map[string]string{
 			"type": "apps",
 			"app":  "hello",

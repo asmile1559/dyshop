@@ -20,8 +20,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// 2) 初始化数据库，自动迁移
-	dsn := viper.GetString("mysql.dsn")
-	if err := dal.InitDB(dsn); err != nil {
+	if err := dal.InitDB(); err != nil {
 		logrus.Fatalf("failed to init DB: %v", err)
 	}
 

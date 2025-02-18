@@ -1,0 +1,11 @@
+FROM prom/prometheus:latest
+
+# 复制当前目录的所有内容到镜像中(根据需要修改)
+COPY . /metrics
+
+# 暴露端口(示例：8080，若有需要修改)
+EXPOSE 9091
+
+ENTRYPOINT ["/metrics/docker.sh"]
+
+CMD ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus"]
