@@ -59,7 +59,6 @@ func RegisterMetrics(info MetricsInfo) {
 }
 
 func DeregisterMetrics(info MetricsInfo) {
-	logrus.Debug("receive a msg")
 	// 向 Prometheus 配置中心注册地址
 	endpoints := viper.GetStringSlice("etcd.endpoints")
 	prometheus := viper.GetString("prometheus")
