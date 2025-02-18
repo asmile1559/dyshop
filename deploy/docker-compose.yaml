@@ -20,7 +20,7 @@ services:
     image: jiny14/mypromethues:latest
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./config/targets:/etc/prometheus/targets
+      # - ./config/targets:/etc/prometheus/targets
     ports:
       - "9090:9090"
       - "9091:9091"
