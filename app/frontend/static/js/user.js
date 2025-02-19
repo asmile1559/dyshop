@@ -1359,6 +1359,5 @@ function bindInputEvents(modaler, parent) {
   account(modaler)
   address(modaler)
   product(modaler)
-  // console.log(document.querySelector('#product-accordion'))
   bindInputEvents(modaler, document.querySelector('#product-accordion'))
 }()

@@ -20,35 +20,37 @@
     <div class="container">
       <div class="shop-nav">
         <div class="shop-nav-brand">
-          <a href="/test/" class="implicit-link">欢迎访问 抖音商城</a>
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
         </div>
-
         <div class="shop-nav-userbox">
-          <div class="have-logined">
+          <div class="user-bar">
             <span style="white-space: nowrap;">您好,</span>
             <span class="dropdown">
-              <button id="nav-user-name" class="btn btn-white dropdown-toggle top-nav-fs-sm1" style="width: 70%;"
-                type="button" data-bs-toggle="dropdown">
-                <span class="d-inline-block text-truncate" style="width: 90%; white-space: nowrap;"> {{ .username }}
-                </span>
+              <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+                data-bs-toggle="dropdown">
+                <span class="d-inline-block text-truncate"
+                  style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/test/user">个人设置</a></li>
-                <li><a class="dropdown-item" href="/test/cart">购物车</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.UserPage}}info">个人设置</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
                 <li><button class="dropdown-item">退出登录</button></li>
               </ul>
             </span>
           </div>
-
         </div>
       </div>
     </div>
   </div>
-  <div class="p-3 content-body">
-    <div class="container sticky-top bg-white p-3 header">
-      <div class="row align-items-center ">
+
+
+  <div class="p-3 main-body">
+    <div class="container header">
+      <div class="row align-items-center">
         <div class="col-3 text-center">
-          <a href="/test/" class="implicit-link">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">
             <h1>抖音商城</h1>
             <span style="font-size: small;">购物就上抖音商城</span>
           </a>
@@ -59,10 +61,12 @@
             <button class="btn btn-orangered fs-5" type="button" id="search"><span>搜索</span></button>
           </div>
         </div>
-        <div class="col-2"></div>
+        <div class="col-2">
+        </div>
       </div>
     </div>
   </div>
+
   <div class="p-3">
     <div class="container">
       <div class="row">
@@ -71,37 +75,37 @@
       <div class="row">
         <div class="col-9 ">
           <!-- 1. 收货地址列表 -->
-          {{with .addressList }}
-          <div class="address-list" data-default-address="{{.defaultAddrId}}">
+          {{with .AddressInfo }}
+          <div class="address-list" data-default-address="{{.Default}}">
             <div class="address-list-title">
               <div>
                 <span style="font-weight: bolder;">收货地址</span>
               </div>
               <div>
-                <a href="/test/user">管理地址</a>
+                <a href="{{$.PageRouter.UserPage}}address">管理地址</a>
               </div>
             </div>
-            {{ range $addr := .addresses }}
-            <div class="address-list-item" data-addr-id="{{.addrId}}">
+            {{ range $addr := .Addresses }}
+            <div class="address-list-item" data-addr-id="{{.AddressId}}">
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="address" {{if eq $.addressList.defaultAddrId .addrId
-                  }} checked {{end}} data-addr-id="{{.addrId}}" />
-                <span class="{{if eq $.addressList.defaultAddrId .addrId }} default-address {{end}}">
-                  {{if eq $.addressList.defaultAddrId .addrId }}默认{{else}}地址{{end}}
+                <input class="form-check-input" type="radio" name="address" {{if eq $.AddressInfo.Default .AddressId }}
+                  checked {{end}} data-addr-id="{{.AddressId}}" />
+                <span class="{{if eq $.AddressInfo.Default .AddressId }} default-address {{end}}">
+                  {{if eq $.AddressInfo.Default .AddressId }}默认{{else}}地址{{end}}
                 </span>
               </div>
               <div class="location">
-                <span class="province">{{ .province }}</span>
-                <span class="city">{{ .city }}</span>
-                <span class="district">{{ .district }}</span>
-                <span class="street">{{ .street }}</span>
+                <span class="province">{{ .Province }}</span>
+                <span class="city">{{ .City }}</span>
+                <span class="district">{{ .District }}</span>
+                <span class="street">{{ .Street }}</span>
               </div>
               <div class="detail">
-                <span>{{ .detail }}</span>
+                <span>{{ .FullAddress }}</span>
               </div>
               <div class="contact">
-                <span class="name">{{ .name }}</span>
-                <span class="phone">{{.phone}}</span>
+                <span class="name">{{ .Recipient }}</span>
+                <span class="phone">{{.Phone}}</span>
               </div>
             </div>
             {{end}}
@@ -130,41 +134,41 @@
               </div>
             </div>
             <div class="order-list-items">
-              {{ range $item := .orderItems }}
-              <div class="order-list-item" data-product-id="{{.productId}}">
-                {{with $item}}
+              {{ range $product := .Products }}
+              {{with $product}}
+              <div class="order-list-item" data-product-id="{{.ProductId}}">
                 <div class="row order-item-content">
                   <div class="col-4">
                     <div class="row">
                       <div class="col-4">
-                        <img src="{{.img}}" alt="p1" class="img-fluid" />
+                        <img src="{{.ProductImg}}" alt="p1" class="img-fluid" />
                       </div>
                       <div class="col-8">
                         <span class="order-item-name">
-                          {{.name}}
+                          {{.ProductName}}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div class="col-3">
-                    <span class="product-property">{{.valueItem}}</span>
+                    <span class="product-property">{{.ProductSpec.Name}}</span>
                   </div>
                   <div class="col-1 text-center">
                     <span class="order-item-oprice">
-                      <span>￥</span><span id="single-price{{.productId}}">{{.singlePrice}}</span>
+                      <span>￥</span><span id="single-price{{.ProductId}}">{{.ProductSpec.Price}}</span>
                     </span>
                   </div>
                   <div class="col-2 text-center">
                     <div class="btn-group" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-outline-secondary" data-btn-role="subQuantity">-</button>
-                      <input type="text" class="form-control text-center" value="{{.quantity}}" style="width: 50px;"
-                        id="quantity{{.productId}}" data-input-role="quantity">
+                      <input type="text" class="form-control text-center" value="{{.Quantity}}" style="width: 50px;"
+                        id="quantity{{.ProductId}}" data-input-role="quantity">
                       <button type="button" class="btn btn-outline-secondary" data-btn-role="addQuantity">+</button>
                     </div>
                   </div>
                   <div class="col-2 text-end">
                     <span class="order-item-fprice">
-                      <span>￥</span><span id="price{{.productId}}">{{.price}}</span>
+                      <span>￥</span><span id="price{{.ProductId}}"></span>
                     </span>
                   </div>
                 </div>
@@ -173,7 +177,7 @@
                   <div class="col-6" style="border-right: 1px solid #e9ecef;">
                     <div class="form-group mt-3">
                       <label for="order-remark">配送服务</label>
-                      <textarea class="form-control" id="order-remark{{.productId}}" rows="3" placeholder="请输入订单备注"
+                      <textarea class="form-control" id="order-remark{{.ProductId}}" rows="3" placeholder="请输入订单备注"
                         style="font-size: small;"></textarea>
                     </div>
                   </div>
@@ -183,24 +187,20 @@
                       <span>配送服务</span>
                       <div class="row mt-2 align-items-center justify-content-between">
                         <div class="col-6">
-                          <select class="form-select" data-select-role="deliver" id="deliver-select{{.productId}}"
-                            data-deliver-target="#deliver-cost{{.productId}}">
-                            <option value="快递" data-deliver-cost="{{ .deliverCost }}" selected>
+                          <select class="form-select" data-select-role="deliver" id="deliver-select{{.ProductId}}"
+                            data-deliver-target="#deliver-cost{{.ProductId}}">
+                            <option value="快递" data-deliver-cost="{{ .Postage }}" selected>
                               <span>快递</span>
-                              <span class="order-item-fprice">￥</span>
-                              <span class="order-item-fprice" id="deliver-cost{{.productId}}">{{.deliverCost}}</span>
                             </option>
                             <option value="自提" data-deliver-cost="0">
                               <span>自提</span>
-                              <span class="order-item-fprice">￥</span>
-                              <span class="order-item-fprice">0</span>
                             </option>
                           </select>
                         </div>
-                        <!-- <div class="col-6 text-end">
-                          <span class="order-item-fprice">￥</span>
-                          <span class="order-item-fprice" id="deliver-cost{{.productId}}">{{.deliverCost}}</span>
-                        </div> -->
+                        <div class="col-6 text-end">
+                          <span class="order-item-price">￥</span>
+                          <span class="order-item-price" id="deliver-cost{{.ProductId}}"></span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -209,7 +209,6 @@
               </div>
               {{end}}
             </div>
-
           </div>
         </div>
         <div class="col-3">
@@ -220,27 +219,27 @@
               <div>
                 <span>商品总价：</span>
                 <span>
-                  <span><span class="price">￥</span><span class="price" id="total-price">{{.totalPrice}}</span></span>
+                  <span><span class="price">￥</span><span class="price" id="total-price">{{.OrderPrice}}</span></span>
                 </span>
 
               </div>
               <div>
                 <span>运费：</span>
                 <span>
-                  <span class="price">￥</span><span class="price" id="total-deliver-cost">{{.totalDeliverCost}}</span>
+                  <span class="price">￥</span><span class="price" id="total-deliver-cost">{{.OrderPostage}}</span>
                 </span>
               </div>
               <div>
                 <span>优惠券：</span>
                 <span>
-                  <span class="discount">￥</span><span class="discount" id="discount">{{.discount}}</span>
+                  <span class="discount">￥</span><span class="discount" id="discount">{{.OrderDiscount}}</span>
                 </span>
               </div>
               <hr />
               <div>
                 <span>实付款：</span>
                 <span><span class="discount">￥</span><span class="discount" style="font-size: larger;"
-                    id="real-price">{{.realPrice}}</span></span>
+                    id="real-price">{{.OrderFinalPrice}}</span></span>
               </div>
 
               <div class="mt-3 justify-content-start">

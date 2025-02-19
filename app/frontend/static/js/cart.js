@@ -1,9 +1,10 @@
-import * as router from './router.js'
-import modalCtrl from './common.js'
+import * as router from './router.js';
+import * as common from './common.js';
 
 axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 axios.defaults.baseURL = router.DefaultURL
+
 
 function DeleteACartItemOnPage(itemId) {
   const cartList = document.querySelector('#cart-list')
@@ -135,40 +136,45 @@ function getCartItemInfo(itemId) {
   const price = document.querySelector('#item-price' + itemId).textContent
   const quantity = document.querySelector('#item-quantity' + itemId).value
   return {
+    item_id: itemId,
     product_id,
     name,
-    spec,
-    price,
-    quantity
+    product_spec: {
+      spec_name: spec,
+      spec_price: price,
+    },
+    quantity,
+    conrrency: "CNY"
   }
 }
 
 function checkout() {
   const items = document.querySelectorAll('.cart-item input[type=checkbox][data-role="choose"]:checked')
   const data = {
-    "total_price": document.querySelector('#totalPrice').textContent,
-    "items": []
+    "order_price": document.querySelector('#totalPrice').textContent,
+    "cart_items": [],
   }
 
   items.forEach((item) => {
     const itemId = item.dataset['itemId']
-    data.items.push(getCartItemInfo(itemId))
+    data.cart_items.push(getCartItemInfo(itemId))
   })
 
   console.log(data)
 
   axios({
     method: 'post',
-    url: router.POSTReqRouters['checkout'],
+    url: router.OperationRouters['cartCheckout'],
     data
   }).then((res) => {
     console.log(res)
+    const resp = res.data.resp
     for (let item of items) {
       DeleteACartItemOnPage(item.dataset['itemId'])
     }
     UpdatePrice()
     UpdateCartTitle()
-    window.location.href = router.GETReqRouters['order'] + '?order_id=' + res.data["orderId"]
+    window.location.href = router.OperationRouters['getOrder'] + '?order_id=' + resp["order_id"]
   }).catch((err) => {
     console.log(err)
   })
@@ -186,7 +192,7 @@ function checkout() {
     console.log(itemIds)
     axios({
       method: 'post',
-      url: router.POSTReqRouters['cartDelete'],
+      url: router.OperationRouters['deleteCartItem'],
       data: {
         item_ids: itemIds
       }
@@ -207,7 +213,7 @@ function checkout() {
       const itemId = ele.dataset['itemId']
       axios({
         method: 'post',
-        url: router.POSTReqRouters['cartDelete'],
+        url: router.OperationRouters['deleteCartItem'],
         data: {
           item_ids: [itemId]
         }
@@ -236,36 +242,8 @@ function checkout() {
 
   document.querySelectorAll('a[data-role="check"]').forEach((ele) => {
     ele.addEventListener('click', (e) => {
-      const itemId = ele.dataset['itemId']
-      const product_id = document.querySelector("#cart-item" + itemId).dataset['productId']
-      const name = document.querySelector('#item-name' + itemId).textContent
-      const spec = document.querySelector('#item-spec' + itemId).textContent
-      const price = document.querySelector('#item-price' + itemId).textContent
-      const quantity = document.querySelector('#item-quantity' + itemId).value
-      const data = {
-        "total_price": parseFloat(price * quantity).toFixed(2),
-        "items": [{
-          product_id,
-          name,
-          spec,
-          price,
-          quantity
-        }]
-      }
-
-      axios({
-        method: 'post',
-        url: router.POSTReqRouters['checkout'],
-        data
-      }).then((res) => {
-        console.log(res)
-        DeleteACartItemOnPage(itemId)
-        UpdatePrice()
-        UpdateCartTitle()
-        window.location.href = router.GETReqRouters['order'] + '?order_id=' + res.data["orderId"]
-      }).catch((err) => {
-        console.log(err)
-      })
+      ele.closest('.cart-item').querySelector('input[type=checkbox][data-role="choose"]').checked = true
+      checkout()
     })
   })
 
@@ -274,6 +252,6 @@ function checkout() {
 !function () {
   document.querySelector('#search').addEventListener('click', (e) => {
     const keyword = document.querySelector('#search-input').value
-    window.location.href = router.GETReqRouters['search'] + '?keyword=' + keyword
+    window.location.href = router.OperationRouters['search'] + '?keyword=' + keyword
   })
 }()

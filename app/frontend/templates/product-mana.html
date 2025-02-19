@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-用户信息</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="../static/css/style.css" />
+
+  <style>
+    .implicit-link.color-change:hover {
+      color: var(--lucky-color);
+      font-size: bold;
+      text-decoration: underline;
+      text-underline-offset: 0.5em;
+    }
+
+    .implicit-link.change-success:hover {
+      color: var(--bs-success);
+      font-size: bold;
+      text-decoration: underline;
+      text-underline-offset: 0.3em;
+    }
+
+    .implicit-link.change-danger:hover {
+      color: var(--bs-danger);
+      font-size: bold;
+      text-decoration: underline;
+      text-underline-offset: 0.3em;
+    }
+
+    .implicit-link.change-primary:hover {
+      color: var(--bs-primary);
+      font-size: bold;
+      text-decoration: underline;
+      text-underline-offset: 0.3em;
+    }
+
+
+    .disabled {
+      pointer-events: none !important;
+      background-color: #e9ecef;
+      color: black;
+    }
+
+    .disabled-white {
+      pointer-events: none !important;
+      color: gray;
+    }
+
+    .edit .d-none {
+      display: revert !important;
+    }
+
+    .edit .onpaper {
+      display: none !important;
+    }
+
+    .edit .disabled {
+      pointer-events: initial !important;
+      background-color: white;
+    }
+
+    .edit .disabled-white {
+      pointer-events: initial !important;
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <span style="white-space: nowrap;">您好,</span>
+          <span class="dropdown">
+            <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+              data-bs-toggle="dropdown">
+              <span class="d-inline-block text-truncate"
+                style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+              <li><button class="dropdown-item">退出登录</button></li>
+            </ul>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-body">
+    <div class="container user-nav">
+      <div class="user-profile">
+        <div class="user-img">
+          <img src="{{ .UserInfo.Img }}" />
+        </div>
+        <div class="user-info">
+          <h5 class="username" id="nav-username">{{ .UserInfo.Name }}</h5>
+          <span class="usersign" id="nav-usersign">{{ .UserInfo.Sign }}</span>
+        </div>
+      </div>
+      <div class="text-end">
+        <a href="{{.PageRouter.HomePage}}" class="implicit-link color-change">回到主页</a>
+      </div>
+    </div>
+
+    <div class="container user-content">
+      <div class="panel">
+        <a href="{{.PageRouter.UserPage}}info" class="btn info" data-tpage=".user-info-page" type="button">个人资料</a>
+        <a href="{{.PageRouter.UserPage}}account" class="btn account " data-tpage=".account-setting-page"
+          type="button">账号</a>
+        <a href="{{.PageRouter.UserPage}}address" class="btn address" data-tpage=".address-management-page"
+          type="button">收货地址</a>
+        <a href="javascript:void(0)" class="btn product active" type="button">商品管理</a>
+      </div>
+
+      <div class="product-page">
+        <h3 class="page-title">商品管理</h3>
+        <div class="row ms-2 detail-product">
+          <div class="count">
+            <span>总计</span>
+            <span>{{len .Products}}</span>
+            <span>件商品</span>
+          </div>
+          <div class="accordion mt-2" id="product-accordion">
+            {{range $idx, $product := .Products}}
+            {{with $product}}
+            <div class="accordion-item" id="accordion-item{{.ProductId}}" data-product-id="{{.ProductId}}">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#accordion-item{{.ProductId}}-body">
+                  {{- .ProductName -}}
+                </button>
+              </h2>
+              <div class="accordion-collapse collapse" id="accordion-item{{.ProductId}}-body"
+                data-bs-parent="#product-accordion">
+                <div class="accordion-body">
+                  <div class="row">
+                    <div class="col-3 text-center">
+                      <img src="{{.ProductImg}}" class="img-fluid" id="img{{.ProductId}}" data-status="no-change" />
+                      <input type="file" id="img-input{{.ProductId}}" accept="image/*" style="display: none;"
+                        data-role="img" data-product-id="{{.ProductId}}" data-target="#img{{.ProductId}}" />
+                      <button class="btn btn-success mt-2 d-none"
+                        data-accordion-id="#accordion-item{{.ProductId}}"><span data-role="updateImg"
+                          data-target="#img-input{{.ProductId}}">修改商品图片</span>
+                      </button>
+                    </div>
+                    <div class=" col-8 myproduct">
+                      <div class="d-flex align-items-center">
+                        <label for="name{{.ProductId}}" class="form-label mb-0 js-name">商品名：</label>
+                        <input id="name{{.ProductId}}" type="text"
+                          class="form-control bg-body-tertiary w-75 ms-2 disabled" value="{{- .ProductName -}}"
+                          data-role="name" />
+                        <span class="ms-2">({{realLen .ProductName}}/30)</span>
+                      </div>
+                      <span>描述信息:</span>
+                      <textarea class="form-control bg-body-tertiary mt-1 disabled js-desc" id="desc{{.ProductId}}"
+                        rows="5" data-role="desc">{{- .ProductDesc -}}</textarea>
+                      <div class="text-end">
+                        <span class="">({{realLen .ProductDesc}}/200)</span>
+                      </div>
+
+                    </div>
+                    <div class="category-area">
+                      <div class="categories" id="categories{{.ProductId}}">
+                        <span>商品类别 ({{len .ProductCategories}}/5): </span>
+                        {{range $cat :=.ProductCategories}}
+                        <span class="category">
+                          <span class="category-name">{{$cat}}</span>
+                          <a href="javascript:void(0)" class="category-del d-none"
+                            data-executor="#categories{{$product.ProductId}}" data-role="categoryDel">&otimes;</a>
+                        </span>
+                        {{end}}
+                      </div>
+                      <div class="category-control">
+                        <select class="form-select d-none" id="select{{.ProductId}}">
+                          <option value="" disabled selected>选择商品类别</option>
+                          {{range $opt := $.CategoriesOptions}}
+                          <option value="{{$opt}}">{{$opt}}</option>
+                          {{end}}
+                          <option value="其他"> 其他 </option>
+                        </select>
+                        <a href="javascript:void(0)" class="disable-link d-none">
+                          <span data-executor="#categories{{.ProductId}}" data-role="categoryAdd"
+                            data-selector="#select{{.ProductId}}">+添加类别</span>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="misc row">
+                      <div class="insurance col-6">
+                        <label for="insurance-select{{.ProductId}}">保险类型</label>
+                        <select class="form-select disabled" id="insurance-select{{.ProductId}}">
+                          <option value="无保险" {{if eq .ProductInsurance "无保险" }}selected{{end}}>无保险</option>
+                          <option value="退货险" {{if eq .ProductInsurance "退货险" }}selected{{end}}>退货险</option>
+                          <option value="运输险" {{if eq .ProductInsurance "运输险" }}selected{{end}}> 运输险 </option>
+                        </select>
+                      </div>
+                      <div class="express col-6">
+                        <label for="express-select{{.ProductId}}">快递类型</label>
+                        <select class="form-select disabled" id="express-select{{.ProductId}}">
+                          <option value="到付" {{if eq .ProductExpress "到付" }}selected{{end}}>到付</option>
+                          <option value="包邮" {{if eq .ProductExpress "包邮" }}selected{{end}}>包邮</option>
+                        </select>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                      <table class="text-center spec-table">
+                        <caption>商品规格表</caption>
+                        <thead>
+                          <tr>
+                            <th>规格名</th>
+                            <th>价格</th>
+                            <th>库存</th>
+                            <th>操作</th>
+                            <th>规格名</th>
+                            <th>价格</th>
+                            <th>库存</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="spec-table-body" data-row-nxt-idx="{{rowIdx (len .ProductSpecs) 2}}"
+                          data-col-nxt-idx="{{colIdx (len .ProductSpecs) 2}}" id="spec-tbody{{.ProductId}}">
+                          {{range $idx, $spec := .ProductSpecs}}
+                          {{if eq (iMod $idx 2) 0}}
+                          <tr>
+                            {{end}}
+                            {{with $spec}}
+                            <td>{{.SpecName}}</td>
+                            <td>{{.SpecPrice}}</td>
+                            <td>{{.SpecStock}}</td>
+                            <td data-row-idx="{{rowIdx $idx 2}}" data-col-idx="{{colIdx $idx 2}}">
+                              <a href="javascript:void(0)" class="implicit-link change-success disabled-white">
+                                <span data-role="modifyRow" data-domain="spec"
+                                  data-target="#spec-tbody{{ $product.ProductId }}">修改</span>
+                              </a>
+                              <a href="javascript:void(0)" class="implicit-link change-danger disabled-white">
+                                <span data-role="deleteRow">删除</span>
+                              </a>
+                            </td>
+                            {{end}}
+                            {{if eq (iMod $idx 2) 1}}
+                          </tr>
+                          {{end}}
+                          {{end}}
+                          {{if eq (iMod (len .ProductSpecs) 2) 1}}
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td data-row-idx="{{rowIdx (len .ProductSpecs ) 2}}"
+                            data-col-idx="{{colIdx (len .ProductSpecs) 2}}"></td>
+                          </tr>
+                          {{end}}
+                        </tbody>
+                        <tfoot class="d-none">
+                          <tr>
+                            <td colspan="8">
+                              <a class="implicit-link change-primary" href="javascript:void(0)" data-role="addRow"
+                                data-domain="spec" data-target="#spec-tbody{{.ProductId}}">添加规格</a>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <hr>
+                    <div class="row ">
+                      <table class="text-center params-table">
+                        <caption>商品参数表</caption>
+                        <thead>
+                          <tr>
+                            <th>参数名</th>
+                            <th>参数值</th>
+                            <th>操作</th>
+                            <th>参数名</th>
+                            <th>参数值</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        <tbody data-row-nxt-idx="{{rowIdx (len .ProductParams) 2}}"
+                          data-col-nxt-idx="{{colIdx (len .ProductParams) 2}}" id="params-tbody{{.ProductId}}">
+                          {{range $idx, $param := .ProductParams}}
+                          {{if eq (iMod $idx 2) 0}}
+                          <tr>
+                            {{end}}
+                            {{with $param}}
+                            <td>{{.ParamName}}</td>
+                            <td>{{.ParamValue}}</td>
+                            <td data-row-idx="{{rowIdx $idx 2}}" data-col-idx="{{colIdx $idx 2}}">
+                              <a href="javascript:void(0)" class="implicit-link change-success disabled-white">
+                                <span data-role="modifyRow" data-domain="param"
+                                  data-target="#params-tbody{{ $product.ProductId }}">修改</span>
+                              </a>
+                              <a href="javascript:void(0)" class="implicit-link change-danger disabled-white">
+                                <span data-role="deleteRow">删除</span>
+                              </a>
+                            </td>
+                            {{end}}
+                            {{if eq (iMod $idx 2) 1}}
+                          </tr>
+                          {{end}}
+                          {{end}}
+                          {{if eq (iMod (len .ProductParams) 2) 1}}
+                          <td></td>
+                          <td></td>
+                          <td data-row-idx="{{rowIdx (len .ProductParams ) 2}}"
+                            data-col-idx="{{colIdx (len .ProductParams) 2}}"></td>
+                          </tr>
+                          {{end}}
+                        </tbody>
+                        <tfoot class="d-none">
+                          <tr>
+                            <td colspan="8">
+                              <a class="implicit-link change-primary" href="javascript:void(0)" data-role="addRow"
+                                data-domain="param" data-target="#params-tbody{{.ProductId}}">添加参数</a>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <hr>
+                    <div class="text-end mt-3 onpaper">
+                      <button class="btn btn-outline-primary btn-sm w-25"
+                        data-accordion-id="#accordion-item{{.ProductId}}" data-role="productEdit">编辑</button>
+                      <button class="btn btn-outline-danger btn-sm w-25"
+                        data-accordion-id="#accordion-item{{.ProductId}}" data-role="productDel"
+                        data-target-id="{{.ProductId}}">删除</button>
+                    </div>
+
+                    <div class="text-end mt-3 d-none">
+                      <button class="btn btn-outline-success btn-sm w-25"
+                        data-accordion-id="#accordion-item{{.ProductId}}" data-role="productSave">保存</button>
+                      <button class="btn btn-outline-secondary btn-sm w-25"
+                        data-accordion-id="#accordion-item{{.ProductId}}" data-role="productDiscard">放弃</button>
+                    </div>
+                  </div>
+                  <hr />
+                </div>
+              </div>
+              {{end}}
+            </div>
+            {{end}}
+            <div class="accordion-item edit" id="public-product" data-product-id="0">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                  data-bs-target="#public-product-body" style="text-align: center;">
+                  发布新商品
+                </button>
+              </h2>
+              <div class="accordion-collapse collapse" id="public-product-body" data-bs-parent="#product-accordion">
+                <div class="accordion-body">
+                  <div class="row">
+                    <div class="col-3 text-center">
+                      <img src="{{.NoImg}}" class="img-fluid" id="img0" data-status="no-change" />
+                      <input type="file" id="new-img-input" accept="image/*" style="display: none;" data-role="img"
+                        data-product-id="0" data-target="#img0" />
+                      <button class="btn btn-success mt-2" data-accordion-id="#public-product"><span
+                          data-role="updateImg" data-target="#new-img-input">添加商品图片</span></button>
+                    </div>
+                    <div class=" col-8 myproduct">
+                      <div class="d-flex align-items-center">
+                        <label for="name0" class="form-label mb-0 js-name">商品名：</label>
+                        <input id="name0" type="text" class="form-control bg-body-tertiary w-75 ms-2"
+                          placeholder="请填写商品名" data-role="name" />
+                        <span class="ms-2">(0/30)</span>
+                      </div>
+                      <span>描述信息:</span>
+                      <textarea class="form-control bg-body-tertiary mt-1 js-desc" id="desc0" rows="5" data-role="desc"
+                        placeholder="请填写描述信息"></textarea>
+                      <div class="text-end">
+                        <span class="">(0/200)</span>
+                      </div>
+                    </div>
+                    <div class="category-area">
+                      <div class="categories" id="categories0">
+                        <span>商品类别 (0/5): </span>
+                      </div>
+                      <div class="category-control">
+                        <select class="form-select" id="select0">
+                          <option value="" disabled selected>选择商品类别</option>
+                          {{range $opt := $.CategoriesOptions}}
+                          <option value="{{$opt}}">{{$opt}}</option>
+                          {{end}}
+                          <option value="其他"> 其他 </option>
+                        </select>
+                        <a href="javascript:void(0)" class="disable-link">
+                          <span data-executor="#categories0" data-role="categoryAdd"
+                            data-selector="#select0">+添加类别</span>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="misc row">
+                      <div class="insurance col-6">
+                        <label for="insurance-select0">保险类型</label>
+                        <select class="form-select" id="insurance-select0">
+                          <option value="无保险" selected>无保险</option>
+                          <option value="退货险">退货险</option>
+                          <option value="运输险"> 运输险 </option>
+                        </select>
+                      </div>
+                      <div class="express col-6">
+                        <label for="express-select0">快递类型</label>
+                        <select class="form-select" id="express-select0">
+                          <option value="到付" selected>到付</option>
+                          <option value="包邮">包邮</option>
+                        </select>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                      <table class="text-center spec-table">
+                        <caption>商品规格表</caption>
+                        <thead>
+                          <tr>
+                            <th>规格名</th>
+                            <th>价格</th>
+                            <th>库存</th>
+                            <th>操作</th>
+                            <th>规格名</th>
+                            <th>价格</th>
+                            <th>库存</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        <tbody class="spec-table-body" data-row-nxt-idx="1" data-col-nxt-idx="1" id="spec-tbody0">
+                        </tbody>
+                        <tfoot class="">
+                          <tr>
+                            <td colspan="8">
+                              <a class="implicit-link change-primary" href="javascript:void(0)" data-role="addRow"
+                                data-domain="spec" data-target="#spec-tbody0">添加规格</a>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <hr>
+                    <div class="row ">
+                      <table class="text-center params-table">
+                        <caption>商品参数表</caption>
+                        <thead>
+                          <tr>
+                            <th>参数名</th>
+                            <th>参数值</th>
+                            <th>操作</th>
+                            <th>参数名</th>
+                            <th>参数值</th>
+                            <th>操作</th>
+                          </tr>
+                        </thead>
+                        <tbody data-row-nxt-idx="1" data-col-nxt-idx="1" id="params-tbody0">
+                        </tbody>
+                        <tfoot class="">
+                          <tr>
+                            <td colspan="8">
+                              <a class="implicit-link change-primary" href="javascript:void(0)" data-role="addRow"
+                                data-domain="param" data-target="#params-tbody0">添加参数</a>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <hr>
+                    <div class="text-end mt-3">
+                      <button class="btn btn-outline-success btn-sm w-25" data-accordion-id="#public-product"
+                        data-role="public-confirm">发布商品</button>
+                      <button class="btn btn-outline-secondary btn-sm w-25" data-accordion-id="#public-product"
+                        data-role="public-discard">放弃发布</button>
+                    </div>
+                  </div>
+                  <hr />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- detail-product end-->
+      </div> <!-- myproducts end-->
+
+    </div>
+  </div> <!-- main-body end-->
+
+  <div class="placeholder-body">
+    <div class="modal message-modal" tabindex="-1" id="message-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary confirm">好的</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal spec-modal" tabindex="-1" id="spec-modal" data-target-row="" data-target-col="" data-action=""
+    data-target="">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">修改规格</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="specname">
+            <label for="spec-name" class="form-label">规格名</label>
+            <input type="text" class="form-control bg-body-tertiary" id="spec-name" value="" />
+          </div>
+          <div class="specprice">
+            <label for="spec-price" class="form-label">价格</label>
+            <input type="number" class="form-control bg-body-tertiary" id="spec-price" value="" />
+          </div>
+          <div class="specstock">
+            <label for="spec-stock" class="form-label">库存</label>
+            <input type="number" step="1" class="form-control bg-body-tertiary" id="spec-stock" value="" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light btn-cancel">取消</button>
+            <button type="button" class="btn btn-success btn-confirm">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal param-modal" tabindex="-1" id="param-modal" data-target-row="" data-target-col="" data-action=""
+    data-target="">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">修改参数</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="paramname">
+            <label for="param-name" class="form-label">参数名</label>
+            <input type="text" class="form-control bg-body-tertiary" id="param-name" value="" />
+          </div>
+          <div class="paramvalue">
+            <label for="param-value" class="form-label">参数值</label>
+            <input type="text" class="form-control bg-body-tertiary" id="param-value" value="" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light btn-cancel">取消</button>
+            <button type="button" class="btn btn-success btn-confirm">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="p-2 mt-3 bg-white text-dark text-center">
+    <div class="container">
+      <p class="">Copyright &copy; 166-队就是队</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script type="module" src="/static/js/product-mana.js">  </script>
+</body>
+
+</html>

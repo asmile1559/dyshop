@@ -159,7 +159,7 @@ import * as router from './router.js'
         modal.style.display = 'block'
         axios({
             method: 'post',
-            url: router.POSTReqRouters['register'],
+            url: router.OperationRouters['register'],
             data: {
                 email: accountInput.value,
                 password: passwordInput.value,
@@ -175,7 +175,7 @@ import * as router from './router.js'
                     modalBody.innerText = `注册成功，${count}秒后跳转到登录页面。`
                     if (count === 0) {
                         clearInterval(timer)
-                        window.location.href = router.GETReqRouters['login']
+                        window.location.href = router.OperationRouters['login']
                     }
                 }, 1000)
 
@@ -186,7 +186,7 @@ import * as router from './router.js'
 
                 jumpNow.addEventListener('click', () => {
                     clearInterval(timer)
-                    window.location.href = router.GETReqRouters['login']
+                    window.location.href = router.OperationRouters['login']
                 })
             } else {
                 messageBox.style.display = 'block'

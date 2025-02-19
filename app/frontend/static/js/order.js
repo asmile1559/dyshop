@@ -1,4 +1,9 @@
-import * as router from './router.js'
+import * as router from './router.js';
+import * as common from './common.js';
+
+axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
+axios.defaults.headers.post['Content-Type'] = 'application/json'
+axios.defaults.baseURL = router.DefaultURL
 
 function UpdatePrice() {
   const orderListItems = document.querySelector('.order-list-items')
@@ -13,6 +18,7 @@ function UpdatePrice() {
     const dc = parseFloat(select.options[select.selectedIndex].dataset['deliverCost']).toFixed(2)
     const sum = q * sp
     item.querySelector('#price' + product_id).textContent = sum.toFixed(2)
+    item.querySelector('#deliver-cost' + product_id).textContent = dc
     totalPrice += parseFloat(sum.toFixed(2))
     totalDeliverCost += parseFloat(dc)
   }
@@ -76,18 +82,13 @@ function UpdatePrice() {
 
     axios({
       method: 'post',
-      url: router.POSTReqRouters['orderCancel'],
+      url: router.OperationRouters['cancelOrder'],
       data: {
         order_id: order_id,
       }
     }).then((res) => {
       console.log(res.data)
-      if (window.history.length > 1) {
-        window.history.back()
-        window.history.replaceState(null, document.title, document.location.href)
-      } else {
-        window.location.href = '/'
-      }
+      window.location.href = '/'
     }).catch((err) => {
       console.log(err)
       window.history.back()
@@ -139,25 +140,24 @@ function UpdatePrice() {
     const data = {
       order_id: order_id,
       address: address,
-      items: orderItems,
-      discount: parseFloat(document.querySelector('#discount').textContent),
-      total_price: parseFloat(document.querySelector('#total-price').textContent),
-      total_deliver_cost: parseFloat(document.querySelector('#total-deliver-cost').textContent),
-      real_price: parseFloat(document.querySelector('#real-price').textContent),
+      products: orderItems,
+      discount: parseFloat(document.querySelector('#discount').textContent).toFixed(2),
+      order_price: parseFloat(document.querySelector('#total-price').textContent).toFixed(2),
+      order_postage: parseFloat(document.querySelector('#total-deliver-cost').textContent).toFixed(2),
+      order_final_price: parseFloat(document.querySelector('#real-price').textContent).toFixed(2),
     }
 
     console.log(data)
-
-
     axios({
       method: 'post',
-      url: router.POSTReqRouters['orderSubmit'],
+      url: router.OperationRouters['submitOrder'],
       data: data,
     }).then((res) => {
-      console.log(res.data)
-      const paymentId = res.data['payment_id']
-      console.log(paymentId)
-      window.location.href = `${router.GETReqRouters['payment']}?payment_id=${paymentId}`
+      const resp = res.data['resp']
+      const transaction_id = resp['transaction_id']
+      const order_id = resp['order_id']
+      console.log(transaction_id)
+      window.location.href = `${router.OperationRouters['checkout']}?transaction_id=${transaction_id}&order_id=${order_id}`
     }).catch((err) => {
       console.log(err)
     })
@@ -169,6 +169,6 @@ UpdatePrice()
 !function () {
   document.querySelector('#search').addEventListener('click', (e) => {
     const keyword = document.querySelector('#search-input').value
-    window.location.href = router.GETReqRouters['search'] + '?keyword=' + keyword
+    window.location.href = router.OperationRouters['search'] + '?keyword=' + keyword
   })
 }()

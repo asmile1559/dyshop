@@ -139,7 +139,7 @@
     <div class="container">
         <div class="shop-nav">
             <div class="shop-nav-brand">
-                <a href="/test" class="implicit-link">欢迎访问 抖音商城</a>
+                <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
             </div>
         </div>
     </div>
@@ -183,7 +183,7 @@
                             <input type="password" class="form-control" id="confirmPasswordInput" placeholder="请确认密码">
                             <label for="confirmPasswordInput"><img src="/static/src/basic/wrong.svg" alt=""></label>
                         </div>
-                        <div class="prompt-area password"> 密码与上面的登录密码不符 </div>
+                        <div class="prompt-area password"> 两次输入的密码不相同 </div>
                     </div>
 
                     <div class="message-box"> </div>
@@ -200,7 +200,7 @@
                     </div>
 
                     <div class="jump">
-                        <a href="/test/user/login">已有账号? 现在登录</a>
+                        <a href="{{.PageRouter.LoginPage}}">已有账号? 现在登录</a>
                     </div>
 
                     <div class="modal" tabindex="-1">

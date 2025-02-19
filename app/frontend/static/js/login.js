@@ -1,4 +1,5 @@
 import * as router from './router.js'
+import * as common from './common.js'
 
 !function loginProcess() {
 
@@ -111,7 +112,7 @@ import * as router from './router.js'
 
         axios({
             method: 'post',
-            url: router.POSTReqRouters['login'],
+            url: router.OperationRouters['login'],
             data: {
                 email: accountInput.value,
                 password: passwordInput.value
@@ -120,6 +121,7 @@ import * as router from './router.js'
             if (res.data.code === 200) {
                 // cookies.set('token', res.data.token)
                 localStorage.setItem('token', res.data.token)
+                common.setCookie('token', res.data.token, 1)
                 modal.style.display = 'block'
                 let count = 3
                 modalBody.innerText = `登录成功，${count}秒后跳转到首页。`
@@ -128,7 +130,7 @@ import * as router from './router.js'
                     modalBody.innerText = `登录成功，${count}秒后跳转到首页。`
                     if (count === 0) {
                         clearInterval(timer)
-                        window.location.href = router.GETReqRouters['home']
+                        window.location.href = router.OperationRouters['home']
                     }
                 }, 1000)
 
@@ -139,7 +141,7 @@ import * as router from './router.js'
 
                 jumpNow.addEventListener('click', function () {
                     clearInterval(timer)
-                    window.location.href = router.GETReqRouters['home']
+                    window.location.href = router.OperationRouters['home']
                 })
                 console.log(res.data)
             } else {
@@ -153,74 +155,3 @@ import * as router from './router.js'
         })
     })
 }()
-
-// // File: public/js/login.js
-// document.getElementById('login-form').addEventListener('submit', async (e) => {
-//     e.preventDefault();
-
-//     const formData = new FormData(e.target);
-//     const data = {
-//         username: formData.get('username'),
-//         password: formData.get('password')
-//     };
-
-//     try {
-//         const response = await fetch('/api/v1/login', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify(data)
-//         });
-
-//         const result = await response.json();
-
-//         if (!response.ok) {
-//             throw new Error(result.error || 'Login failed');
-//         }
-
-//         // Store token and redirect
-//         localStorage.setItem('token', result.token);
-//         window.location.href = '/dashboard';  // Redirect to dashboard page
-//     } catch (error) {
-//         const errorDiv = document.getElementById('error-message');
-//         errorDiv.textContent = error.message;
-//         errorDiv.classList.remove('hidden');
-//     }
-// });
-
-// // File: public/js/register.js
-// document.getElementById('register-form').addEventListener('submit', async (e) => {
-//     e.preventDefault();
-
-//     const formData = new FormData(e.target);
-//     const data = {
-//         username: formData.get('username'),
-//         password: formData.get('password'),
-//         email: formData.get('email'),
-//         phone: formData.get('phone')
-//     };
-
-//     try {
-//         const response = await fetch('/api/v1/register', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify(data)
-//         });
-
-//         const result = await response.json();
-
-//         if (!response.ok) {
-//             throw new Error(result.error || 'Registration failed');
-//         }
-
-//         // Redirect to login page on success
-//         window.location.href = '/login';
-//     } catch (error) {
-//         const errorDiv = document.getElementById('error-message');
-//         errorDiv.textContent = error.message;
-//         errorDiv.classList.remove('hidden');
-//     }
-// });

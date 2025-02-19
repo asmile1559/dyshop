@@ -1,40 +1,34 @@
 // router map
 const DefaultURL = "http://192.168.191.130:10166"
 
-const GETReqRouters = {
-  "home": "/test",
-  "user": "/test/user",
-  "login": "/test/user/login",
-  "register": "/test/user/register",
-  "cart": "/test/cart",
-  "checkout": "/test/checkout",
-  "product": "/test/product",
-  "payment": "/test/payment",
-  "order": "/test/order",
-  "search": "/test/product/search",
+const OperationRouters = {
+  "home": "/example/", // GET
+  "switchShowcase": "/example/showcase/", // GET
+  "updateUserInfo": "/example/user/info/", // POST
+  "updateUserImg": "/example/user/info/upload/", // POST
+  "registerMerchant": "/example/user/role/merchant/", // GET
+  "updateUserAccount": "/example/user/account/", // POST
+  "deleteUserAccount": "/example/user/account/delete/", // POST
+  "updateAddress": "/example/user/address/", // POST
+  "deleteAddress": "/example/user/address/delete/", // POST
+  "setDefAddress": "/example/user/address/setDefault/", // POST
+  "updateProduct": "/example/user/product/", // POST
+  "deleteProduct": "/example/user/product/delete/", // POST
+  "getProduct": "/example/product/", // GET
+  "buy": "/example/product/buy/", // POST
+  "addToCart": "/example/product/add2cart/", // POST
+  "getCart": "/example/cart/", // GET
+  "deleteCartItem": "/example/cart/delete/", // POST
+  "cartCheckout": "/example/cart/checkout/", // POST
+  "getOrder": "/example/order/", // GET
+  "cancelOrder": "/example/order/cancel/", // POST
+  "submitOrder": "/example/order/submit/", // POST
+  "checkout": "/example/checkout/", // GET
+  "cancelCheckout": "/example/checkout/cancel/", // POST
+  "payment": "/example/payment/", // POST
+  "search": "/example/search/", // GET
+  "register": "/example/user/register/", // GET|POST
+  "login": "/example/user/login/", // GET|POST
+  "verify": "/example/verify/", // POST
 }
-
-const POSTReqRouters = {
-  "login": "/test/user/login",
-  "register": "/test/user/register",
-  "cart": "/test/cart",
-  "checkout": "/test/checkout",
-  "product": "/test/product",
-  "payment": "/test/payment",
-  "order": "/test/order",
-  "updateInfo": "/test/user",
-  "updateImg": "/test/upload/img",
-  "newProduct": "/test/upload/product",
-  "updateProduct": "/test/upload/product",
-  "deleteProduct": "/test/product/delete",
-  "buyNow": "/test/product/buyNow",
-  "addToCart": "/test/product/add2cart",
-  "orderCancel": "/test/order/cancel",
-  "orderSubmit": "/test/order/submit",
-  "paymentCancel": "/test/payment/cancel",
-  "paymentSubmit": "/test/payment/",
-  "cartDelete": "/test/cart/delete",
-  "checkout": "/test/checkout",
-}
-
-export { DefaultURL, GETReqRouters, POSTReqRouters }
+export { DefaultURL, OperationRouters }
