@@ -27,7 +27,7 @@ type CheckoutService struct {
 // NewCheckoutService 创建结算服务实例
 func NewCheckoutService(c context.Context) *CheckoutService {
 	// 连接支付服务
-	paymentViper, err := initViper("/home/djj/devel/dyshop/app/payment/conf/config.yaml")
+	paymentViper, err := InitViper("/home/djj/devel/dyshop/app/payment/conf/config.yaml")
     if err != nil {
         logrus.Fatalf("Error reading order service config file, %s", err)
     }
@@ -134,7 +134,7 @@ func calculateTotalAmount(items []*pborder.OrderItem) (float64, error) {
 
 // getOrderFromOrderService 获取订单信息
 func getOrderFromOrderService() (*pborder.ListOrderResp, error) {
-	orderViper, err := initViper("/home/djj/devel/dyshop/app/order/conf/config.yaml")
+	orderViper, err := InitViper("/home/djj/devel/dyshop/app/order/conf/config.yaml")
     if err != nil {
         logrus.Fatalf("Error reading order service config file, %s", err)
     }
@@ -160,7 +160,7 @@ func getOrderFromOrderService() (*pborder.ListOrderResp, error) {
 	return resp, nil
 }
 
-func initViper(configPath string) (*viper.Viper, error) {
+func InitViper(configPath string) (*viper.Viper, error) {
     v := viper.New()
     v.SetConfigFile(configPath)
     if err := v.ReadInConfig(); err != nil {
