@@ -23,26 +23,27 @@
     <div class="container">
       <div class="shop-nav">
         <div class="shop-nav-brand">
-          <a href="/test" class="implicit-link">欢迎访问 抖音商城</a>
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
         </div>
-
         <div class="shop-nav-userbox">
-          <div class="login">
-            <span style="white-space: nowrap;">您好,</span>
-            <span class="dropdown">
-              <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
-                data-bs-toggle="dropdown">
-                <span class="d-inline-block text-truncate" style="width: 90%; white-space: nowrap; font-size: small;">
-                  {{- .username -}}</span>
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/test/user">个人设置</a></li>
-                <li><a class="dropdown-item" href="/test/cart">购物车</a></li>
-                <li><a class="dropdown-item" href="/test/order">订单</a></li>
-                <li><a class="dropdown-item" href="/test/payment">支付</a></li>
-                <li><button class="dropdown-item">退出登录</button></li>
-              </ul>
-            </span>
+          <div class="wel-bar">
+            <div class="user-bar">
+              <span style="white-space: nowrap;">您好,</span>
+              <span class="dropdown">
+                <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+                  data-bs-toggle="dropdown">
+                  <span class="d-inline-block text-truncate"
+                    style="width: 90%; white-space: nowrap; font-size: small;"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{{.PageRouter.UserPage}}info">个人设置</a></li>
+                  <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+                  <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+                  <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+                  <li><button class="dropdown-item">退出登录</button></li>
+                </ul>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -50,10 +51,10 @@
   </div>
 
   <div class="p-3 main-body">
-    <div class="container sticky-top bg-white p-3">
-      <div class="row align-items-center ">
+    <div class="container sticky-top header">
+      <div class="row align-items-center">
         <div class="col-3 text-center">
-          <a href="#" class="implicit-link">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">
             <h1>抖音商城</h1>
             <span style="font-size: small;">购物就上抖音商城</span>
           </a>
@@ -64,7 +65,8 @@
             <button class="btn btn-orangered fs-5" type="button" id="search"><span>搜索</span></button>
           </div>
         </div>
-        <div class="col-2"></div>
+        <div class="col-2">
+        </div>
       </div>
     </div>
 
@@ -72,45 +74,47 @@
       <div class="product-list-nav gap-2">
         <div class="product-list-tabtitle">
           <ul>
-            <li><a href="/test/product/search?keyword={{.keyword}}&pg={{subOne .curPage}}&sort=comprehensive"
-                class="implicit-link {{if eq .sort `comprehensive`}}active{{end}}">综合</a></li>
-            <li><a href="/test/product/search?keyword={{.keyword}}&pg={{subOne .curPage}}&sort=sold"
-                class="implicit-link {{if eq .sort `sold`}}active{{end}}">销量</a></li>
-            <li><a href="/test/product/search?keyword={{.keyword}}&pg={{subOne .curPage}}&sort=price"
-                class="implicit-link {{if eq .sort `price`}}active{{end}}">价格</a></li>
-            <li><a href="/test/product/search?keyword={{.keyword}}&pg={{subOne .curPage}}&sort=latest"
-                class="implicit-link {{if eq .sort `latest`}}active{{end}}">新品</a></li>
-            <li><a href="/test/product/search?keyword={{.keyword}}&pg={{subOne .curPage}}&sort=score"
-                class="implicit-link {{if eq .sort `score`}}active{{end}}">评分</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=comprehensive"
+                class="implicit-link {{if eq .Sort `comprehensive`}}active{{end}}">综合</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=sold"
+                class="implicit-link {{if eq .Sort `sold`}}active{{end}}">销量</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=price"
+                class="implicit-link {{if eq .Sort `price`}}active{{end}}">价格</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=latest"
+                class="implicit-link {{if eq .Sort `latest`}}active{{end}}">新品</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=score"
+                class="implicit-link {{if eq .Sort `score`}}active{{end}}">评分</a></li>
           </ul>
         </div>
         <div class="product-list-pagenav">
           <span><a
-              href="{{if ne .curPage 1}}/test/product/search?keyword={{.keyword}}&pg={{subOne .curPage}}&sort={{.sort}}{{end}}"
-              class="implicit-link {{if eq .curPage 1}}disabled{{end}}">&lt;</a></span>
-          <span class="cur-page">{{.curPage}}</span><span>/</span><span class="tot-page">{{ .totalPage }}</span>
+              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}{{end}}"
+              class="implicit-link {{if eq .CurPage 1}}disabled{{end}}">&lt;</a></span>
+          <span class="cur-page">{{.CurPage}}</span><span>/</span><span class="tot-page">{{ .TotalPage }}</span>
           <span class=""><a
-              href="{{if ne .curPage .totalPage}}/test/product/search?keyword={{.keyword}}&pg={{addOne .curPage}}&sort={{.sort}}{{end}}"
-              class="implicit-link {{if eq .curPage .totalPage}}disabled{{end}}">&gt;</a></span>
+              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}{{end}}"
+              class="implicit-link {{if eq .CurPage .TotalPage}}disabled{{end}}">&gt;</a></span>
         </div>
       </div>
 
       <div class="product-list">
         <div class="row justify-content-start">
-          {{ range $idx, $product := .products }}
+          {{ range $idx, $product := .Products }}
           {{with $product}}
-          <div class="col-2 product-item-g" data-product-id="{{ .productId }}">
+          <div class="col-2 product-item-g" data-product-id="{{ .ProductId }}">
             <div class="item-img">
-              <img src=" {{.img}} " alt="product-img">
+              <img src=" {{.ProductImg}} " alt="product-img">
             </div>
             <div class="item-name">
-              {{ .name }}
+              {{ .ProductName }}
             </div>
             <div class="item-price">
-              <span class="currency">￥</span><span class="price">{{ .price }}</span>
+              {{with .ProductSpec}}
+              <span class="currency">￥</span><span class="price">{{ .Price }}</span>
+              {{end}}
             </div>
             <div class="item-sold">
-              <span>{{ .sold }}</span>
+              <span>{{ .Sold }}</span>
               <span>+人购买</span>
             </div>
           </div>
@@ -128,16 +132,16 @@
     <div class="p-3 pagination">
       <div class="container d-flex justify-content-center">
         <ul class="pagination">
-          <li class="page-item"><a class="page-link {{if eq .curPage 1}}disabled{{end}} "
-              href="{{if ne .curPage 1}}/test/product/search?keyword={{.keyword}}&pg={{subOne .curPage}}&sort={{.sort}}{{end}}">上一页</a>
+          <li class="page-item"><a class="page-link {{if eq .CurPage 1}}disabled{{end}} "
+              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}{{end}}">上一页</a>
           </li>
-          {{range $idx, $page := showPages .curPage .totalPage}}
-          <li class="page-item"><a class="page-link {{if eq $.curPage $page}} active {{end}}"
-              href="/test/product/search?keyword={{$.keyword}}&pg={{$page}}&sort={{$.sort}}">{{$page}}</a>
+          {{range $idx, $page := showPages .CurPage .TotalPage}}
+          <li class="page-item"><a class="page-link {{if eq $.CurPage $page}} active {{end}}"
+              href="{{$.PageRouter.SearchPage}}?keyword={{$.Keyword}}&pg={{$page}}&sort={{$.Sort}}">{{$page}}</a>
           </li>
           {{end}}
-          <li class="page-item"><a class="page-link {{if eq .curPage .totalPage}}disabled{{end}}"
-              href="{{if ne .curPage .totalPage}}/test/product/search?keyword={{.keyword}}&pg={{addOne .curPage}}&sort={{.sort}}{{end}}">下一页</a>
+          <li class="page-item"><a class="page-link {{if eq .CurPage .TotalPage}}disabled{{end}}"
+              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}{{end}}">下一页</a>
           </li>
         </ul>
       </div>
@@ -155,7 +159,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
       integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
       crossorigin="anonymous"></script>
-    <script type="module" src="../static/js/search.js"></script>
+    <script type="module" src="/static/js/search.js"></script>
     </script>
 </body>
 

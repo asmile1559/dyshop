@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-用户信息</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .implicit-link.color-change:hover {
+      color: var(--lucky-color);
+      font-size: bold;
+      text-decoration: underline;
+      text-underline-offset: 0.5em;
+    }
+
+    .disabled {
+      pointer-events: none !important;
+      background-color: #e9ecef;
+      color: black;
+    }
+
+    .edit .d-none {
+      display: revert !important;
+    }
+
+    .edit .onpaper {
+      display: none !important;
+    }
+
+    .edit .disabled {
+      pointer-events: initial !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <span style="white-space: nowrap;">您好,</span>
+          <span class="dropdown">
+            <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+              data-bs-toggle="dropdown">
+              <span class="d-inline-block text-truncate"
+                style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+              <li><button class="dropdown-item">退出登录</button></li>
+            </ul>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-body">
+    <div class="container user-nav">
+      <div class="user-profile">
+        <div class="user-img">
+          <img src="{{ .UserInfo.Img }}" />
+        </div>
+        <div class="user-info">
+          <h5 class="username" id="nav-username">{{ .UserInfo.Name }}</h5>
+          <span class="usersign" id="nav-usersign">{{ .UserInfo.Sign }}</span>
+        </div>
+      </div>
+      <div class="text-end">
+        <a href="{{.PageRouter.HomePage}}" class="implicit-link color-change">回到主页</a>
+      </div>
+    </div>
+
+    <div class="container user-content">
+      <div class="panel">
+        <a href="javascript:void(0)" class="btn info active" data-tpage=".user-info-page" type="button">个人资料</a>
+        <a href="{{.PageRouter.UserPage}}account" class="btn account" data-tpage=".account-setting-page"
+          type="button">账号</a>
+        <a href="{{.PageRouter.UserPage}}address" class="btn address" data-tpage=".address-management-page"
+          type="button">收货地址</a>
+        <a href="{{.PageRouter.UserPage}}product"
+          class="btn product {{if not (inSlice `merchant` .UserInfo.Role )}}d-none{{end}}" type="button">商品管理</a>
+      </div>
+
+      <div class="info-page">
+        <h3 class="page-title">个人资料</h3>
+
+        <div class="row ms-2 detail-info">
+          <div class="col-8 text-part">
+            <div>
+              <label for="user-name" class="form-label">用户名</label>
+              <input type="text" class="form-control bg-body-tertiary username" id="username"
+                value="{{ .UserInfo.Name }}" />
+              <p style="font-size: small;margin-top: 5px ">你的朋友可以通过用户名找到你哦</p>
+            </div>
+
+            <div>
+              <label for="user-sign" class="form-label">个性签名</label>
+              <textarea class="form-control bg-body-tertiary usersign" id="usersign"
+                rows="3">{{ .UserInfo.Sign }}</textarea>
+              <p style="font-size: small;margin-top: 5px ">快来编辑你的个性签名吧</p>
+            </div>
+
+            <div>
+              <label for="user-gender" class="form-label">性别</label>
+              <select class="form-select bg-body-tertiary" id="user-gender">
+                <option value="notshow" {{if eq .UserInfo.Gender "notshow" }}selected{{end}}>不愿公开</option>
+                <option value="male" {{if eq .UserInfo.Gender "male" }}selected{{end}}>男</option>
+                <option value="female" {{if eq .UserInfo.Gender "female" }}selected{{end}}>女</option>
+              </select>
+              <p style="font-size: small;margin-top: 5px ">性别什么的无所谓了</p>
+            </div>
+
+            <div>
+              <label for="user-birthday" class="form-label">生日</label>
+              <input type="date" class="form-control bg-body-tertiary" id="user-birthday"
+                value="{{ .UserInfo.Birthday.Format `2006-01-02` }}" />
+              <p style="font-size: small;margin-top: 5px ">在你生日的时候, 可能会给你一份大礼</p>
+            </div>
+
+            <div style="border-top: 1px solid #e9ecef; ">
+              <p style=" font-size: small; padding-top: 5px; color: gray;">
+                此页面上的所有字段都是可选的，可以随时删除，填写这些字段即表示您同意我们在您的用户资料出现的任何地方共享这些数据。请参阅我们的隐私声明，了解更多关于我们如何使用这些信息的信息。
+              </p>
+              <button id="update-info-btn" class="btn btn-success">更改个人资料</button>
+            </div>
+          </div>
+
+          <div class="col-4 img-part">
+            <div class="row">
+              <h5>头像</h5>
+            </div>
+            <div class="row user-img">
+              <img src="{{ .UserInfo.Img }}" />
+            </div>
+            <div class="row ms-2">
+              <button id="update-img-btn" class="btn btn-outline-secondary w-50 " type="button">更换头像</button>
+              <input type="file" id="user-img-input" accept="image/*" style="display: none;" data-target-url="" />
+            </div>
+          </div> <!-- user-info-page-content-img end-->
+        </div> <!-- user-info-page-content end-->
+      </div> <!-- user-info-page end-->
+    </div> <!-- container end-->
+
+  </div> <!-- main-body end-->
+  <div class="placeholder-body">
+    <div class="modal message-modal" tabindex="-1" id="message-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary confirm">好的</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="p-2 mt-3 bg-white text-dark text-center">
+    <div class="container">
+      <p class="">Copyright &copy; 166-队就是队</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    flatpickr("#user-birthday", {
+      dateFormat: "Y年m月d日"
+    });
+  </script>
+  <script type="module" src="/static/js/info.js">  </script>
+</body>
+
+</html>

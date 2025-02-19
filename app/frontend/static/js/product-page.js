@@ -1,82 +1,83 @@
-import * as router from './router.js'
+import * as router from './router.js';
+import * as common from './common.js';
 
-function UpdatePrice() {
-  const price = document.querySelector('#price')
+axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
+axios.defaults.headers.post['Content-Type'] = 'application/json'
+axios.defaults.baseURL = router.DefaultURL
+
+!function () {
+  updatePrice()
+}()
+
+function updatePrice() {
+  const spec = document.querySelector("input:checked[data-role='spec']:checked")
   const quantity = document.querySelector('#quantity')
-  const valueItme = document.querySelector("input:checked[data-input-type='valueItem']")
-  let realPrice = valueItme.dataset.price * quantity.value
-  price.textContent = realPrice.toFixed(2)
+  document.querySelector('#show-price').textContent = parseFloat(parseFloat(spec.dataset["price"]) * parseInt(quantity.value)).toFixed(2)
 }
 
 !function () {
-  const price = document.querySelector('#price')
-  const quantity = document.querySelector('#quantity')
-  document.querySelector('.value-item-box').addEventListener('click', (e) => {
-    if (e.target.tagName === 'INPUT') {
-      UpdatePrice()
+  document.querySelector('#quantity').addEventListener('blur', (e) => {
+    if (e.target.value < 1) {
+      e.target.value = 1
     }
-  })
-}()
-
-!function () {
-  const quantity = document.querySelector('#quantity')
-  const subQuantity = document.querySelector('#subQuantity')
-  const addQuantity = document.querySelector('#addQuantity')
-  quantity.addEventListener('blur', (e) => {
-    if (quantity.value < 1) {
-      quantity.value = 1
+    e.target.value = parseInt(e.target.value)
+    if (isNaN(e.target.value)) {
+      e.target.value = 1
     }
-    quantity.value = parseInt(quantity.value)
-    if (isNaN(quantity.value)) {
-      quantity.value = 1
-    }
-    UpdatePrice()
+    updatePrice()
   })
 
-  subQuantity.addEventListener('click', (e) => {
+  document.querySelector('#subQuantity').addEventListener('click', (e) => {
+    const quantity = document.querySelector('#quantity')
     if (quantity.value > 1) {
       quantity.value--
     }
     if (isNaN(quantity.value)) {
       quantity.value = 1
     }
-    UpdatePrice()
+    updatePrice()
   })
 
-  addQuantity.addEventListener('click', (e) => {
+  document.querySelector('#addQuantity').addEventListener('click', (e) => {
+    const quantity = document.querySelector('#quantity')
     quantity.value++
     if (isNaN(quantity.value)) {
       quantity.value = 1
     }
-    UpdatePrice()
+    updatePrice()
+  })
+
+  document.querySelectorAll(".spec-box input").forEach((input) => {
+    input.addEventListener('click', (e) => {
+      updatePrice()
+    })
   })
 }()
 
 !function () {
-  axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
-  axios.defaults.headers.post['Content-Type'] = 'application/json'
-  axios.defaults.baseURL = router.DefaultURL
   const buyNow = document.querySelector('#buyNow')
   const addToCart = document.querySelector('#addToCart')
   buyNow.addEventListener('click', (e) => {
-    console.log(e.target.dataset.productId)
-    const item = document.querySelector("input:checked[data-input-type='valueItem']").nextElementSibling.textContent
-    const singlePrice = parseFloat(document.querySelector("input:checked[data-input-type='valueItem']").dataset.price)
-    console.log(item)
+    const target = e.target
+    const spec = document.querySelector("input:checked[data-role='spec']:checked")
     axios({
       method: 'post',
-      url: router.POSTReqRouters['buyNow'],
+      url: router.OperationRouters['buy'],
       data: {
-        product_id: e.target.dataset.productId,
-        item: item,
-        single_price: singlePrice,
-        quantity: parseFloat(document.querySelector('#quantity').value),
-        price: parseFloat(document.querySelector('#price').textContent),
+        product_id: target.dataset.productId,
+        product_spec: {
+          name: spec.nextElementSibling.textContent,
+          price: spec.dataset.price,
+        },
+        quantity: document.querySelector('#quantity').value,
+        order_price: parseFloat(document.querySelector('#show-price').textContent).toFixed(2),
+        postage: parseInt(document.querySelector('#postage').textContent).toFixed(2),
+        currency: "CNY",
       },
     }).then((res) => {
-      console.log(res)
-      const orderId = res.data['order_id']
-      window.location.href = `${router.GETReqRouters['order']}?order_id=${orderId}`
+      const resp = res.data.resp
+      const orderId = resp['order_id']
+      window.location.href = `${router.OperationRouters['getOrder']}?order_id=${orderId}`
     }
     ).catch((err) => {
       console.log(err)
@@ -84,36 +85,34 @@ function UpdatePrice() {
   })
 
   addToCart.addEventListener('click', (e) => {
-    console.log(e.target.dataset.productId)
-    const item = document.querySelector("input:checked[data-input-type='valueItem']").nextElementSibling.textContent
-    const singlePrice = parseFloat(document.querySelector("input:checked[data-input-type='valueItem']").dataset.price)
-    console.log(item)
+    const target = e.target
+    const spec = document.querySelector("input:checked[data-role='spec']:checked")
     axios({
       method: 'post',
-      url: router.POSTReqRouters['addToCart'],
+      url: router.OperationRouters['addToCart'],
       data: {
-        product_id: e.target.dataset.productId,
-        item: item,
-        single_price: singlePrice,
-        quantity: parseFloat(document.querySelector('#quantity').value),
-        price: parseFloat(document.querySelector('#price').textContent),
+        product_id: target.dataset.productId,
+        product_spec: {
+          name: spec.nextElementSibling.textContent,
+          price: spec.dataset.price,
+        },
+        quantity: document.querySelector('#quantity').value,
+        postage: parseInt(document.querySelector('#postage').textContent).toFixed(2),
+        currency: "CNY",
       },
     }).then((res) => {
-      console.log(res)
-      window.location.href = `${router.GETReqRouters['cart']}` // 使用token替代user id
+      window.location.href = `${router.OperationRouters['getCart']}` // 使用token替代user id
     }
     ).catch((err) => {
       console.log(err)
     })
   })
 
-  console.log(buyNow)
-  console.log(addToCart)
 }()
 
 !function () {
   document.querySelector('#search').addEventListener('click', (e) => {
     const keyword = document.querySelector('#search-input').value
-    window.location.href = router.GETReqRouters['search'] + '?keyword=' + keyword
+    window.location.href = router.OperationRouters['search'] + '?keyword=' + keyword
   })
 }()
