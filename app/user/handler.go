@@ -18,6 +18,9 @@ func (s *UserServiceServer) Login(ctx context.Context, req *pbuser.LoginReq) (*p
 	return service.NewLoginService(ctx).Run(req)
 }
 
+func (s *UserServiceServer) Logout(ctx context.Context, req *pbuser.LogoutReq) (*pbuser.LogoutResp, error) {
+	return service.NewLogoutService(ctx).Run(req)
+}
 func (s *UserServiceServer) UpdateUser(ctx context.Context, req *pbuser.UpdateUserReq) (*pbuser.UpdateUserResp, error) {
 	return service.NewUpdateUserService(ctx).Run(req)
 }
