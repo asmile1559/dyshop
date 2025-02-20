@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-确认订单</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <div class="user-bar">
+            <span style="white-space: nowrap;">您好,</span>
+            <span class="dropdown">
+              <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+                data-bs-toggle="dropdown">
+                <span class="d-inline-block text-truncate"
+                  style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{.PageRouter.UserPage}}info">个人设置</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+                <li><button class="dropdown-item">退出登录</button></li>
+              </ul>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="p-3 main-body">
+    <div class="container header">
+      <div class="row align-items-center">
+        <div class="col-3 text-center">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">
+            <h1>抖音商城</h1>
+            <span style="font-size: small;">购物就上抖音商城</span>
+          </a>
+        </div>
+        <div class="col-7">
+          <div class="input-group">
+            <input type="text" class="form-control form-outline-orangered fs-5" placeholder="搜索商品" id="search-input">
+            <button class="btn btn-orangered fs-5" type="button" id="search"><span>搜索</span></button>
+          </div>
+        </div>
+        <div class="col-2">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-3">
+    <div class="container">
+      <div class="row">
+        <h1>订单</h1>
+      </div>
+      <div class="row">
+        <div class="col-9 ">
+          <!-- 1. 收货地址列表 -->
+          {{with .AddressInfo }}
+          <div class="address-list" data-default-address="{{.Default}}">
+            <div class="address-list-title">
+              <div>
+                <span style="font-weight: bolder;">收货地址</span>
+              </div>
+              <div>
+                <a href="{{$.PageRouter.UserPage}}address">管理地址</a>
+              </div>
+            </div>
+            {{ range $addr := .Addresses }}
+            <div class="address-list-item" data-addr-id="{{.AddressId}}">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="address" {{if eq $.AddressInfo.Default .AddressId }}
+                  checked {{end}} data-addr-id="{{.AddressId}}" />
+                <span class="{{if eq $.AddressInfo.Default .AddressId }} default-address {{end}}">
+                  {{if eq $.AddressInfo.Default .AddressId }}默认{{else}}地址{{end}}
+                </span>
+              </div>
+              <div class="location">
+                <span class="province">{{ .Province }}</span>
+                <span class="city">{{ .City }}</span>
+                <span class="district">{{ .District }}</span>
+                <span class="street">{{ .Street }}</span>
+              </div>
+              <div class="detail">
+                <span>{{ .FullAddress }}</span>
+              </div>
+              <div class="contact">
+                <span class="name">{{ .Recipient }}</span>
+                <span class="phone">{{.Phone}}</span>
+              </div>
+            </div>
+            {{end}}
+          </div>
+          {{end}}
+          <!-- 2. 订单详情列表 -->
+          <div class="order-list">
+            <div>
+              <span style="font-weight: bolder;">订单详情</span>
+            </div>
+            <div class="row order-list-header">
+              <div class="col-4">
+                商品名称
+              </div>
+              <div class="col-3">
+                商品属性
+              </div>
+              <div class="col-1 text-center">
+                单价
+              </div>
+              <div class="col-2 text-center">
+                数量
+              </div>
+              <div class="col-2 text-end">
+                小计
+              </div>
+            </div>
+            <div class="order-list-items">
+              {{ range $product := .Products }}
+              {{with $product}}
+              <div class="order-list-item" data-product-id="{{.ProductId}}">
+                <div class="row order-item-content">
+                  <div class="col-4">
+                    <div class="row">
+                      <div class="col-4">
+                        <img src="{{.ProductImg}}" alt="p1" class="img-fluid" />
+                      </div>
+                      <div class="col-8">
+                        <span class="order-item-name">
+                          {{.ProductName}}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <span class="product-property">{{.ProductSpec.Name}}</span>
+                  </div>
+                  <div class="col-1 text-center">
+                    <span class="order-item-oprice">
+                      <span>￥</span><span id="single-price{{.ProductId}}">{{.ProductSpec.Price}}</span>
+                    </span>
+                  </div>
+                  <div class="col-2 text-center">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                      <button type="button" class="btn btn-outline-secondary" data-btn-role="subQuantity">-</button>
+                      <input type="text" class="form-control text-center" value="{{.Quantity}}" style="width: 50px;"
+                        id="quantity{{.ProductId}}" data-input-role="quantity">
+                      <button type="button" class="btn btn-outline-secondary" data-btn-role="addQuantity">+</button>
+                    </div>
+                  </div>
+                  <div class="col-2 text-end">
+                    <span class="order-item-fprice">
+                      <span>￥</span><span id="price{{.ProductId}}"></span>
+                    </span>
+                  </div>
+                </div>
+                <div class="row order-item-addition">
+                  <!-- 订单备注 最多200字 -->
+                  <div class="col-6" style="border-right: 1px solid #e9ecef;">
+                    <div class="form-group mt-3">
+                      <label for="order-remark">配送服务</label>
+                      <textarea class="form-control" id="order-remark{{.ProductId}}" rows="3" placeholder="请输入订单备注"
+                        style="font-size: small;"></textarea>
+                    </div>
+                  </div>
+                  <!-- 配送服务 -->
+                  <div class="col-6" style="border-left: 1px solid #e9ecef;">
+                    <div class="form-group mt-3">
+                      <span>配送服务</span>
+                      <div class="row mt-2 align-items-center justify-content-between">
+                        <div class="col-6">
+                          <select class="form-select" data-select-role="deliver" id="deliver-select{{.ProductId}}"
+                            data-deliver-target="#deliver-cost{{.ProductId}}">
+                            <option value="快递" data-deliver-cost="{{ .Postage }}" selected>
+                              <span>快递</span>
+                            </option>
+                            <option value="自提" data-deliver-cost="0">
+                              <span>自提</span>
+                            </option>
+                          </select>
+                        </div>
+                        <div class="col-6 text-end">
+                          <span class="order-item-price">￥</span>
+                          <span class="order-item-price" id="deliver-cost{{.ProductId}}"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {{end}}
+              </div>
+              {{end}}
+            </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <!-- 3. 订单总价 -->
+          <div class="card sticky-top" style="top: 10px;">
+            <div class="card-body order-total">
+              <h5 class="">订单总价</h5>
+              <div>
+                <span>商品总价：</span>
+                <span>
+                  <span><span class="price">￥</span><span class="price" id="total-price">{{.OrderPrice}}</span></span>
+                </span>
+
+              </div>
+              <div>
+                <span>运费：</span>
+                <span>
+                  <span class="price">￥</span><span class="price" id="total-deliver-cost">{{.OrderPostage}}</span>
+                </span>
+              </div>
+              <div>
+                <span>优惠券：</span>
+                <span>
+                  <span class="discount">￥</span><span class="discount" id="discount">{{.OrderDiscount}}</span>
+                </span>
+              </div>
+              <hr />
+              <div>
+                <span>实付款：</span>
+                <span><span class="discount">￥</span><span class="discount" style="font-size: larger;"
+                    id="real-price">{{.OrderFinalPrice}}</span></span>
+              </div>
+
+              <div class="mt-3 justify-content-start">
+                <a href="javascript:void(0)" class="btn btn-outline-secondary me-3" id="goBack">返回</a>
+                <a href="javascript:void(0)" class="btn btn-outline-success" id="submitOrder">提交订单</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class=" placeholder-body"> </div>
+  <footer class="p-3 bg-white text-dark text-center">
+    <div class="container">
+      <span class="">Copyright &copy; 166-队就是队</span>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script type="module" src="/static/js/order.js"></script>
+</body>
+
+</html>

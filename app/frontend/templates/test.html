@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品规格和价格管理</title>
+  <style>
+    .spec-price-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .spec-price-table th,
+    .spec-price-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .spec-price-table th {
+      background-color: #f2f2f2;
+    }
+
+    .add-spec-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .add-spec-btn:hover {
+      background-color: #45a049;
+    }
+
+    .remove-spec-btn {
+      padding: 4px 8px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .remove-spec-btn:hover {
+      background-color: #e53935;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>商品规格和价格管理</h1>
+  <form id="productForm">
+    <table class="spec-price-table" id="specPriceTable">
+      <thead>
+        <tr>
+          <th>规格名称</th>
+          <th>规格值</th>
+          <th>价格</th>
+          <th>库存</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 动态添加规格和价格行 -->
+      </tbody>
+    </table>
+    <button type="button" class="add-spec-btn" onclick="addSpecRow()">添加规格</button>
+    <button type="submit" class="add-spec-btn">保存商品</button>
+  </form>
+
+  <script>
+    function addSpecRow() {
+      const table = document.getElementById('specPriceTable').getElementsByTagName('tbody')[0];
+      const newRow = table.insertRow();
+
+      const specNameCell = newRow.insertCell(0);
+      const specValueCell = newRow.insertCell(1);
+      const priceCell = newRow.insertCell(2);
+      const stockCell = newRow.insertCell(3);
+      const actionCell = newRow.insertCell(4);
+
+      specNameCell.innerHTML = '<input type="text" name="specName[]" class="form-control" placeholder="规格名称">';
+      specValueCell.innerHTML = '<input type="text" name="specValue[]" class="form-control" placeholder="规格值">';
+      priceCell.innerHTML = '<input type="number" name="price[]" class="form-control" placeholder="价格" step="0.01">';
+      stockCell.innerHTML = '<input type="number" name="stock[]" class="form-control" placeholder="库存">';
+      actionCell.innerHTML = '<button type="button" class="remove-spec-btn" onclick="removeSpecRow(this)">删除</button>';
+    }
+
+    function removeSpecRow(button) {
+      const row = button.parentNode.parentNode;
+      row.parentNode.removeChild(row);
+    }
+
+    document.getElementById('productForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const formData = new FormData(this);
+      const data = {};
+      formData.forEach((value, key) => {
+        if (!data[key]) {
+          data[key] = [];
+        }
+        data[key].push(value);
+      });
+      console.log('商品数据:', data);
+      // 在这里可以发送数据到服务器
+    });
+  </script>
+</body>
+
+</html>

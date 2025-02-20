@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+
 	pbcheckout "github.com/asmile1559/dyshop/pb/backend/checkout"
 	pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
-	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
@@ -12,13 +13,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+func init() {
+	hookx.Init(hookx.DefaultHook)
+}
+
 func main() {
-	if err := loadConfig(); err != nil {
-		logrus.Fatal(err)
-	}
-
-	initLog()
-
 	cc, err := grpc.NewClient("localhost:"+viper.GetString("server.port"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logrus.Fatal(err)
@@ -49,15 +48,4 @@ func main() {
 	}
 
 	fmt.Printf("resp: %v\n", resp)
-}
-
-func loadConfig() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("conf")
-	return viper.ReadInConfig()
-}
-
-func initLog() {
-	logx.Init()
 }

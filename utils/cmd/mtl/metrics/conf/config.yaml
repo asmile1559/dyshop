@@ -1,0 +1,14 @@
+etcd:
+  endpoints:
+    - "etcd:2379" # Etcd 节点地址
+  prefix: "/services/prometheus" # 服务注册前缀
+
+services:
+  - id: "prometheus-service-1" # 服务实例ID
+    address: "127.0.0.1:9091" # 服务实例地址
+
+targets:
+  path: "/etc/prometheus/targets"  # promethus yml file_sd_configs
+
+log:
+  level: "debug"

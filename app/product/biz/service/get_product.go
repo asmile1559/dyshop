@@ -1,8 +1,14 @@
 package service
 
 import (
+	"github.com/asmile1559/dyshop/app/product/biz/dal"
+	"github.com/asmile1559/dyshop/app/product/biz/model"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 type GetProductService struct {
@@ -15,17 +21,17 @@ func NewGetProductService(c context.Context) *GetProductService {
 
 func (s *GetProductService) Run(req *pbproduct.GetProductReq) (*pbproduct.GetProductResp, error) {
 	// TODO: finish your business code...
-	//
+	var dbProduct model.Product
+
+	// 使用 uint 类型查询
+	if err, _ := model.GetProductByID(dal.DB, uint(req.Id)); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.NotFound, "product not found")
+		}
+		return nil, status.Errorf(codes.Internal, "database error: %v", err)
+	}
 	return &pbproduct.GetProductResp{
-		Product: &pbproduct.Product{
-			Id:          1,
-			Name:        "haoguozhi",
-			Description: "a type of drink",
-			Picture:     "https://ss0.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1899428878,3492225815&fm=253&gp=0.jpg",
-			Price:       100.0,
-			Categories: []string{
-				"drink", "daoge",
-			},
-		},
+		Product: dbProduct.ToProto(),
 	}, nil
+
 }

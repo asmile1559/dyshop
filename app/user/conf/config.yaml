@@ -1,14 +1,16 @@
 server:
   port: 12166
   mode: development
+  start_time: "2025-02-14"
+  machine_id: 1
 
 database:
   driver: mysql
-  host: localhost
+  host: "127.0.0.1"
   port: 3306
   username: root
-  password: root
-  dbname: user
+  password: 123456
+  dbname: dyshop
   max_idle_conns: 10
   max_open_conns: 100
   conn_max_lifetime: 3600
@@ -21,7 +23,22 @@ redis:
 
 log:
   level: debug
-  filename: ./logs/app.log
+  path: logs/app.log
   maxsize: 100
   maxage: 7
   maxbackups: 10
+
+etcd:
+  endpoints:
+    - "127.0.0.1:2379" # Etcd 节点地址
+  prefix: "/services/user" # 服务注册前缀
+
+services:
+  - id: "user-service-1" # 服务实例ID
+    address: "127.0.0.1:12166" # 服务实例地址
+
+prometheus: "/services/prometheus"
+
+metrics:
+  host: "127.0.0.1"
+  port: 12167 # 服务实例监控端口

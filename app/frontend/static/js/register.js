@@ -1,116 +1,202 @@
-// File: public/js/register.js
+import * as router from './router.js'
 
-// Helper function to show error messages
-function showError(message) {
-    const errorDiv = document.getElementById('error-message');
-    errorDiv.textContent = message;
-    errorDiv.classList.remove('hidden');
-}
+!function registerProcess() {
+    axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
+    axios.defaults.headers.post['Content-Type'] = 'application/json'
+    axios.defaults.baseURL = router.DefaultURL
 
-// Helper function to clear error messages
-function clearError() {
-    const errorDiv = document.getElementById('error-message');
-    errorDiv.textContent = '';
-    errorDiv.classList.add('hidden');
-}
+    const registerTabTitle = document.querySelector('.register-tabtitle')
+    const emailTabTitle = document.getElementById('email-tabtitle')
+    const phoneTabTitle = document.getElementById('phone-tabtitle')
 
-// Helper function to validate email format
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
+    const accountInput = document.getElementById('accountInput')
+    const passwordInput = document.getElementById('passwordInput')
+    const confirmPasswordInput = document.getElementById('confirmPasswordInput')
 
-// Add form submission handler
-document.getElementById('register-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    clearError();
+    const accountInputLabelImg = document.querySelector('.account label[for="accountInput"] img')
+    const passwordInputLabelImg = document.querySelector('.password label[for="passwordInput"] img')
+    const confirmPasswordInputLabelImg = document.querySelector('.confirm-password label[for="confirmPasswordInput"] img')
 
-    const submitButton = document.getElementById('submit-button');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Registering...';
+    const accountInputPrompt = document.querySelector('.account .prompt-area')
+    const passwordInputPrompt = document.querySelector('.password .prompt-area')
+    const confirmPasswordInputPrompt = document.querySelector('.confirm-password .prompt-area')
 
-    const formData = new FormData(e.target);
+    const messageBox = document.querySelector('.message-box')
+    const agreement = document.getElementById('invalidCheck')
 
-    // Get form values
-    const username = formData.get('username').trim();
-    const password = formData.get('password');
-    const email = formData.get('email').trim();
-    let phone = formData.get('phone');
+    const registerBtn = document.getElementById('register-btn')
+    const jumpLink = document.querySelector('.jump a')
 
-    // Validate username
-    if (username.length < 3 || username.length > 50) {
-        showError('Username must be between 3 and 50 characters');
-        submitButton.disabled = false;
-        submitButton.textContent = 'Register';
-        return;
-    }
+    const modal = document.querySelector('.modal')
+    const modalBody = document.querySelector('.modal-body p')
+    const jumpCancel = document.getElementById('jump-cancel')
+    const jumpNow = document.getElementById('jump-now')
 
-    // Validate password
-    if (password.length < 6 || password.length > 50) {
-        showError('Password must be between 6 and 50 characters');
-        submitButton.disabled = false;
-        submitButton.textContent = 'Register';
-        return;
-    }
+    let registerWay = 'email'
+    let accountInputOk = false
+    let passwordInputOk = false
+    let confirmPasswordInputOk = false
 
-    // Validate email
-    if (!isValidEmail(email)) {
-        showError('Please enter a valid email address');
-        submitButton.disabled = false;
-        submitButton.textContent = 'Register';
-        return;
-    }
+    registerTabTitle.addEventListener('click', (e) => {
+        const target = e.target
+        if (target.tagName === 'A') {
+            if (target.classList.contains('active')) {
+                return
+            }
+            console.log(target.dataset)
+            registerWay = target.dataset['registerWay']
+            emailTabTitle.classList.remove('active')
+            phoneTabTitle.classList.remove('active')
+            accountInput.classList = 'form-control'
+            passwordInput.classList = 'form-control'
+            confirmPasswordInput.classList = 'form-control'
+            accountInput.value = ''
+            passwordInput.value = ''
+            confirmPasswordInput.value = ''
 
-    // Process phone number if provided
-    if (phone) {
-        // Remove any non-digit characters
-        phone = phone.replace(/\D/g, '');
-
-        // Validate phone number length
-        if (phone.length !== 11) {
-            showError('Phone number must be exactly 11 digits');
-            submitButton.disabled = false;
-            submitButton.textContent = 'Register';
-            return;
+            target.classList.add('active')
+            if (registerWay === 'email') {
+                accountInput.setAttribute('placeholder', '请输入邮箱')
+                confirmPasswordInput.setAttribute('placeholder', '再次输入登陆密码')
+            } else if (registerWay === 'phone') {
+                accountInput.setAttribute('placeholder', '请输入手机号')
+                confirmPasswordInput.setAttribute('placeholder', '请输入验证码(123456)')
+            }
         }
-    }
+    })
 
-    // Prepare data for submission
-    const data = {
-        username: username,
-        password: password,
-        email: email,
-        phone: phone || '' // Use empty string if no phone provided
-    };
+    accountInput.addEventListener('blur', function () {
+        accountInputOk = false
+        if (this.value === '') {
+            accountInputLabelImg.style.display = 'none'
+            accountInputPrompt.style.display = 'none'
+            return
+        }
+        accountInputLabelImg.style.display = 'inline-block'
+        accountInputLabelImg.src = '/static/src/basic/wrong.svg'
+        accountInputPrompt.style.display = 'block'
+        if (registerWay === 'email') {
+            if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(this.value)) {
+                accountInputPrompt.innerText = '你输入的邮箱格式不正确'
+                return
+            }
+        } else if (registerWay === 'phone') {
+            if (!/^1[3456789]\d{9}$/.test(this.value)) {
+                accountInputPrompt.innerText = '你输入的手机号格式不正确'
+                return
+            }
+        }
+        accountInputOk = true
+        accountInputLabelImg.src = '/static/src/basic/correct.svg'
+        accountInputPrompt.style.display = 'none'
+        return
+    })
 
-    try {
-        const response = await fetch('/api/v1/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+    passwordInput.addEventListener('blur', function () {
+        passwordInputOk = false
+        if (this.value === '') {
+            passwordInputLabelImg.style.display = 'none'
+            passwordInputPrompt.style.display = 'none'
+            return
+        }
+        passwordInputLabelImg.style.display = 'inline-block'
+        passwordInputLabelImg.src = '/static/src/basic/wrong.svg'
+        passwordInputPrompt.style.display = 'block'
+        if (!/^[a-zA-Z0-9-_!@#$%^&*~+=]{6,16}$/.test(this.value)) {
+            passwordInputPrompt.innerText = '你输入的密码格式不正确'
+            return
+        }
+        passwordInputOk = true
+        passwordInputLabelImg.src = '/static/src/basic/correct.svg'
+        passwordInputPrompt.style.display = 'none'
 
-        const result = await response.json();
+        if (confirmPasswordInput.value !== '' && confirmPasswordInput.value === this.value) {
+            confirmPasswordInputOk = true
+            confirmPasswordInputLabelImg.src = '/static/src/basic/correct.svg'
+            confirmPasswordInputPrompt.style.display = 'none'
+        }
+        return
+    })
 
-        if (!response.ok) {
-            throw new Error(result.error || 'Registration failed');
+    confirmPasswordInput.addEventListener('blur', function () {
+        confirmPasswordInputOk = false
+        if (this.value === '') {
+            confirmPasswordInputLabelImg.style.display = 'none'
+            confirmPasswordInputPrompt.style.display = 'none'
+            return
+        }
+        confirmPasswordInputLabelImg.style.display = 'inline-block'
+        confirmPasswordInputLabelImg.src = '/static/src/basic/wrong.svg'
+        confirmPasswordInputPrompt.style.display = 'block'
+        if (!passwordInputOk || this.value !== passwordInput.value) {
+            confirmPasswordInputPrompt.innerText = '登录密码输入格式不正确或两次输入的密码不一致'
+            return
+        }
+        confirmPasswordInputOk = true
+        confirmPasswordInputLabelImg.src = '/static/src/basic/correct.svg'
+        confirmPasswordInputPrompt.style.display = 'none'
+        return
+    })
+
+    registerBtn.addEventListener('click', (e) => {
+        if (!accountInputOk) {
+            messageBox.style.display = 'block'
+            messageBox.innerText = '请检查邮箱或手机号格式是否正确。'
+            return
         }
 
-        // Show success message
-        showError('Registration successful! Redirecting to login...');
-        errorDiv.classList.remove('text-red-700', 'bg-red-100');
-        errorDiv.classList.add('text-green-700', 'bg-green-100');
+        if (!passwordInputOk || !confirmPasswordInputOk) {
+            messageBox.style.display = 'block'
+            messageBox.innerText = '密码不能为空且格式需要正确。'
+            return
+        }
 
-        // Redirect to login page after short delay
-        setTimeout(() => {
-            window.location.href = '/login';
-        }, 2000);
+        if (!agreement.checked) {
+            messageBox.style.display = 'block'
+            messageBox.innerText = '请先阅读并同意用户协议、隐私政策、产品服务协议。'
+            return
+        }
+        modal.style.display = 'block'
+        axios({
+            method: 'post',
+            url: router.OperationRouters['register'],
+            data: {
+                email: accountInput.value,
+                password: passwordInput.value,
+                confirm_password: confirmPasswordInput.value
+            }
+        }).then(res => {
+            if (res.data.code === 200) {
+                modal.style.display = 'block'
+                let count = 3
+                modalBody.innerText = `注册成功，${count}秒后跳转到登录页面。`
+                let timer = setInterval(() => {
+                    count--
+                    modalBody.innerText = `注册成功，${count}秒后跳转到登录页面。`
+                    if (count === 0) {
+                        clearInterval(timer)
+                        window.location.href = router.OperationRouters['login']
+                    }
+                }, 1000)
 
-    } catch (error) {
-        showError(error.message);
-        submitButton.disabled = false;
-        submitButton.textContent = 'Register';
-    }
-});
+                jumpCancel.addEventListener('click', () => {
+                    clearInterval(timer)
+                    modal.style.display = 'none'
+                })
+
+                jumpNow.addEventListener('click', () => {
+                    clearInterval(timer)
+                    window.location.href = router.OperationRouters['login']
+                })
+            } else {
+                messageBox.style.display = 'block'
+                messageBox.innerText = '注册失败，账号已存在。'
+            }
+        }).catch(err => {
+            console.log(err)
+            messageBox.style.display = 'block'
+            messageBox.innerText = '一个错误发生了，请稍后再试。'
+        })
+    })
+
+}()

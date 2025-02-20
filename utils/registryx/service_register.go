@@ -16,6 +16,7 @@ type EtcdService struct {
 	Address   string // 比如 "127.0.0.1:8080"
 	TTL       time.Duration
 	ConnCount int64
+	cancel    context.CancelFunc
 }
 
 // 初始化 Etcd 服务实例
@@ -51,14 +52,17 @@ func (s *EtcdService) Register() error {
 		return err
 	}
 
+	ctxGoroutine, cancel := context.WithCancel(context.Background())
+	s.cancel = cancel
+
 	// 定期上报连接数
-	go s.reportConnectionCount()
+	go s.reportConnectionCount(ctxGoroutine)
 
 	// 续租协程
 	go func() {
 		ch, kaErr := s.Client.KeepAlive(context.Background(), lease.ID)
 		if kaErr != nil {
-			logrus.Panicf("KeepAlive error: %v\n", kaErr)
+			logrus.WithError(kaErr).Panic("KeepAlive error")
 			return
 		}
 		for range ch {
@@ -66,7 +70,11 @@ func (s *EtcdService) Register() error {
 		}
 	}()
 
-	logrus.Infof("Service %s registered with key=%s, address=%s", s.ServiceID, key, s.Address)
+	logrus.WithFields(logrus.Fields{
+		"id":      s.ServiceID,
+		"key":     key,
+		"address": s.Address,
+	}).Info("Service registered")
 	return nil
 }
 
@@ -74,13 +82,17 @@ func (s *EtcdService) Register() error {
 func (s *EtcdService) DeRegister() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+	defer s.cancel()
 
 	key := fmt.Sprintf("%s/%s", s.Prefix, s.ServiceID)
 	_, err := s.Client.Delete(ctx, key)
 	if err != nil {
 		return err
 	}
-	logrus.Infof("Service %s deregistered, key=%s", s.ServiceID, key)
+	logrus.WithFields(logrus.Fields{
+		"id":  s.ServiceID,
+		"key": key,
+	}).Info("Service deregistered")
 	return nil
 }
 
@@ -90,20 +102,25 @@ func (s *EtcdService) UpdateConnectionCount(connCount int64) {
 }
 
 // 定期上报连接数 => /services/hello/<serviceID>/connCount
-func (s *EtcdService) reportConnectionCount() {
+func (s *EtcdService) reportConnectionCount(ctx context.Context) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 
-	for range ticker.C {
-		func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			updateCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			instanceConnKey := fmt.Sprintf("%s/%s/connCount", s.Prefix, s.ServiceID)
-			_, err := s.Client.Put(ctx, instanceConnKey, fmt.Sprintf("%d", s.ConnCount))
+			_, err := s.Client.Put(updateCtx, instanceConnKey, fmt.Sprintf("%d", s.ConnCount))
+			// 确保及时释放 updateCtx 的 cancel，而不是延迟到函数结束
+			cancel()
+
 			if err != nil {
-				logrus.Panicf("Failed to update connection count for %s: %v", s.ServiceID, err)
+				logrus.WithError(err).WithField("id", s.ServiceID).Error("Failed to update connection count")
+				return
 			}
-		}()
+		}
 	}
 }

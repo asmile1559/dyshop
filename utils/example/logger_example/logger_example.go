@@ -3,13 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/asmile1559/dyshop/utils/logx"
+	"github.com/asmile1559/dyshop/utils/hookx"
 
 	"github.com/sirupsen/logrus"
 )
 
 func init() {
-	logx.Init()
+	hookx.Init(hookx.DefaultHook)
 }
 
 func main() {

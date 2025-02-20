@@ -14,19 +14,20 @@ func NewSearchProductService(c context.Context) *SearchProductService {
 }
 
 func (s *SearchProductService) Run(req *pbproduct.SearchProductsReq) (*pbproduct.SearchProductsResp, error) {
+	//var dbProduct model.Product
+
+	// 使用 uint 类型查询
+	//if err, dbProdcut := model.ListProducts(dal.DB, dal.DB, req.Query); err != nil {
+	//	if errors.Is(err, gorm.ErrRecordNotFound) {
+	//		return nil, status.Errorf(codes.NotFound, "product not found")
+	//	}
+	//	return nil, status.Errorf(codes.Internal, "database error: %v", err)
+	//}
+	pbProducts := make([]*pbproduct.Product, 0, 1)
+	return &pbproduct.SearchProductsResp{
+		Results: pbProducts, // 转换模型到 Protobuf
+	}, nil
 	// TODO: finish your business code...
 	//
-	return &pbproduct.SearchProductsResp{
-		Results: []*pbproduct.Product{
-			{
-				Id:          1,
-				Name:        "haoguozhi",
-				Description: "a type of drink",
-				Picture:     "https://ss0.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1899428878,3492225815&fm=253&gp=0.jpg",
-				Price:       100.0,
-				Categories: []string{
-					"drink", "daoge",
-				},
-			},
-		}}, nil
+
 }
