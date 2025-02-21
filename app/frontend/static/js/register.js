@@ -1,7 +1,9 @@
+import * as router from './router.js'
+
 !function registerProcess() {
     axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
     axios.defaults.headers.post['Content-Type'] = 'application/json'
-    axios.defaults.baseURL = 'http://192.168.191.130:10166'
+    axios.defaults.baseURL = router.DefaultURL
 
     const registerTabTitle = document.querySelector('.register-tabtitle')
     const emailTabTitle = document.getElementById('email-tabtitle')
@@ -34,10 +36,6 @@
     let accountInputOk = false
     let passwordInputOk = false
     let confirmPasswordInputOk = false
-    jumpLink.addEventListener('click', function (e) {
-        e.preventDefault()
-        window.location.href = '/test/login'
-    })
 
     registerTabTitle.addEventListener('click', (e) => {
         const target = e.target
@@ -161,7 +159,7 @@
         modal.style.display = 'block'
         axios({
             method: 'post',
-            url: '/test/register',
+            url: router.OperationRouters['register'],
             data: {
                 email: accountInput.value,
                 password: passwordInput.value,
@@ -177,7 +175,7 @@
                     modalBody.innerText = `注册成功，${count}秒后跳转到登录页面。`
                     if (count === 0) {
                         clearInterval(timer)
-                        window.location.href = '/test/login'
+                        window.location.href = router.OperationRouters['login']
                     }
                 }, 1000)
 
@@ -188,7 +186,7 @@
 
                 jumpNow.addEventListener('click', () => {
                     clearInterval(timer)
-                    window.location.href = '/test/login'
+                    window.location.href = router.OperationRouters['login']
                 })
             } else {
                 messageBox.style.display = 'block'

@@ -8,6 +8,9 @@ service ProductCatalogService {
   rpc ListProducts(ListProductsReq) returns (ListProductsResp) {}
   rpc GetProduct(GetProductReq) returns (GetProductResp) {}
   rpc SearchProducts(SearchProductsReq) returns (SearchProductsResp) {}
+  rpc CreateProduct(CreateProductReq) returns (CreateProductResp) {};
+  rpc ModifyProduct(ModifyProductReq) returns (ModifyProductResp) {};
+  rpc DeleteProduct(DeleteProductReq) returns (DeleteProductResp) {};
 }
 
 message ListProductsReq{
@@ -23,12 +26,12 @@ message Product {
   string description = 3;
   string picture = 4;
   float price = 5;
-
   repeated string categories = 6;
 }
 
 message ListProductsResp {
   repeated Product products = 1;
+  int64 total = 2; // 添加总记录数
 }
 
 message GetProductReq {
@@ -45,4 +48,36 @@ message SearchProductsReq {
 
 message SearchProductsResp {
   repeated Product results = 1;
+}
+message CreateProductReq {
+  string name = 1;
+  string description = 2;
+  string picture = 3;
+  float price = 4;
+  repeated string categories = 5;
+}
+
+message CreateProductResp {
+  bool success = 1;
+}
+
+message ModifyProductReq {
+  uint32 id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional string picture = 4;
+  optional float price = 5;
+  repeated string categories = 6; // 客户端提供则替换整个列表
+}
+
+message ModifyProductResp {
+  bool success = 1;
+}
+
+message DeleteProductReq {
+  uint32 id = 1;
+}
+
+message DeleteProductResp {
+  bool success = 1;
 }

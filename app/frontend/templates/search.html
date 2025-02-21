@@ -2,279 +2,164 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抖音商城-搜索</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-搜索</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
-    <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/static/css/style.css" />
 
-    <style>
-
-    </style>
+  <style>
+    .implicit-link.disabled {
+      pointer-events: none;
+      color: #dee2e6;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="container top-layer">
-        <nav class="navbar navbar-expand-lg bg-body-white top-nav-fs-sm">
-            <div class="" style="width: 80%;">
-                <a class="navbar-brand fs-6" href="#">欢迎访问 抖音商城</a>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <div class="wel-bar">
+            <div class="user-bar">
+              <span style="white-space: nowrap;">您好,</span>
+              <span class="dropdown">
+                <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+                  data-bs-toggle="dropdown">
+                  <span class="d-inline-block text-truncate"
+                    style="width: 90%; white-space: nowrap; font-size: small;"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{{.PageRouter.UserPage}}info">个人设置</a></li>
+                  <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+                  <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+                  <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+                  <li><button class="dropdown-item">退出登录</button></li>
+                </ul>
+              </span>
             </div>
-            <div class="text-end" style="width: 20%;">
-                <span style="white-space: nowrap;">您好,</span>
-                <span class="dropdown">
-                    <button id="nav-user-name" class="btn btn-white dropdown-toggle top-nav-fs-sm1" style="width: 70%;"
-                        type="button" data-bs-toggle="dropdown">
-                        <span class="d-inline-block text-truncate" style="width: 90%; white-space: nowrap;">Lorem ipsum
-                            dolor sit amet.</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">个人设置</a></li>
-                        <li><a class="dropdown-item" href="#">购物车</a></li>
-                        <li><a class="dropdown-item" href="#">订单</a></li>
-                        <li><a class="dropdown-item" href="#">支付</a></li>
-                        <li><button class="dropdown-item">退出登录</button></li>
-                    </ul>
-                </span>
-            </div>
-        </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-3 main-body">
+    <div class="container sticky-top header">
+      <div class="row align-items-center">
+        <div class="col-3 text-center">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">
+            <h1>抖音商城</h1>
+            <span style="font-size: small;">购物就上抖音商城</span>
+          </a>
+        </div>
+        <div class="col-7">
+          <div class="input-group">
+            <input type="text" class="form-control form-outline-orangered fs-5" placeholder="搜索商品" id="search-input">
+            <button class="btn btn-orangered fs-5" type="button" id="search"><span>搜索</span></button>
+          </div>
+        </div>
+        <div class="col-2">
+        </div>
+      </div>
     </div>
 
-    <div class="p-3 main-body">
-        <div class="container sticky-top bg-white p-3">
-            <div class="row align-items-center ">
-                <div class="col-3 text-center">
-                    <a href="#" class="implicit-link">
-                        <h1>抖音商城</h1>
-                        <span style="font-size: small;">购物就上抖音商城</span>
-                    </a>
-
-                </div>
-                <div class="col-7">
-                    <div class="input-group">
-                        <input type="text" class="form-control form-outline-orangered fs-5" placeholder="搜索商品">
-                        <button class="btn btn-orangered fs-5" type="button" id="button-addon2"><span>搜索</span></button>
-                    </div>
-                </div>
-                <div class="col-2"></div>
-            </div>
+    <div class="container p-3">
+      <div class="product-list-nav gap-2">
+        <div class="product-list-tabtitle">
+          <ul>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=comprehensive"
+                class="implicit-link {{if eq .Sort `comprehensive`}}active{{end}}">综合</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=sold"
+                class="implicit-link {{if eq .Sort `sold`}}active{{end}}">销量</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=price"
+                class="implicit-link {{if eq .Sort `price`}}active{{end}}">价格</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=latest"
+                class="implicit-link {{if eq .Sort `latest`}}active{{end}}">新品</a></li>
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=score"
+                class="implicit-link {{if eq .Sort `score`}}active{{end}}">评分</a></li>
+          </ul>
         </div>
-
-        <div class="container p-3">
-            <div class="product-list-nav gap-2">
-                <div class="product-list-tabtitle">
-                    <ul>
-                        <li><a href="#" class="implicit-link active">综合</a></li>
-                        <li><a href="#" class="implicit-link">销量</a></li>
-                        <li><a href="#" class="implicit-link">价格</a></li>
-                        <li><a href="#" class="implicit-link">新品</a></li>
-                        <li><a href="#" class="implicit-link">评分</a></li>
-                    </ul>
-                </div>
-                <div class="product-list-pagenav">
-                    <span><a href="#" class="implicit-link">&lt;</a></span>
-                    <span class="cur-pagenumber">1</span><span>/</span><span class="tot-pagenumber">10</span>
-                    <span class=""><a href="#" class="implicit-link">&gt;</a></span>
-                </div>
-            </div>
-
-            <div class="product-list">
-                <div class="row justify-content-start">
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product1.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product2.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product3.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product4.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-2 product-item">
-                        <div class="d-flex flex-column justify-content-start align-items-center">
-                            <div class="product-item-img">
-                                <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
-                            </div>
-                            <div class="product-item-details text-start" style="width: 100%;">
-                                <div class="product-item-name">
-                                    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, alias!
-                                </div>
-                                <div class="product-item-price d-flex align-items-end">
-                                    <div class="currency">￥</div>
-                                    <div class="price">123.00</div>
-                                </div>
-                                <div class="product-item-bought d-flex justify-content-start align-items-center">
-                                    <span class="buy-count">10</span>
-                                    <span class="buy-decl"> +人购买</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="product-list-pagenav">
+          <span><a
+              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}{{end}}"
+              class="implicit-link {{if eq .CurPage 1}}disabled{{end}}">&lt;</a></span>
+          <span class="cur-page">{{.CurPage}}</span><span>/</span><span class="tot-page">{{ .TotalPage }}</span>
+          <span class=""><a
+              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}{{end}}"
+              class="implicit-link {{if eq .CurPage .TotalPage}}disabled{{end}}">&gt;</a></span>
         </div>
+      </div>
+
+      <div class="product-list">
+        <div class="row justify-content-start">
+          {{ range $idx, $product := .Products }}
+          {{with $product}}
+          <div class="col-2 product-item-g" data-product-id="{{ .ProductId }}">
+            <div class="item-img">
+              <img src=" {{.ProductImg}} " alt="product-img">
+            </div>
+            <div class="item-name">
+              {{ .ProductName }}
+            </div>
+            <div class="item-price">
+              {{with .ProductSpec}}
+              <span class="currency">￥</span><span class="price">{{ .Price }}</span>
+              {{end}}
+            </div>
+            <div class="item-sold">
+              <span>{{ .Sold }}</span>
+              <span>+人购买</span>
+            </div>
+          </div>
+          {{end}}
+          {{else}}
+          <div class="col-12 text-center mt-5">
+            <span>没有找到相关商品</span>
+          </div>
+          {{ end }}
+        </div>
+      </div>
     </div>
 
-
+    <div class="placeholder-body"></div>
     <div class="p-3 pagination">
-        <div class="container d-flex justify-content-center">
-
-            <ul class="pagination">
-                <li class="page-item"><a class="page-link " href="#">上一页</a></li>
-                <li class="page-item"><a class="page-link active" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">4</a></li>
-                <li class="page-item"><a class="page-link" href="#">5</a></li>
-                <li class="page-item"><a class="page-link" href="#">下一页</a></li>
-            </ul>
-        </div>
+      <div class="container d-flex justify-content-center">
+        <ul class="pagination">
+          <li class="page-item"><a class="page-link {{if eq .CurPage 1}}disabled{{end}} "
+              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}{{end}}">上一页</a>
+          </li>
+          {{range $idx, $page := showPages .CurPage .TotalPage}}
+          <li class="page-item"><a class="page-link {{if eq $.CurPage $page}} active {{end}}"
+              href="{{$.PageRouter.SearchPage}}?keyword={{$.Keyword}}&pg={{$page}}&sort={{$.Sort}}">{{$page}}</a>
+          </li>
+          {{end}}
+          <li class="page-item"><a class="page-link {{if eq .CurPage .TotalPage}}disabled{{end}}"
+              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}{{end}}">下一页</a>
+          </li>
+        </ul>
+      </div>
     </div>
-    <div class="content"></div>
     <footer class="p-3 bg-white text-dark text-center">
-        <div class="container">
-            <span class="">Copyright &copy; 166-队就是队</span>
-        </div>
+      <div class="container">
+        <span class="">Copyright &copy; 166-队就是队</span>
+      </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-        crossorigin="anonymous"></script>
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+      crossorigin="anonymous"></script>
+    <script type="module" src="/static/js/search.js"></script>
     </script>
 </body>
 

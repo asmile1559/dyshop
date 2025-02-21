@@ -21,7 +21,6 @@ func main() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-
 	cli := pbproduct.NewProductCatalogServiceClient(cc)
 	resp, err := cli.GetProduct(context.TODO(), &pbproduct.GetProductReq{Id: 123})
 	if err != nil {

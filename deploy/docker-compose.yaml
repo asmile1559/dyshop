@@ -1,15 +1,11 @@
 services:
-  # etcd:
-  #   image: quay.io/coreos/etcd:latest
-  #   ports:
-  #     - "2379:2379"
-  #     - "2380:2380"
-  #   command: |
-  #     /usr/local/bin/etcd
-  #     --name etcd0
-  #     --data-dir /etcd-data
-  #     --advertise-client-urls http://0.0.0.0:2379
-  #     --listen-client-urls http://0.0.0.0:2379
+  etcd:
+    image: docker.io/bitnami/etcd:3.5
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+    ports:
+      - 2379:2379
+      - 2380:2380
   mysql:
     image: "mysql:latest"
     ports:
@@ -17,14 +13,13 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
   prometheus:
-    image: prom/prometheus:latest
+    image: jiny14/mypromethues:latest
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./config/targets:/etc/prometheus/targets
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
+      # - ./config/targets:/etc/prometheus/targets
     ports:
       - "9090:9090"
+      - "9091:9091"
   grafana:
     image: grafana/grafana:latest
     environment:
