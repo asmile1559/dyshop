@@ -474,7 +474,7 @@ package main
 import "github.com/gin-gonic/gin"
 
 var (
-	pageRouter = gin.H{
+	PageRouter = gin.H{
 		"HomePage":     "/example/",
 		"LoginPage":    "/example/user/login/",
 		"RegisterPage": "/example/user/register/",

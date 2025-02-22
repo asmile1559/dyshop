@@ -2,8 +2,9 @@
 const DefaultURL = "http://192.168.191.130:10166"
 
 const OperationRouters = {
-  "home": "/example/", // GET
-  "switchShowcase": "/example/showcase/", // GET
+  "home": "/", // GET
+  "switchShowcase": "/showcase/", // GET
+  "verify": "/verify/", // POST
   "updateUserInfo": "/example/user/info/", // POST
   "updateUserImg": "/example/user/info/upload/", // POST
   "registerMerchant": "/example/user/role/merchant/", // GET
@@ -29,6 +30,6 @@ const OperationRouters = {
   "search": "/example/search/", // GET
   "register": "/example/user/register/", // GET|POST
   "login": "/example/user/login/", // GET|POST
-  "verify": "/example/verify/", // POST
+
 }
 export { DefaultURL, OperationRouters }
