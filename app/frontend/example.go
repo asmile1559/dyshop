@@ -31,9 +31,9 @@ func registerExampleRouter(e *gin.Engine) {
 			// 根据是否有user_id判断是否登录
 			// 提供UserInfo时, 是已登录页面, 否则为未登录页面
 			resp := gin.H{
-				"PageRouter":   pageRouter,
-				"CategoryList": categoryList,
-				"Carousels":    carousels,
+				"PageRouter":   PageRouter,
+				"CategoryList": CategoryList,
+				"Carousels":    Carousels,
 				"Products": []gin.H{
 					{
 						"Id":      "1",
@@ -151,7 +151,7 @@ func registerExampleRouter(e *gin.Engine) {
 		// 获取注册界面
 		_user.GET("/register", func(c *gin.Context) {
 			c.HTML(http.StatusOK, "register.html", gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 			})
 		})
 
@@ -182,7 +182,7 @@ func registerExampleRouter(e *gin.Engine) {
 		// 获取登录界面
 		_user.GET("/login", func(c *gin.Context) {
 			c.HTML(http.StatusOK, "login.html", gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 			})
 		})
 
@@ -217,7 +217,7 @@ func registerExampleRouter(e *gin.Engine) {
 				}(userId.(int64))
 				t, _ := time.Parse("2006年1月2日", "1970年1月1日")
 				c.HTML(http.StatusOK, "info.html", gin.H{
-					"PageRouter": pageRouter,
+					"PageRouter": PageRouter,
 					"UserInfo": gin.H{
 						"Id":       userId,
 						"Name":     "lixiaoming",
@@ -342,7 +342,7 @@ func registerExampleRouter(e *gin.Engine) {
 				})
 			}
 			c.HTML(http.StatusOK, "account.html", gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 				"UserInfo": gin.H{
 					"Id":    userId.(int64),
 					"Name":  "lixiaoming",
@@ -445,7 +445,7 @@ func registerExampleRouter(e *gin.Engine) {
 				}(userId.(int64))
 
 				resp := gin.H{
-					"PageRouter": pageRouter,
+					"PageRouter": PageRouter,
 					"UserInfo": gin.H{
 						"Id":   userId,
 						"Name": "lixiaoming",
@@ -623,7 +623,7 @@ func registerExampleRouter(e *gin.Engine) {
 			}(userId.(int64))
 
 			resp := gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 				"UserInfo": gin.H{
 					"Id":   userId,
 					"Name": "lixiaoming",
@@ -818,7 +818,7 @@ func registerExampleRouter(e *gin.Engine) {
 			userId, _ := c.Get("user_id")
 			productId := c.Query("product_id")
 			resp := gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 				"UserInfo": gin.H{
 					"Id":   userId,
 					"Name": "lixiaoming",
@@ -969,7 +969,7 @@ func registerExampleRouter(e *gin.Engine) {
 		_cart.GET("/", func(c *gin.Context) {
 			userId, _ := c.Get("user_id")
 			resp := gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 				"UserInfo": gin.H{
 					"Id":   userId,
 					"Name": "lixiaoming",
@@ -1092,7 +1092,7 @@ func registerExampleRouter(e *gin.Engine) {
 		_order.GET("/", func(c *gin.Context) {
 			orderId := c.Query("order_id")
 			resp := gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 				"UserInfo": gin.H{
 					"Name": "lixiaoming",
 				},
@@ -1247,7 +1247,7 @@ func registerExampleRouter(e *gin.Engine) {
 			fmt.Println(transactionId, ",", orderId)
 
 			resp := gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 				"UserInfo": gin.H{
 					"Name": "lixiaoming",
 				},
@@ -1418,7 +1418,7 @@ func registerExampleRouter(e *gin.Engine) {
 			}
 			totalPage := 8
 			resp := gin.H{
-				"PageRouter": pageRouter,
+				"PageRouter": PageRouter,
 				"UserInfo": gin.H{
 					"Name": "lixiaoming",
 				},
