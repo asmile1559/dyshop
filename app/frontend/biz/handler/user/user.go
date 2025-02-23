@@ -28,12 +28,20 @@ func Register(c *gin.Context) {
 		if !ok {
 			// 非validator.ValidationErrors类型错误直接返回
 			logrus.WithError(err)
-			c.String(http.StatusOK, "An error occurred: %v", err)
+			//c.String(http.StatusOK, "An error occurred: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "err",
+			})
 			return
 		}
 		// validator.ValidationErrors类型错误则进行翻译
 		logrus.Error(errs.Translate(trans))
-		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
+		//c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "err",
+		})
 		return
 	}
 
@@ -43,14 +51,22 @@ func Register(c *gin.Context) {
 		Password:        p.Password,
 		ConfirmPassword: p.ConfirmPassword,
 	}
-	resp, err := service.NewRegisterService(c).Run(&req)
+	_, err = service.NewRegisterService(c).Run(&req)
 
 	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+		//c.String(http.StatusOK, "An error occurred: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "err",
+		})
 		return
 	}
 
-	c.String(http.StatusOK, "%v", resp)
+	//c.String(http.StatusOK, "%v", resp)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "register ok!",
+	})
 }
 
 func Login(c *gin.Context) {
@@ -88,8 +104,13 @@ func Login(c *gin.Context) {
 		c.String(http.StatusOK, "%v", err)
 		return
 	}
-
-	c.String(http.StatusOK, "%v", resp)
+	
+	//c.String(http.StatusOK, "%v", resp)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "login ok!",
+		"token":   resp["token"],
+	})
 
 }
 

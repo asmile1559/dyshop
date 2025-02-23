@@ -28,8 +28,8 @@ const OperationRouters = {
   "cancelCheckout": "/example/checkout/cancel/", // POST
   "payment": "/example/payment/", // POST
   "search": "/example/search/", // GET
-  "register": "/example/user/register/", // GET|POST
-  "login": "/example/user/login/", // GET|POST
+  "register": "/user/register/", // GET|POST
+  "login": "/user/login/", // GET|POST
 
 }
 export { DefaultURL, OperationRouters }
