@@ -43,64 +43,20 @@ function getCookie(key) {
     return null;
 }
 
-// function writeDB(dbName, osName, id, data, dbVersion = 1) {
-//   return new Promise((resolve, reject) => {
-//     const request = window.indexedDB.open(dbName, dbVersion)
-//     request.onupgradeneeded = (event) => {
-//       const db = event.target.result
-//       if (!db.objectStoreNames.contains(osName)) {
-//         const objectStore = db.createObjectStore(osName, { keyPath: 'id' })
-//         objectStore.createIndex('id', 'id', { unique: true })
-//       }
-//     }
+function deleteAllCookies() {
+  // 获取所有 Cookie
+  const cookies = document.cookie.split(";");
 
-//     request.onsuccess = (event) => {
-//       const db = event.target.result
-//       const transaction = db.transaction(osName, 'readwrite')
-//       const objectStore = transaction.objectStore(osName)
-//       const req = objectStore.put({ id: id, data: data })
-//       req.onsuccess = (event) => {
-//         console.log('writeDB success', event)
-//         resolve(event.target.result)
-//       }
-//       req.onerror = (event) => {
-//         console.log('error', event)
-//         reject(event)
-//       }
-//     }
+  // 遍历每个 Cookie
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i];
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
 
-//     request.onerror = (event) => {
-//       console.log('error', event)
-//       reject(event)
-//     }
-//   })
-// }
-
-// function readDB(dbName, osName, id, dbVersion = 1) {
-//   return new Promise((resolve, reject) => {
-//     const request = window.indexedDB.open(dbName, dbVersion)
-//     request.onsuccess = (event) => {
-//       const db = event.target.result
-//       const transaction = db.transaction(osName, 'readonly')
-//       const objectStore = transaction.objectStore(osName)
-//       const req = objectStore.get(id)
-//       req.onsuccess = (event) => {
-//         console.log('readDB success', event)
-//         resolve(event.target.result)
-//       }
-//       req.onerror = (event) => {
-//         console.log('readDB error', event)
-//         reject(event)
-//       }
-//     }
-
-//     request.onerror = (event) => {
-//       console.log('readDB error', event)
-//       reject(event)
-//     }
-//   })
-// }
-
+    // 设置过期时间为过去的日期
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+  }
+}
 
 function openDB(dbName, osName, dbVersion = 1) {
   return new Promise((resolve, reject) => {
@@ -126,14 +82,12 @@ function openDB(dbName, osName, dbVersion = 1) {
 
 async function writeDB(dbName, osName, id, data, dbVersion = 1) {
   const db = await openDB(dbName, osName, dbVersion);
-  console.log(db)
   return await new Promise((resolve, reject) => {
     const transaction = db.transaction(osName, 'readwrite');
     const objectStore = transaction.objectStore(osName);
     const req = objectStore.put({ id: id, data: data });
 
     req.onsuccess = (event) => {
-      console.log('writeDB success', event);
       resolve(event.target.result);
     };
 
@@ -162,7 +116,6 @@ async function readDB(dbName, osName, id, dbVersion = 1) {
     const req = objectStore.get(id);
 
     req.onsuccess = (event) => {
-      console.log('readDB success', event);
       resolve(event.target.result);
     };
 
@@ -182,20 +135,15 @@ async function readDB(dbName, osName, id, dbVersion = 1) {
   });
 }
 
-function deleteAllCookies() {
-  // 获取所有 Cookie
-  const cookies = document.cookie.split(";");
-
-  // 遍历每个 Cookie
-  for (let i = 0; i < cookies.length; i++) {
-    const cookie = cookies[i];
-    const eqPos = cookie.indexOf("=");
-    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-
-    // 设置过期时间为过去的日期
-    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-  }
-}
+!function logout() {
+  document.querySelectorAll('[data-role="logout"]').forEach(ele => {
+    ele.addEventListener('click', () => {
+      localStorage.clear();
+      deleteAllCookies();
+      window.location.href = '/';
+    });
+  });
+}()
 
 export { alertByModal };
 export { setCookie, delCookie, getCookie, deleteAllCookies };

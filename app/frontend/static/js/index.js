@@ -135,9 +135,6 @@ function NewProductItem(product) {
   axios({
     'method': 'POST',
     'url': router.OperationRouters['verify'],
-    data: {
-      token: localStoragetoken
-    }
   }).then((res) => {
     console.log(res)
     const resp = res.data.resp
