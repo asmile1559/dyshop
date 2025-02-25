@@ -1,2 +1,20 @@
 server:
   port: 16166
+
+database:
+  dsn: "djj:123456@tcp(127.0.0.1:3306)/checkout?charset=utf8mb4&parseTime=True&loc=Local"
+
+etcd:
+  endpoints:
+    - "127.0.0.1:2379"       # Etcd 节点地址
+  prefix: "/services/checkout"  # 服务注册前缀
+
+services:
+  - id: "checkout-service-1"     # 服务实例ID
+    address: "127.0.0.1:16166" # 服务实例地址
+
+prometheus: "/services/prometheus"
+
+metrics:
+  host: "127.0.0.1"
+  port: 16166 # 服务实例监控端口

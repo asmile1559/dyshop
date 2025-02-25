@@ -26,8 +26,8 @@ func main() {
 	resp, err := cli.Charge(context.TODO(), &pbpayment.ChargeReq{
 		Amount: 123,
 		CreditCard: &pbpayment.CreditCardInfo{
-			CreditCardNumber:          "987654321",
-			CreditCardCvv:             123456789,
+			CreditCardNumber:          "9876543210001",
+			CreditCardCvv:             1234,
 			CreditCardExpirationYear:  2099,
 			CreditCardExpirationMonth: 12,
 		},

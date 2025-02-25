@@ -25,7 +25,7 @@ func main() {
 
 	cli := pbcheckout.NewCheckoutServiceClient(cc)
 	resp, err := cli.Checkout(context.TODO(), &pbcheckout.CheckoutReq{
-		UserId:    1,
+		UserId:    123,
 		Firstname: "hua",
 		Lastname:  "li",
 		Email:     "123@abc.com",
@@ -37,8 +37,8 @@ func main() {
 			ZipCode:       "123456",
 		},
 		CreditCard: &pbpayment.CreditCardInfo{
-			CreditCardNumber:          "987654321",
-			CreditCardCvv:             123456,
+			CreditCardNumber:          "9876543210002",
+			CreditCardCvv:             1234,
 			CreditCardExpirationYear:  2099,
 			CreditCardExpirationMonth: 12,
 		},
