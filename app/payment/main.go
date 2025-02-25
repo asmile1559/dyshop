@@ -116,7 +116,7 @@ func main() {
 	
 	s := grpc.NewServer()
 
-	pbpayment.RegisterPaymentServiceServer(s, &PaymentServiceServer{})
+	// pbpayment.RegisterPaymentServiceServer(s, &PaymentServiceServer{})
 	if err = s.Serve(cc); err != nil {
 		logrus.Fatal(err)
 	}

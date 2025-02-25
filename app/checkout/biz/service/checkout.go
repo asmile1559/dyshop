@@ -14,62 +14,52 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	//"google.golang.org/grpc/credentials/insecure"
+	"github.com/asmile1559/dyshop/utils/registryx"
 )
 
-// initServiceViper 读取指定配置文件
-func initServiceViper(configPath string) (*viper.Viper, error) {
-	v := viper.New()
-	v.SetConfigFile(configPath)
-	if err := v.ReadInConfig(); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// CheckoutService 结算服务（不依赖 etcd，只使用纯 gRPC）
+// CheckoutService 结算服务，通过 etcd 发现依赖服务
 type CheckoutService struct {
 	ctx        context.Context
+	// 通过 etcd 服务发现获得 Payment 和 Order 客户端
 	paymentCli pbpayment.PaymentServiceClient
 	orderCli   pborder.OrderServiceClient
 }
 
-// NewCheckoutService 创建结算服务实例，分别从 payment 和 order 的配置文件中读取服务地址
+// NewCheckoutService 创建结算服务实例，使用 registryx.DiscoverEtcdServices 发现 Payment 和 Order 服务
 func NewCheckoutService(ctx context.Context) *CheckoutService {
-	// 读取 payment 服务的配置文件
-	paymentViper, err := initServiceViper("/root/dyshop/app/payment/conf/config.yaml")
-	if err != nil {
-		logrus.Fatalf("读取 payment 配置文件失败: %v", err)
-	}
-	paymentPort := paymentViper.GetString("server.port")
-	// 假设 payment 服务部署在本机
-	paymentAddr := "localhost:" + paymentPort
+	etcdEndpoints := viper.GetStringSlice("etcd.endpoints")
 
-	// 读取 order 服务的配置文件
-	orderViper, err := initServiceViper("/root/dyshop/app/order/conf/config.yaml")
+	// 发现 Payment 服务
+	paymentClient, _, err := registryx.DiscoverEtcdServices[pbpayment.PaymentServiceClient](
+		etcdEndpoints,
+		"/services/payment",
+		func(conn grpc.ClientConnInterface) pbpayment.PaymentServiceClient {
+			return pbpayment.NewPaymentServiceClient(conn)
+		},
+	)
 	if err != nil {
-		logrus.Fatalf("读取 order 配置文件失败: %v", err)
+		logrus.Fatalf("Failed to discover payment service: %v", err)
 	}
-	orderPort := orderViper.GetString("server.port")
-	// 假设 order 服务部署在本机
-	orderAddr := "localhost:" + orderPort
+	// 如果需要，请在服务关闭时关闭 paymentConn
 
-	// 建立与 payment 服务的 gRPC 连接
-	paymentConn, err := grpc.Dial(paymentAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// 发现 Order 服务
+	orderClient, _, err := registryx.DiscoverEtcdServices[pborder.OrderServiceClient](
+		etcdEndpoints,
+		"/services/order",
+		func(conn grpc.ClientConnInterface) pborder.OrderServiceClient {
+			return pborder.NewOrderServiceClient(conn)
+		},
+	)
 	if err != nil {
-		logrus.Fatalf("连接 payment 服务失败: %v", err)
+		logrus.Fatalf("Failed to discover order service: %v", err)
 	}
-
-	// 建立与 order 服务的 gRPC 连接
-	orderConn, err := grpc.Dial(orderAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		logrus.Fatalf("连接 order 服务失败: %v", err)
-	}
+	// 同样，orderConn 关闭由调用方负责
 
 	return &CheckoutService{
 		ctx:        ctx,
-		paymentCli: pbpayment.NewPaymentServiceClient(paymentConn),
-		orderCli:   pborder.NewOrderServiceClient(orderConn),
+		paymentCli: paymentClient,
+		orderCli:   orderClient,
 	}
 }
 
@@ -80,29 +70,25 @@ func (s *CheckoutService) Run(req *pbcheckout.CheckoutReq) (*pbcheckout.Checkout
 		return nil, err
 	}
 
-	// 从 order 服务获取订单信息
+	// 通过 Order 服务获取订单信息
 	orderResp, err := s.getOrderFromOrderService(req.UserId)
 	if err != nil {
-		return nil, fmt.Errorf("获取订单失败: %v", err)
+		return nil, fmt.Errorf("failed to get orders: %v", err)
 	}
-
-	// 如果订单列表为空
 	if len(orderResp.Orders) == 0 {
-		return nil, errors.New("未找到订单")
+		return nil, errors.New("no orders found")
 	}
 	order := orderResp.Orders[0] // 取第一笔订单
 	orderID := order.OrderId
 
-	fmt.Println("订单测试：", order.OrderItems)
-
-	// 计算订单金额
+	// 计算订单总金额
 	totalAmount, err := calculateTotalAmount(order.OrderItems)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("订单金额：", totalAmount)
+	fmt.Println("Order total:", totalAmount)
 
-	// 调用 payment 服务进行支付
+	// 调用 Payment 服务进行支付
 	paymentResp, err := s.paymentCli.Charge(context.TODO(), &pbpayment.ChargeReq{
 		Amount: float32(totalAmount),
 		CreditCard: &pbpayment.CreditCardInfo{
@@ -115,10 +101,10 @@ func (s *CheckoutService) Run(req *pbcheckout.CheckoutReq) (*pbcheckout.Checkout
 		UserId:  req.UserId,
 	})
 	if err != nil || paymentResp.TransactionId == "" {
-		return nil, errors.New("支付失败")
+		return nil, errors.New("payment failed")
 	}
 
-	// 存储订单信息到数据库
+	// 存储订单记录到数据库
 	record := model.OrderRecord{
 		OrderID:       orderID,
 		UserID:        req.UserId,
@@ -128,41 +114,38 @@ func (s *CheckoutService) Run(req *pbcheckout.CheckoutReq) (*pbcheckout.Checkout
 		CreatedAt:     time.Now(),
 	}
 	if err := dal.DB.Create(&record).Error; err != nil {
-		return nil, fmt.Errorf("保存订单失败: %v", err)
+		return nil, fmt.Errorf("failed to save order: %v", err)
 	}
 
-	// 返回订单信息
 	return &pbcheckout.CheckoutResp{
 		OrderId:       orderID,
 		TransactionId: paymentResp.TransactionId,
 	}, nil
 }
 
-// getOrderFromOrderService 获取订单信息
+// getOrderFromOrderService 调用 Order 服务的 ListOrder 方法获取订单数据
 func (s *CheckoutService) getOrderFromOrderService(userId uint32) (*pborder.ListOrderResp, error) {
 	resp, err := s.orderCli.ListOrder(context.TODO(), &pborder.ListOrderReq{UserId: userId})
 	if err != nil {
-		return nil, fmt.Errorf("获取订单数据失败: %v", err)
+		return nil, fmt.Errorf("failed to get order data: %v", err)
 	}
-	fmt.Printf("订单列表: %+v\n", resp)
+	fmt.Printf("Orders: %+v\n", resp)
 	return resp, nil
 }
 
-// validateCheckoutRequest 校验结算请求
 func validateCheckoutRequest(req *pbcheckout.CheckoutReq) error {
 	if req.UserId == 0 || req.Firstname == "" || req.Lastname == "" || req.Email == "" {
-		return errors.New("缺少必要字段")
+		return errors.New("missing required fields")
 	}
 	if req.Address.StreetAddress == "" || req.Address.City == "" || req.Address.ZipCode == "" {
-		return errors.New("地址无效")
+		return errors.New("invalid address")
 	}
 	if req.CreditCard.CreditCardNumber == "" || req.CreditCard.CreditCardCvv == 0 {
-		return errors.New("信用卡信息无效")
+		return errors.New("invalid credit card info")
 	}
 	return nil
 }
 
-// calculateTotalAmount 计算订单总金额
 func calculateTotalAmount(items []*pborder.OrderItem) (float64, error) {
 	var total float64
 	for _, item := range items {
