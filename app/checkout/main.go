@@ -1,8 +1,8 @@
 package main
 
 import (
-	//"sync/atomic"
-	//"time"
+	"sync/atomic"
+	"time"
 	"net"
 	"context"
 
@@ -22,12 +22,36 @@ type CheckoutServerWrapper struct {
 	pbcheckout.UnimplementedCheckoutServiceServer
 	instanceID  string
 	etcdService *registryx.EtcdService
+	connCount   int64
 	// 实际业务实现
 	server *CheckoutServiceServer
 }
 
+// trackConnection 统计连接数，并动态更新到 etcd
+func (s *CheckoutServerWrapper) trackConnection(f func() error) error {
+	atomic.AddInt64(&s.connCount, 1)
+	// 更新 etcd 连接数
+	s.etcdService.UpdateConnectionCount(s.connCount)
+	defer func() {
+		atomic.AddInt64(&s.connCount, -1)
+		s.etcdService.UpdateConnectionCount(s.connCount)
+	}()
+	// 模拟耗时操作
+	time.Sleep(50 * time.Millisecond)
+	return f()
+}
+
 func (s *CheckoutServerWrapper) Checkout(ctx context.Context, req *pbcheckout.CheckoutReq) (*pbcheckout.CheckoutResp, error) {
-	return s.server.Checkout(ctx, req)
+	var (
+		resp *pbcheckout.CheckoutResp
+		err  error
+	)
+	err = s.trackConnection(func() error {
+		r, e := s.server.Checkout(ctx, req)
+		resp = r
+		return e
+	})
+	return resp, err
 }
 
 func init() {
