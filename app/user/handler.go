@@ -11,12 +11,21 @@ type UserServiceServer struct {
 }
 
 func (s *UserServiceServer) Register(ctx context.Context, req *pbuser.RegisterReq) (*pbuser.RegisterResp, error) {
-	resp, err := service.NewRegisterService(ctx).Run(req)
-
-	return resp, err
+	return service.NewRegisterService(ctx).Run(req)
 }
-func (s *UserServiceServer) Login(ctx context.Context, req *pbuser.LoginReq) (*pbuser.LoginResp, error) {
-	resp, err := service.NewLoginService(ctx).Run(req)
 
-	return resp, err
+func (s *UserServiceServer) Login(ctx context.Context, req *pbuser.LoginReq) (*pbuser.LoginResp, error) {
+	return service.NewLoginService(ctx).Run(req)
+}
+
+func (s *UserServiceServer) UpdateUser(ctx context.Context, req *pbuser.UpdateUserReq) (*pbuser.UpdateUserResp, error) {
+	return service.NewUpdateUserService(ctx).Run(req)
+}
+
+func (s *UserServiceServer) GetUserInfo(ctx context.Context, req *pbuser.GetUserInfoReq) (*pbuser.GetUserInfoResp, error) {	
+	return service.NewGetUserInfoService(ctx).Run(req)
+}
+
+func (s *UserServiceServer) DeleteUser(ctx context.Context, req *pbuser.DeleteUserReq) (*pbuser.DeleteUserResp, error) {	
+	return service.NewDeleteUserService(ctx).Run(req)
 }

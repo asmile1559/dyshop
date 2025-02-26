@@ -4,12 +4,14 @@ import (
 	"net/http"
 
 	"github.com/asmile1559/dyshop/app/frontend/middleware"
+	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/asmile1559/dyshop/utils/jwt"
 	"github.com/sirupsen/logrus"
 
 	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -21,9 +23,15 @@ func init() {
 func main() {
 	rpcclient.InitRPCClient()
 
-	router := gin.Default()
+	//初始化gin框架内置的校验器翻译器
+	if err := user.InitTrans("zh"); err != nil {
+		logrus.Fatal(err)
+	}
 
+	router := gin.Default()
+	router.Use(cors.Default())
 	router.LoadHTMLGlob("templates/**")
+
 	router.StaticFS("/static", http.Dir("static"))
 
 	router.GET("/ping", func(c *gin.Context) {
@@ -60,8 +68,39 @@ func registerTestRouter(e *gin.Engine) {
 	}
 
 	_test := e.Group("/test")
+	_test.GET("/register", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "register.html", gin.H{})
+	})
+	_test.POST("/register", func(c *gin.Context) {
+		u := struct {
+			Email           string `json:"email"`
+			Password        string `json:"password"`
+			ConfirmPassword string `json:"confirm_password"`
+		}{}
+		err := c.BindJSON(&u)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "Expect json format register information",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "register ok!",
+			"token":   "111",
+		})
+	})
+
+	_test.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", gin.H{})
+	})
 	_test.POST("/login", func(c *gin.Context) {
-		u := user{}
+		u := struct {
+			Email    string `json:"email"`
+			Password string `json:"password"`
+		}{}
 		err := c.BindJSON(&u)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -70,7 +109,7 @@ func registerTestRouter(e *gin.Engine) {
 			})
 			return
 		}
-		token, err := jwt.GenerateJWT(u.UserID)
+		token, err := jwt.GenerateJWT(int64(1))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"code":    http.StatusInternalServerError,

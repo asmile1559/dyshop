@@ -7,93 +7,17 @@
   <title>抖音商城(Dyshop)</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
-  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../static/css/style.css" />
 
   <style>
-    .category-screen {
-      margin-block: 10px;
-      background-color: #F5F5F5;
-      border-radius: 10px;
-    }
 
-    .category-list {
-      margin: 5px;
-    }
-
-    .category-list ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    .category-list ul li {
-      margin-block: 10px;
-      font-size: 1rem;
-    }
-
-    .category-list ul li a:hover {
-      color: orangered !important;
-      text-decoration: underline !important;
-      text-decoration-color: orangered !important;
-    }
-
-    .carousel-screen {
-      margin-block: 10px;
-      border-radius: 10px;
-      max-height: 60vh;
-      overflow: hidden;
-    }
-
-    .carousel-screen img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    .user-screen {
-      margin-block: 10px;
-      border-radius: 10px;
-      background-color: #F5F5F5;
-    }
-
-    .usercard-img img {
-      border-radius: 20px;
-      overflow: hidden;
-    }
-
-    .products-nav {
-      padding-top: 10px;
-      padding-bottom: 3px;
-    }
-
-    .products-nav ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    .products-nav ul {
-      display: flex;
-      justify-content: flex-start;
-      padding: 0;
-    }
-
-    .products-nav ul li {
-      font-size: large;
-      margin-inline: 10px;
-    }
-
-    .products-nav ul li a.active {
-      color: orangered;
-      font-weight: bold;
-      text-decoration: underline;
-      text-decoration-color: orangered;
-      text-underline-offset: 0.5rem;
-    }
   </style>
 
 </head>
 
 <body>
   <!-- navigator -->
-  <div class="p-3 top-layer">
+  <div class="p-3 nav-body">
     <div class="container">
       <div class="shop-nav">
         <div class="shop-nav-brand">
@@ -132,8 +56,8 @@
   </div>
 
   <div class="p-3 main-body">
-    <div class="container sticky-top bg-white p-3 header">
-      <div class="row align-items-center ">
+    <div class="container sticky-top header">
+      <div class="row align-items-center">
         <div class="col-3 text-center">
           <a href="#" class="implicit-link">
             <h1>抖音商城</h1>
@@ -150,8 +74,8 @@
       </div>
     </div>
     <div class="container main-screen">
-      <div class="row ">
-        <div class="col-2 category-screen ">
+      <div class="row">
+        <div class="col-2 category-screen">
           <div class="category-list ">
             <ul>
               <li>
@@ -236,13 +160,13 @@
             </div>
             <div class="carousel-inner">
               <div class="carousel-item active" data-bs-interval="1000">
-                <img src="../src/img1.jpg" alt="img1">
+                <img src="../static/src/img1.jpg" alt="img1">
               </div>
               <div class="carousel-item" data-bs-interval="1000">
-                <img src="../src/img2.jpg" alt="img2">
+                <img src="../static/src/img2.jpg" alt="img2">
               </div>
               <div class="carousel-item" data-bs-interval="1000">
-                <img src="../src/img3.jpg" alt="img3">
+                <img src="../static/src/img3.jpg" alt="img3">
               </div>
             </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
@@ -256,29 +180,31 @@
           </div>
         </div>
         <div class="col-3 user-screen">
-          <div class="usercard-img">
-            <img src="../src/img4.jpg" class="card-img-top p-2" alt="img4">
-          </div>
-
-          <div class="usercard-body mt-4">
-            <div>您好, </div>
-            <h5 class="text-dark d-inline-block text-truncate mt-2 mb-1">
-              请登录
-            </h5>
-
-            <div class="unlogin-op row justify-content-center">
-              <button class=" btn btn-danger mt-5" style="width: 70%;">立即登录</button>
+          <div class="usercard">
+            <div class="usercard-img">
+              <img src="../static/src/img4.jpg" class="card-img-top p-2" alt="img4">
             </div>
 
-            <div class="login-op d-none">
-              <div class="row">
-                <div class="col btn">设置</div>
-                <div class="col btn">购物车</div>
-                <div class="col btn">订单</div>
-                <div class="col btn">支付</div>
+            <div class="usercard-body mt-4">
+              <div>您好, </div>
+              <h5 class="text-dark d-inline-block text-truncate mt-2 mb-1">
+                请登录
+              </h5>
+
+              <div class="unlogin-op row justify-content-center">
+                <button class=" btn btn-danger mt-5" style="width: 70%;">立即登录</button>
               </div>
-              <div class="row mt-3 justify-content-center">
-                <button class="btn btn-outline-secondary" style="width: 70%;">退出登录</button>
+
+              <div class="login-op d-none">
+                <div class="row">
+                  <div class="col btn">设置</div>
+                  <div class="col btn">购物车</div>
+                  <div class="col btn">订单</div>
+                  <div class="col btn">支付</div>
+                </div>
+                <div class="row mt-3 justify-content-center">
+                  <button class="btn btn-outline-secondary" style="width: 70%;">退出登录</button>
+                </div>
               </div>
             </div>
           </div>
@@ -288,13 +214,21 @@
     </div>
 
     <div class="p-3 container">
-      <div class="products-nav">
-        <ul>
-          <li><a href="#" class="implicit-link active">热门推荐</a></li>
-          <li><a href="#" class="implicit-link">新品上市</a></li>
-          <li><a href="#" class="implicit-link">折扣商品</a></li>
-          <li><a href="#" class="implicit-link">限时秒杀</a></li>
-        </ul>
+      <div class="product-list-nav gap-2">
+        <div class="product-list-tabtitle">
+          <ul>
+            <li><a href="#" class="implicit-link active">热门推荐</a></li>
+            <li><a href="#" class="implicit-link">新品上市</a></li>
+            <li><a href="#" class="implicit-link">折扣商品</a></li>
+            <li><a href="#" class="implicit-link">限时秒杀</a></li>
+
+          </ul>
+        </div>
+        <div class="product-list-pagenav">
+          <span><a href="#" class="implicit-link">&lt;</a></span>
+          <span class="cur-pagenumber">1</span><span>/</span><span class="tot-pagenumber">10</span>
+          <span class=""><a href="#" class="implicit-link">&gt;</a></span>
+        </div>
       </div>
 
       <div class="product-list">
@@ -302,7 +236,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product1.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product1.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -322,7 +256,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product2.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product2.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -342,7 +276,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product3.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product3.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -362,7 +296,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product4.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product4.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -382,7 +316,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product5.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -402,7 +336,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product6.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -422,7 +356,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product6.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product6.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -442,7 +376,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product5.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product5.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -462,7 +396,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product4.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product4.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -482,7 +416,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product3.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product3.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -502,7 +436,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product2.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product2.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -522,7 +456,7 @@
           <div class="col-2 product-item">
             <div class="d-flex flex-column justify-content-start align-items-center">
               <div class="product-item-img">
-                <img src="../src/product1.jpg" alt="product-img" class="img-fluid">
+                <img src="../static/src/product1.jpg" alt="product-img" class="img-fluid">
               </div>
               <div class="product-item-details text-start" style="width: 100%;">
                 <div class="product-item-name">
@@ -547,7 +481,6 @@
 
   <div class="p-3 pagination">
     <div class="container d-flex justify-content-center">
-
       <ul class="pagination">
         <li class="page-item"><a class="page-link " href="#">上一页</a></li>
         <li class="page-item"><a class="page-link active" href="#">1</a></li>
