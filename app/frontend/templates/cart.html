@@ -2,314 +2,169 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抖音商城-购物车</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
-    <link rel="stylesheet" href="../css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-购物车</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/static/css/style.css" />
 
-    <style>
+  <style>
+    .implicit-link.nice-link {
+      color: #0d6efd !important;
+    }
 
-    </style>
+    .implicit-link.nice-link:hover {
+      text-decoration: underline !important;
+      text-underline-offset: 0.25rem;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="container top-layer">
-        <nav class="navbar navbar-expand-lg bg-body-white top-nav-fs-sm">
-            <div class="" style="width: 80%;">
-                <a class="navbar-brand" href="#">抖音商城</a>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <span style="white-space: nowrap;">您好,</span>
+          <span class="dropdown">
+            <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+              data-bs-toggle="dropdown">
+              <span class="d-inline-block text-truncate"
+                style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{.PageRouter.UserPage}}info">个人设置</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+              <li><button class="dropdown-item" data-role="logout">退出登录</button></li>
+            </ul>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <h1>购物车</h1>
+      <div class="input-group w-25">
+        <input type="text" class="form-control " placeholder="搜索商品" id="search-input">
+        <button class="btn btn-danger me-5" type="button" id="search">搜索</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-3">
+    <div class="container">
+      <div class="row">
+        <div class="col-9 ">
+          <!-- checkbox and buttons -->
+          <div class="d-flex justify-content-start align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="chooseAll">
+              <label class=" form-check-label" for="chooseAll">
+                全选
+              </label>
             </div>
-            <div class="text-end" style="width: 20%;">
-                <span style="white-space: nowrap;">您好,</span>
-                <span class="dropdown">
-                    <button id="nav-user-name" class="btn btn-white dropdown-toggle top-nav-fs-sm1" style="width: 70%;"
-                        type="button" data-bs-toggle="dropdown">
-                        <span class="d-inline-block text-truncate" style="width: 90%; white-space: nowrap;">Lorem ipsum
-                            dolor sit amet.</span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">个人设置</a></li>
-                        <li><a class="dropdown-item" href="#">订单</a></li>
-                        <li><a class="dropdown-item" href="#">支付</a></li>
-                        <li><button class="dropdown-item">退出登录</button></li>
-                    </ul>
+            <button type="button" class="btn btn-outline-secondary ms-3" disabled id="globalDel">删除</button>
+            <button type="button" class="btn btn-outline-secondary ms-3" disabled id="globalCheckout">结算</button>
+          </div>
+          <!-- cart list -->
+          <div class="mt-3 cart-list" id="cart-list">
+            {{ range $idx, $cartItem := .CartItems }}
+            {{with $cartItem}}
+            <div class="cart-item" id="cart-item{{ .ItemId }}" data-item-id="{{ .ItemId }}"
+              data-product-id="{{ .ProductId }}">
+              <div class="item-checkbox">
+                <input class="form-check-input" type="checkbox" id="item-checkbox{{ .ItemId }}"
+                  data-item-id="{{ .ItemId }}" data-role="choose">
+              </div>
+
+              <div class="item-img">
+                <img src="{{ .ProductImg }}" alt="商品图片" id="item-img{{ .ItemId }}">
+              </div>
+              <div class="item-name">
+                <span id="item-name{{.ItemId}}">{{ .ProductName }}</span>
+              </div>
+              <div class="item-spec">
+                <span id="item-spec{{.ItemId}}">{{ .ProductSpec.Name }}</span>
+              </div>
+              <div class="item-price">
+                <div>价格</div>
+                <div class="price">
+                  <span>￥</span>
+                  <span id="item-price{{.ItemId}}">{{.ProductSpec.Price}}</span>
+                </div>
+                <div>邮费</div>
+                <div class="postage">
+                  <span>￥</span>
+                  <span id="item-postage{{.ItemId}}">{{ .Postage }}</span>
+                </div>
+              </div>
+              <div class="item-quantity">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-outline-danger" data-role="subQuantity"
+                    data-target="#item-quantity{{.ItemId}}">-</button>
+                  <input type="text" class="form-control text-center" value="{{.Quantity}}"
+                    id="item-quantity{{.ItemId}}" data-role="quantity">
+                  <button type="button" class="btn btn-outline-success" data-role="addQuantity"
+                    data-target="#item-quantity{{.ItemId}}">+</button>
+                </div>
+              </div>
+              <div class="item-oper">
+                <a href="javascript:void(0)" class="implicit-link nice-link" data-role="check"
+                  data-item-id="{{ .ItemId }}">结算</a>
+                <a href="javascript:void(0)" class="implicit-link nice-link" data-role="del"
+                  data-item-id="{{ .ItemId }}">删除</a>
+              </div>
+            </div>
+            {{end}}
+            {{ end }}
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="card sticky-top" style="top: 10px;">
+            <div class="card-body">
+              <h5 class="card-title">结算</h5>
+              <hr>
+              <p class="card-text">
+                <span>共计</span>
+                <span style="color: orangered; font-weight: bold;" id="totalQuantity">0</span>
+                <span>件商品</span>
+              </p>
+              <p class="card-text">总价：
+                <span class="" style="color: orangered; font-weight: bold;">
+                  <span>￥</span><span id="totalPrice">0.00</span>
                 </span>
+              </p>
+              <div class="text-end">
+                <button class="btn btn-outline-success" id="checkout">结算</button>
+              </div>
             </div>
-        </nav>
-    </div>
-
-    <div class="p-3 second-layer">
-        <div class="container d-flex justify-content-between align-items-center">
-            <h1>购物车</h1>
-            <div class="input-group w-25">
-                <input type="text" class="form-control " placeholder="搜索商品">
-                <button class="btn btn-danger me-5" type="button">搜索</button>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <div class="p-3 second-layer">
-        <div class="container">
-            <div class="row">
-                <div class="col-9 ">
-                    <!-- checkbox and buttons -->
-                    <div class="d-flex justify-content-start align-items-center">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                全选
-                            </label>
-                        </div>
-                        <button type="button" class="btn btn-outline-secondary ms-3" disabled>删除</button>
-                        <button type="button" class="btn btn-outline-secondary ms-3" disabled>结算</button>
-                    </div>
-                    <!-- cart list -->
-                    <div class="mt-3 cart-list">
-                        <div class="cart-item">
-                            <div class="cart-item-checkbox">
-                                <input class="form-check-input" type="checkbox" value="">
-                            </div>
-                            <div class="cart-item-img">
-                                <img src="../src/product1.jpg" alt="" class="img-fluid">
-                            </div>
-                            <div class="cart-item-desc">
-                                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem atque eum quae
-                                    omnis labore aspernatur laboriosam voluptate nam quo harum.</span>
-                            </div>
-                            <div class="cart-item-param">
-                                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis accusamus,
-                                    voluptatibus numquam ea, accusantium in ad porro consectetur dolor tempore quam
-                                    fugiat. Quas reprehenderit temporibus iste tempore, totam ex soluta?</span>
-                            </div>
-                            <div class="cart-item-price">
-                                <span class="cart-item-price-takeoff">折后价</span>
-                                <span class="cart-item-price-takeoff">￥199.00</span>
-                                <span class="cart-item-price-normal">￥299.00</span>
-                            </div>
-
-                            <div class="cart-item-amout">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <button type="button" class="btn btn-outline-secondary">-</button>
-                                    <input type="text" class="form-control text-center" value="1" style="width: 50px;">
-                                    <button type="button" class="btn btn-outline-secondary">+</button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item-operation">
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mb-1">结算</a>
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">删除</a>
-                            </div>
-                        </div>
-                        <div class="cart-item">
-                            <div class="cart-item-checkbox">
-                                <input class="form-check-input" type="checkbox" value="">
-                            </div>
-                            <div class="cart-item-img">
-                                <img src="../src/product2.jpg" alt="" class="img-fluid">
-                            </div>
-                            <div class="cart-item-desc">
-                                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsa, beatae!</span>
-                            </div>
-                            <div class="cart-item-param">
-                                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Incidunt, eius ex numquam
-                                    quibusdam nostrum iste ipsam accusamus suscipit iusto? Rem?</span>
-                            </div>
-                            <div class="cart-item-price">
-                                <span class="cart-item-price-takeoff">折后价</span>
-                                <span class="cart-item-price-takeoff">￥199.00</span>
-                                <span class="cart-item-price-normal">￥299.00</span>
-                            </div>
-
-                            <div class="cart-item-amout">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <button type="button" class="btn btn-outline-secondary">-</button>
-                                    <input type="text" class="form-control text-center" value="1" style="width: 50px;">
-                                    <button type="button" class="btn btn-outline-secondary">+</button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item-operation">
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mb-1">结算</a>
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">删除</a>
-                            </div>
-                        </div>
-                        <div class="cart-item">
-                            <div class="cart-item-checkbox">
-                                <input class="form-check-input" type="checkbox" value="">
-                            </div>
-                            <div class="cart-item-img">
-                                <img src="../src/product3.jpg" alt="" class="img-fluid">
-                            </div>
-                            <div class="cart-item-desc">
-                                <span>Lorem ipsum dolor sit.</span>
-                            </div>
-                            <div class="cart-item-param">
-                                <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam cumque quibusdam
-                                    voluptas earum culpa ullam rem veritatis consequuntur veniam id.</span>
-                            </div>
-                            <div class="cart-item-price">
-                                <span class="cart-item-price-takeoff">折后价</span>
-                                <span class="cart-item-price-takeoff">￥199.00</span>
-                                <span class="cart-item-price-normal">￥299.00</span>
-                            </div>
-
-                            <div class="cart-item-amout">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <button type="button" class="btn btn-outline-secondary">-</button>
-                                    <input type="text" class="form-control text-center" value="1" style="width: 50px;">
-                                    <button type="button" class="btn btn-outline-secondary">+</button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item-operation">
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mb-1">结算</a>
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">删除</a>
-                            </div>
-                        </div>
-                        <div class="cart-item">
-                            <div class="cart-item-checkbox">
-                                <input class="form-check-input" type="checkbox" value="">
-                            </div>
-                            <div class="cart-item-img">
-                                <img src="../src/product4.jpg" alt="" class="img-fluid">
-                            </div>
-                            <div class="cart-item-desc">
-                                <span>Lorem.</span>
-                            </div>
-                            <div class="cart-item-param">
-                                <span>Lorem ipsum dolor sit./span>
-                            </div>
-                            <div class="cart-item-price">
-                                <span class="cart-item-price-takeoff">折后价</span>
-                                <span class="cart-item-price-takeoff">￥199.00</span>
-                                <span class="cart-item-price-normal">￥299.00</span>
-                            </div>
-
-                            <div class="cart-item-amout">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <button type="button" class="btn btn-outline-secondary">-</button>
-                                    <input type="text" class="form-control text-center" value="1" style="width: 50px;">
-                                    <button type="button" class="btn btn-outline-secondary">+</button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item-operation">
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mb-1">结算</a>
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">删除</a>
-                            </div>
-                        </div>
-                        <div class="cart-item">
-                            <div class="cart-item-checkbox">
-                                <input class="form-check-input" type="checkbox" value="">
-                            </div>
-                            <div class="cart-item-img">
-                                <img src="../src/product5.jpg" alt="" class="img-fluid">
-                            </div>
-                            <div class="cart-item-desc">
-                                <span>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptate, accusantium
-                                    dignissimos minima nobis assumenda, cupiditate a provident impedit nesciunt fugit,
-                                    quae ipsa.</span>
-                            </div>
-                            <div class="cart-item-param">
-                                <span>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Earum aliquam
-                                    consectetur ex odio quod, ullam, natus dolores quisquam laboriosam ut voluptatum aut
-                                    et magni sequi error nesciunt facilis sapiente!</span>
-                            </div>
-                            <div class="cart-item-price">
-                                <span class="cart-item-price-takeoff">折后价</span>
-                                <span class="cart-item-price-takeoff">￥199.00</span>
-                                <span class="cart-item-price-normal">￥299.00</span>
-                            </div>
-
-                            <div class="cart-item-amout">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <button type="button" class="btn btn-outline-secondary">-</button>
-                                    <input type="text" class="form-control text-center" value="1" style="width: 50px;">
-                                    <button type="button" class="btn btn-outline-secondary">+</button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item-operation">
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mb-1">结算</a>
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">删除</a>
-                            </div>
-                        </div>
-                        <div class="cart-item">
-                            <div class="cart-item-checkbox">
-                                <input class="form-check-input" type="checkbox" value="">
-                            </div>
-                            <div class="cart-item-img">
-                                <img src="../src/product6.jpg" alt="" class="img-fluid">
-                            </div>
-                            <div class="cart-item-desc">
-                                <span>地球仪正版学生用初中生小学生专用3d立体磁悬浮ar智能大号儿童启蒙地图地形摆件高中世界官方旗舰店生日礼物</span>
-                            </div>
-                            <div class="cart-item-param">
-                                <span>【20cm无灯】政区+地形+实心底/便携+50大数字地球专题</span>
-                            </div>
-                            <div class="cart-item-price">
-                                <span class="cart-item-price-takeoff">折后价</span>
-                                <span class="cart-item-price-takeoff">￥199.00</span>
-                                <span class="cart-item-price-normal">￥299.00</span>
-                            </div>
-
-                            <div class="cart-item-amout">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <button type="button" class="btn btn-outline-secondary">-</button>
-                                    <input type="text" class="form-control text-center" value="1" style="width: 50px;">
-                                    <button type="button" class="btn btn-outline-secondary">+</button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item-operation">
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover mb-1">结算</a>
-                                <a href="#"
-                                    class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">删除</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-3">
-                    <!-- checkout panel -->
-                    <div class="card sticky-top" style="top: 10px;">
-                        <div class="card-body">
-                            <h5 class="card-title">结算</h5>
-                            <p class="card-text">共计 <span class="text-primary" style="font-weight: bold;">3</span> 件商品
-                            </p>
-                            <p class="card-text">总价：<span class=""
-                                    style="color: orangered; fonT-weight: bold;">￥597.00</span></p>
-                            <a href="#" class="btn btn-outline-success">结算</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="container text-center mb-3 mt-3 placeholder-body" style="color: gray;">没有更多了</div>
+  <footer class="p-3 bg-white text-dark text-center">
+    <div class="container">
+      <span class="">Copyright &copy; 166-队就是队</span>
     </div>
-
-    <div class="container content text-center mb-3 mt-3" style="color: gray;">没有更多了</div>
-    <footer class="p-3 bg-white text-dark text-center">
-        <div class="container">
-            <span class="">Copyright &copy; 166-队就是队</span>
-        </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-        crossorigin="anonymous"></script>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script type="module" src="/static/js/cart.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-用户信息</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .implicit-link.color-change:hover {
+      color: var(--lucky-color);
+      font-size: bold;
+      text-decoration: underline;
+      text-underline-offset: 0.5em;
+    }
+
+    .disabled {
+      pointer-events: none !important;
+      background-color: #e9ecef;
+      color: black;
+    }
+
+    .edit .d-none {
+      display: revert !important;
+    }
+
+    .edit .onpaper {
+      display: none !important;
+    }
+
+    .edit .disabled {
+      pointer-events: initial !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <span style="white-space: nowrap;">您好,</span>
+          <span class="dropdown">
+            <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+              data-bs-toggle="dropdown">
+              <span class="d-inline-block text-truncate"
+                style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+              <li><button class="dropdown-item" data-role="logout">退出登录</button></li>
+            </ul>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-body">
+    <div class="container user-nav">
+      <div class="user-profile">
+        <div class="user-img">
+          <img src="{{ .UserInfo.Img }}" />
+        </div>
+        <div class="user-info">
+          <h5 class="username" id="nav-username">{{ .UserInfo.Name }}</h5>
+          <span class="usersign" id="nav-usersign">{{ .UserInfo.Sign }}</span>
+        </div>
+      </div>
+      <div class="text-end">
+        <a href="{{.PageRouter.HomePage}}" class="implicit-link color-change">回到主页</a>
+      </div>
+    </div>
+
+    <div class="container user-content">
+      <div class="panel">
+        <a href="{{.PageRouter.UserPage}}info" class="btn info" data-tpage=".user-info-page" type="button">个人资料</a>
+        <a href="javascript:void(0)" class="btn account active" data-tpage=".account-setting-page" type="button">账号</a>
+        <a href="{{.PageRouter.UserPage}}address" class="btn address" data-tpage=".address-management-page"
+          type="button">收货地址</a>
+        <a href="{{.PageRouter.UserPage}}product"
+          class="btn product {{if not (inSlice `merchant` .UserInfo.Role )}}d-none{{end}}" type="button">商品管理</a>
+      </div>
+
+      <div class="account-page">
+        <h3 class="page-title">账号</h3>
+        <div class="row ms-2 detail-account">
+          <div class="account-info">
+            <label for="user-id" class="form-label">用户ID</label>
+            <input type="text" class="form-control bg-body-tertiary" id="user-id" value="{{ .UserInfo.Id }}" disabled />
+            <p style="font-size: small;margin-top: 5px ">用户ID是唯一的</p>
+
+            <span>用户身份</span>
+            <div class="user-role mt-2">
+              <span class="active">普通用户</span>
+              <span class="{{if inSlice `merchant` .UserInfo.Role  }} active {{end}} ">商户</span>
+            </div>
+
+            <a class="implicit-link color-change {{if inSlice `merchant` .UserInfo.Role }}d-none{{end}}"
+              id="register-merchant" style="font-size: small;margin-top: 5px " data-user-id="{{.UserInfo.Id}}"
+              href="javascript:void(0)">成为商户才能发布商品哦</a>
+            <span class=" {{if not (inSlice `merchant` .UserInfo.Role) }}d-none{{end}}"
+              style="font-size: small;margin-top: 5px ">你已经是商户了, 记得发布商品哦</span>
+
+          </div>
+
+          <hr class="container">
+
+          <div class="account-phone">
+            <h4>修改手机号</h4>
+            <p style="font-size: small;margin-top: 5px ">手机号可以用来登录, 可以找回密码</p>
+
+            <label for="user-phone" class="form-label">当前手机号</label>
+            <input type="tel" class="form-control bg-body-tertiary" id="user-phone" value="{{ .UserInfo.Phone }}"
+              disabled />
+            <p style="font-size: small;margin-top: 5px "></p>
+
+            <label for="new-user-phone" class="form-label">新手机号</label>
+            <input type="tel" class="form-control bg-body-tertiary" id="new-user-phone" value="" />
+            <p style="font-size: small;margin-top: 5px "></p>
+
+            <button class="btn btn-success" id="update-phone-btn" data-action-type="phone">更改手机号</button>
+          </div>
+
+          <hr class="container">
+
+          <div class="account-email">
+            <h4>修改邮箱</h4>
+            <p style="font-size: small;margin-top: 5px ">邮箱可以用来登录, 可以找回密码</p>
+
+            <label for="user-email" class="form-label">当前邮箱</label>
+            <input type="email" class="form-control bg-body-tertiary" id="user-email" value="{{ .UserInfo.Email }}"
+              disabled />
+            <p style="font-size: small;margin-top: 5px "></p>
+
+            <label for="new-user-email" class="form-label">新邮箱</label>
+            <input type="email" class="form-control bg-body-tertiary" id="new-user-email" value="" />
+            <p style="font-size: small;margin-top: 5px "></p>
+
+            <button class="btn btn-success" id="update-email-btn" data-action-type="email">更改邮箱</button>
+          </div>
+
+          <hr class="container">
+
+          <div class="account-password">
+            <h4>修改密码</h4>
+            <p style="font-size: small;margin-top: 5px ">要记住你的密码哦</p>
+
+            <label for="user-password" class="form-label">旧密码</label>
+            <input type="password" class="form-control bg-body-tertiary" id="user-password" value="" />
+            <p style="font-size: small;margin-top: 5px ">必须知道旧密码才能修改密码</p>
+
+            <label for="new-user-password" class="form-label">新密码</label>
+            <input type="password" class="form-control bg-body-tertiary" id="new-user-password" value="" />
+            <p style="font-size: small;margin-top: 5px ">密码最好复杂一些</p>
+
+            <label for="confirm-user-password" class="form-label">确认密码</label>
+            <input type="password" class="form-control bg-body-tertiary" id="confirm-user-password" value="" />
+            <p style="font-size: small;margin-top: 5px ">必须与新密码一致</p>
+
+            <button class="btn btn-success" id="update-password-btn" data-action-type="password">更改密码</button>
+          </div>
+
+          <hr class="container">
+
+          <div class="account-delete">
+            <h4>删除账户</h4>
+            <p style="font-size: small;margin-top: 5px ">一旦你删除了你的帐户，就没有回头路了。请确认后再操作。</p>
+            <button class="btn btn-outline-danger" id="del-account-btn" data-user-id="{{.UserInfo.Id}}">删除账户</button>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- container end-->
+
+  </div> <!-- main-body end-->
+  <div class="placeholder-body">
+    <div class="modal message-modal" tabindex="-1" id="message-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary confirm">好的</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="p-2 mt-3 bg-white text-dark text-center">
+    <div class="container">
+      <p class="">Copyright &copy; 166-队就是队</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    flatpickr("#user-birthday", {
+      dateFormat: "Y年m月d日"
+    });
+  </script>
+  <script type="module" src="../static/js/account.js">  </script>
+</body>
+
+</html>

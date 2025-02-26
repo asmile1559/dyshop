@@ -1,0 +1,26 @@
+syntax="proto3";
+
+package home_page;
+
+option go_package="github.com/asmile1559/dyshop/pb/frontend/home_page;home_page";
+
+service HomeService {
+  rpc GetHomepage(GetHomepageReq) returns (GetHomepageResp){}
+  rpc GetShowcase(GetShowcaseReq) returns (GetShowcaseResp) {}
+  rpc VerifyHomepageStatus(VerifyHomepageStatusReq) returns (VerifyHomepageStatusResp){}
+}
+
+message GetHomepageReq{}
+
+message GetHomepageResp{}
+
+message GetShowcaseReq {
+  string which = 1;
+}
+
+message GetShowcaseResp {}
+
+message VerifyHomepageStatusReq{
+  string token = 1;
+}
+message VerifyHomepageStatusResp{}

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-用户信息</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .implicit-link.color-change:hover {
+      color: var(--lucky-color);
+      font-size: bold;
+      text-decoration: underline;
+      text-underline-offset: 0.5em;
+    }
+
+    .disabled {
+      pointer-events: none !important;
+      background-color: #e9ecef;
+      color: black;
+    }
+
+    .edit .d-none {
+      display: revert !important;
+    }
+
+    .edit .onpaper {
+      display: none !important;
+    }
+
+    .edit .disabled {
+      pointer-events: initial !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <span style="white-space: nowrap;">您好,</span>
+          <span class="dropdown">
+            <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+              data-bs-toggle="dropdown">
+              <span class="d-inline-block text-truncate"
+                style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+              <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+              <li><button class="dropdown-item" data-role="logout">退出登录</button></li>
+            </ul>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-body">
+    <div class="container user-nav">
+      <div class="user-profile">
+        <div class="user-img">
+          <img src="{{ .UserInfo.Img }}" />
+        </div>
+        <div class="user-info">
+          <h5 class="username" id="nav-username">{{ .UserInfo.Name }}</h5>
+          <span class="usersign" id="nav-usersign">{{ .UserInfo.Sign }}</span>
+        </div>
+      </div>
+      <div class="text-end">
+        <a href="{{.PageRouter.HomePage}}" class="implicit-link color-change">回到主页</a>
+      </div>
+    </div>
+
+    <div class="container user-content">
+      <div class="panel">
+        <a href="{{.PageRouter.UserPage}}info" class="btn info" type="button">个人资料</a>
+        <a href="{{.PageRouter.UserPage}}account" class="btn account " type="button">账号</a>
+        <a href="javascript:void(0)" class="btn address active" type="button">收货地址</a>
+        <a href="{{.PageRouter.UserPage}}product"
+          class="btn product {{if not (inSlice `merchant` .UserInfo.Role )}}d-none{{end}}" type="button">商品管理</a>
+      </div>
+
+      <div class="address-page">
+        <h3 class="page-title">收货地址</h3>
+        <div class="row ms-2 detail-address">
+          <table class="table table-hover caption-top text-center">
+            <caption>常用地址</caption>
+            <thead>
+              <tr>
+                <th scope="col">收货人</th>
+                <th scope="col">电话/手机</th>
+                <th scope="col">所在地区</th>
+                <th scope="col">详细地址</th>
+                <th scope="col">操作</th>
+                <th scope="col">移动设置</th>
+              </tr>
+            </thead>
+
+            <tbody class="my-addresses align-middle" data-default-id="{{.AddressInfo.Default}}" id="address-tbody">
+              {{range $addr :=.AddressInfo.Addresses}}
+              {{with $addr}}
+              <tr id="address{{.AddressId}}" data-addr-id="{{.AddressId}}">
+                <td class="name-column">
+                  <span>{{.Recipient}}</span>
+                </td>
+                <td class="phone-column">
+                  <span>{{.Phone}}</span>
+                </td>
+                <td class="region-column">
+                  <span>
+                    <span class="province">{{.Province}}</span>
+                    <span class="city">{{.City}}</span>
+                    <span class="district">{{.District}}</span>
+                    <span class="street">{{.Street}}</span>
+                  </span>
+                </td>
+                <td class="detail-column">
+                  <span>{{.FullAddress}}</span>
+                </td>
+                <td class="operation-column">
+                  <a class="implicit-link underline-link" href="javascript:void(0)">
+                    <span data-target="#address{{.AddressId}}">修改</span>
+                  </a>
+                  <a class="implicit-link underline-link" href="javascript:void(0)">
+                    <span data-target="#address{{.AddressId}}">删除</span>
+                  </a>
+                </td>
+                <td class="default-column">
+                  {{if eq .AddressId $.AddressInfo.Default}}
+                  <a class="implicit-link default">
+                    <span data-target="#address{{.AddressId}}">默认地址</span>
+                  </a>
+                  {{else}}
+                  <a href="javascript:void(0)" class="implicit-link underline-link">
+                    <span data-target="#address{{.AddressId}}">设为默认</span>
+                  </a>
+                  {{end}}
+                </td>
+              </tr>
+              {{end}}
+              {{else}}
+              <tr class="no-address">
+                <td colspan="6">你还没有添加任何地址哦</td>
+              </tr>
+              {{end}}
+              <tr class="last-row" id="last-row" data-addr-id="-1">
+                <td colspan="6">
+                  <a href="javascript:void(0)" class="implicit-link " id="add-address">
+                    <span data-target="#last-row">添加新地址</span>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div> <!-- container end-->
+
+  </div> <!-- main-body end-->
+  <div class="placeholder-body">
+    <div class="modal message-modal" tabindex="-1" id="message-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary confirm">好的</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal address-modal" tabindex="-1" id="address-modal" data-target="">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">修改地址</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="contact">
+              <div class="recipient">
+                <div class="name">
+                  <label for="address-name" class="form-label">收件人姓名</label>
+                  <input type="text" class="form-control bg-body-tertiary" id="address-name" value="" />
+                </div>
+                <div class="telephone">
+                  <label for="address-phone" class="form-label">收件人电话</label>
+                  <input type="tel" class="form-control bg-body-tertiary" id="address-phone" value="" />
+                </div>
+              </div>
+            </div>
+            <div class="pcd">
+              <div class="province">
+                <label for="address-province" class="form-label ">省份</label>
+                <input type="text" class="form-control bg-body-tertiary" id="address-province" value="" />
+              </div>
+              <div class="city">
+                <label for="address-city" class="form-label ">城市</label>
+                <input type="text" class="form-control bg-body-tertiary" id="address-city" value="" />
+              </div>
+              <div class="district">
+                <label for="address-district" class="form-label ">区/县</label>
+                <input type="text" class="form-control bg-body-tertiary" id="address-district" value="" />
+              </div>
+            </div>
+            <div class="street">
+              <label for="address-street" class="form-label ">街道</label>
+              <input type="text" class="form-control bg-body-tertiary" id="address-street" value="" />
+            </div>
+            <div class="detail">
+              <label for="address-detail" class="form-label ">详细地址</label>
+              <textarea class="form-control bg-body-tertiary" id="address-detail" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light btn-cancel">取消</button>
+            <button type="button" class="btn btn-success btn-confirm">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="p-2 mt-3 bg-white text-dark text-center">
+    <div class="container">
+      <p class="">Copyright &copy; 166-队就是队</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script type="module" src="/static/js/address.js">  </script>
+</body>
+
+</html>

@@ -24,3 +24,5 @@ func TestVerifyRun(t *testing.T) {
 	}
 	t.Log(resp)
 }
+
+// Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySUQiOjEsIlN1YmplY3QiOiIwMDAwMDAwMSIsImlzcyI6ImR5c2hvcC1nYXRld2F5IiwiZXhwIjoxNzY5MjIyMTI3LCJuYmYiOjE3Mzc2ODYxMjcsImlhdCI6MTczNzY4NjEyN30.w_yD3_YPNyAf71P1jn1LhMoiNv9Tp_B9ngjnHMyL3yw

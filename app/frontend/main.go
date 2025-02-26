@@ -1,16 +1,16 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/asmile1559/dyshop/app/frontend/middleware"
 	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
 	"github.com/asmile1559/dyshop/utils/hookx"
-	"github.com/asmile1559/dyshop/utils/jwt"
 	"github.com/sirupsen/logrus"
+	"html/template"
+	"net/http"
+	"unicode/utf8"
 
 	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
+	feutils "github.com/asmile1559/dyshop/app/frontend/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -30,15 +30,41 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.Default())
+	router.SetFuncMap(template.FuncMap{
+		"realLen":    utf8.RuneCountInString,
+		"iMod":       feutils.IndexMod,
+		"rangeSlice": feutils.RangeSlice,
+		"showPages":  feutils.ShowPages,
+		"subOne":     feutils.SubOne,
+		"addOne":     feutils.AddOne,
+		"inSlice":    feutils.InSlice[string],
+		"rowIdx":     feutils.RowIdx,
+		"colIdx":     feutils.ColIdx,
+		"calcPrice":  feutils.CalcPrice,
+	})
 	router.LoadHTMLGlob("templates/**")
 
 	router.StaticFS("/static", http.Dir("static"))
+	router.StaticFS("/example/static", http.Dir("static"))
 
 	router.GET("/ping", func(c *gin.Context) {
+		// pong.html
+		//  Hi, this is pong page.
+		//  <h1>I am {{ .Host }}</h1>
+		//  <h2>{{ .Pong }}...</h2>
+
+		//  1. 方式 1
+		//resp := struct {
+		//	Code int    `json:"code"`
+		//	Host string `json:"host"`
+		//	Pong string `json:"pong"`
+		//}{http.StatusOK, "192.168.191.130:10166", "Pong"}
+		//c.HTML(http.StatusOK, "pong.html", &resp)
+		// 2. 方式 2
 		c.HTML(http.StatusOK, "pong.html", gin.H{
-			"code": http.StatusOK,
-			"host": "192.168.191.130:10166",
-			"ping": "pong",
+			"Code": http.StatusOK,
+			"Host": "192.168.191.130:10166",
+			"Pong": "Pong",
 		})
 	})
 
@@ -49,93 +75,10 @@ func main() {
 	})
 
 	bizrouter.RegisterRouters(router)
-	registerTestRouter(router)
+	registerExampleRouter(router)
 
 	if err := router.Run(":" + viper.GetString("server.port")); err != nil {
 		logrus.Fatal(err)
 	}
 	//router.Run(":10166")
-}
-
-func registerTestRouter(e *gin.Engine) {
-	type user struct {
-		UserID uint32 `json:"user_id"`
-	}
-
-	mid := func(c *gin.Context) {
-		logrus.Infof("Method: %v, URI: %v", c.Request.Method, c.Request.RequestURI)
-		c.Next()
-	}
-
-	_test := e.Group("/test")
-	_test.GET("/register", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "register.html", gin.H{})
-	})
-	_test.POST("/register", func(c *gin.Context) {
-		u := struct {
-			Email           string `json:"email"`
-			Password        string `json:"password"`
-			ConfirmPassword string `json:"confirm_password"`
-		}{}
-		err := c.BindJSON(&u)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"code":    http.StatusBadRequest,
-				"message": "Expect json format register information",
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "register ok!",
-			"token":   "111",
-		})
-	})
-
-	_test.GET("/login", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.html", gin.H{})
-	})
-	_test.POST("/login", func(c *gin.Context) {
-		u := struct {
-			Email    string `json:"email"`
-			Password string `json:"password"`
-		}{}
-		err := c.BindJSON(&u)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"code":    http.StatusBadRequest,
-				"message": "Expect json format login information",
-			})
-			return
-		}
-		token, err := jwt.GenerateJWT(int64(1))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"code":    http.StatusInternalServerError,
-				"message": "Something went wrong. Please try again later.",
-			})
-			logrus.Error(err)
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "login ok!",
-			"token":   token,
-		})
-
-	})
-	_test.GET("/access", mid, middleware.Auth(), func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "Auth Test OK",
-		})
-	})
-	_test.POST("/access", mid, middleware.Auth(), func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"message": "Auth Test OK",
-		})
-	})
 }

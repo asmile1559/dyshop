@@ -2,203 +2,196 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>抖音商城-产品详情</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音商城-产品详情</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
-    <link rel="stylesheet" href="../css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/static/css/style.css" />
 
-    <style>
+  <style>
 
-    </style>
+  </style>
 </head>
 
 <body>
-    <div class="container top-layer">
-        <nav class="navbar navbar-expand-lg bg-body-white top-nav-fs-sm">
-            <div class="" style="width: 80%;">
-                <a class="navbar-brand" href="#">抖音商城</a>
-            </div>
-            <div class="text-end" style="width: 20%;">
-                <span style="white-space: nowrap;">您好,</span>
-                <span class="dropdown">
-                    <a id="nav-user-name" class="btn btn-white dropdown-toggle top-nav-fs-sm1" style="width: 70%;"
-                        type="button" data-bs-toggle="dropdown">
-                        <span class="d-inline-block text-truncate" style="width: 90%; white-space: nowrap;">Lorem ipsum
-                            dolor sit amet.</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">个人设置</a></li>
-                        <li><a class="dropdown-item" href="#">购物车</a></li>
-                        <li><a class="dropdown-item" href="#">订单</a></li>
-                        <li><a class="dropdown-item" href="#">支付</a></li>
-                        <li><button class="dropdown-item">退出登录</button></li>
-                    </ul>
-                </span>
-            </div>
-        </nav>
+  <div class="p-3 nav-body">
+    <div class="container">
+      <div class="shop-nav">
+        <div class="shop-nav-brand">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">欢迎访问 抖音商城</a>
+        </div>
+        <div class="shop-nav-userbox">
+          <div class="user-bar">
+            <span style="white-space: nowrap;">您好,</span>
+            <span class="dropdown">
+              <button id="nav-user-name" class="btn btn-white dropdown-toggle" style="width: 70%;" type="button"
+                data-bs-toggle="dropdown">
+                <span class="d-inline-block text-truncate"
+                  style="width: 90%; white-space: nowrap; font-size: small;">{{.UserInfo.Name}}</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{.PageRouter.UserPage}}info">个人设置</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
+                <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
+                <li><button class="dropdown-item" data-role="logout">退出登录</button></li>
+              </ul>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="p-3 second-layer">
-        <div class="container d-flex justify-content-between align-items-center">
+
+  <div class="p-3 main-body">
+    <div class="container sticky-top header">
+      <div class="row align-items-center">
+        <div class="col-3 text-center">
+          <a href="{{.PageRouter.HomePage}}" class="implicit-link">
             <h1>抖音商城</h1>
-            <div class="input-group" style="width: 40%;">
-                <input type="text" class="form-control " placeholder="搜索商品">
-                <button class="btn btn-danger me-5" type="button">搜索</button>
-            </div>
+            <span style="font-size: small;">购物就上抖音商城</span>
+          </a>
         </div>
-    </div>
-
-    <div class="p-3 second-layer">
-        <div class="container">
-            <div class="row">
-                <div class="col-6 text-center">
-                    <img src="../src/product6.jpg" alt="p6" class="img-fluid" style="height: 600px;">
-                </div>
-                <div class="col-6 product-content">
-                    <div class="product-name">
-                        NASA联名麂皮绒刺绣棒球服男春秋季痞帅棒球领飞行员情侣夹克外套
-                    </div>
-                    <div class="product-price">
-                        <span class="product-fprice">券后 ¥<span>184.34</span></span>
-                        <span class="product-oprice">优惠前 ¥<span>188</span></span>
-                        <span class="product-sold">已售 <span>3000</span>+</span>
-                    </div>
-
-                    <div class="row product-deliver">
-                        <div class="col-2 param-name">配送</div>
-                        <div class="col-9">
-                            <div class="deliver-position">
-                                <span class="from">福建泉州</span>
-                                <span>至</span>
-                                <span class="to">北京北京</span>
-                            </div>
-                            <div class="deliver-detail">
-                                <span class="deliver-cost">快递：免运费</span>
-                                <span class="deliver-freq">近一周平均1天内发货</span>
-                                <span>|</span>
-                                <span class="deliver-start">承诺7天内发货</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row product-insure">
-                        <div class="col-2 param-name"> 保障 </div>
-                        <div class="col-9">
-                            <span class="insure-name">退货宝</span>
-                            <span class="insure-duraion">7天无理由退货</span>
-                            <span class="insure-speed">极速退款</span>
-                        </div>
-                    </div>
-
-                    <div class="row product-types">
-                        <div class="col-2 param-name">商品种类</div>
-                        <div class="col-9 product-types-box">
-                            <div>
-                                <input type="radio" class="btn-check " name="btnradio" id="btnradio1" autocomplete="off"
-                                    checked>
-                                <label class="btn btn-outline-primary" for="btnradio1">黑色249</label>
-                            </div>
-                            <div>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                                <label class="btn btn-outline-primary" for="btnradio2">绿色249</label>
-                            </div>
-                            <div>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                                <label class="btn btn-outline-primary" for="btnradio3">黑色231008</label>
-                            </div>
-                            <div>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
-                                <label class="btn btn-outline-primary" for="btnradio4">绿色231008</label>
-                            </div>
-                            <div>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off">
-                                <label class="btn btn-outline-primary" for="btnradio5">黑色加棉款231008</label>
-                            </div>
-                            <div>
-                                <input type="radio" class="btn-check" name="btnradio" id="btnradio6" autocomplete="off">
-                                <label class="btn btn-outline-primary" for="btnradio6">绿色加棉款231008</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row product-quantity">
-                        <div class="col-2 param-name">数量</div>
-                        <div class="col-9 d-flex align-items-center">
-                            <div class="btn-group flex" role="group" aria-label="Basic example">
-                                <button type="button" class="btn btn-outline-secondary">-</button>
-                                <input type="text" class="form-control text-center" value="1" style="width: 50px;">
-                                <button type="button" class="btn btn-outline-secondary">+</button>
-                            </div>
-                            <div>有货</div>
-                        </div>
-                    </div>
-
-                    <div class="product-operation">
-                        <div class="col-1"></div>
-                        <div class="col-10 d-grid">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-outline-orangered w-50">购买</button>
-                                <button type="button" class="btn btn-outline-success w-50">加入购物车</button>
-                            </div>
-                        </div>
-                        <div class="col-1"></div>
-                    </div>
-                </div>
-            </div>
+        <div class="col-7">
+          <div class="input-group">
+            <input type="text" class="form-control form-outline-orangered fs-5" placeholder="搜索商品" id="search-input">
+            <button class="btn btn-orangered fs-5" type="button" id="search"><span>搜索</span></button>
+          </div>
         </div>
+        <div class="col-2">
+        </div>
+      </div>
     </div>
-
     <hr class="container" />
+    <div class="container p-3">
+      {{with .Product}}
+      <div class="row product-page">
+        <div class="col-6 text-center">
+          <img src="{{ .ProductImg }}" class="img-fluid" style="height: 600px; width: 600px;">
+        </div>
+        <div class="col-6 product-content">
+          <div class="product-name">
+            {{- .ProductName -}}
+          </div>
+          <div class="product-price">
+            <span class="strong-orange">价格 ¥<span class="fs-3" id="show-price"></span></span>
+            <span class="weak-gray">已售 <span>{{ .ProductSold }}</span>+</span>
+          </div>
+          <div class="product-desc">
+            <p>{{- .ProductDesc -}}</p>
+          </div>
 
-    <div class="p-3 second-layer">
-        <div class="container ">
-            <h4>商品参数</h4>
-            <!-- 使用table展示商品参数 -->
-            <div class="row">
-                <div class="col-8">
-                    <table class="table table-bordered product-detail">
-                        <tr>
-                            <td>品牌</td>
-                            <td> 无品牌/无注册商标</td>
-                            <td>版型</td>
-                            <td>标准</td>
-                        </tr>
-                        <tr>
-                            <td>基础风格</td>
-                            <td>青春流行</td>
-                            <td>适用对象 </td>
-                            <td>青少年</td>
-                        </tr>
-                        <tr>
-                            <td>适用场景</td>
-                            <td>其他休闲</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </table>
-                </div>
+          <div class="row product-express">
+            <div class="col-2">配送</div>
+            <div class="col-9">
+              <div class="express-detail">
+                <span class="express"> {{ .ProductExpress }} </span>
+                <span>|￥</span>
+                <span id="postage">{{if eq .ProductExpress "包邮"}}0{{else}}10{{end}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row product-insurance">
+            <div class="col-2"> 保障 </div>
+            <div class="col-9">
+              <span class="insurance-name"> {{ .ProductInsurance }} </span>
+              <span>|</span>
+              <span class="insurance-desc"> {{if eq .ProductInsurance "运输险"}}在运输过程中出问题包赔{{else if eq .ProductInsurance
+                "退货险"}}7天内退货免邮费{{end}}</span>
+            </div>
+          </div>
+
+          <div class="row product-specs">
+            <div class="col-2">商品种类</div>
+            <div class="col-9 spec-box">
+              {{range $idx, $spec := .ProductSpecs}}
+              <div>
+                {{with $spec}}
+                <input type="radio" class="btn-check" name="specRadio" id="specRadio{{$idx}}" autocomplete="off"
+                  data-price="{{.SpecPrice}}" data-role="spec" {{if eq $idx 0}}checked{{end}}>
+                <label class="btn btn-outline-primary" for="specRadio{{$idx}}">{{.SpecName}}</label>
+                {{end}}
+              </div>
+              {{end}}
             </div>
 
-        </div>
-    </div>
-    <div class="content"></div>
-    <footer class="p-3 bg-white text-dark text-center">
-        <div class="container">
-            <span class="">Copyright &copy; 166-队就是队</span>
-        </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-        crossorigin="anonymous"></script>
-    <script>
+            <div class="row product-quantity align-items-center">
+              <div class="col-2">数量</div>
+              <div class="col-9 d-flex align-items-center">
+                <div class="btn-group flex" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-outline-secondary" id="subQuantity">-</button>
+                  <input type="text" class="form-control text-center" value="1" style="width: 200px;" id="quantity">
+                  <button type="button" class="btn btn-outline-secondary" id="addQuantity">+</button>
+                </div>
+                <div class="ms-3">有货</div>
+              </div>
+            </div>
+          </div>
 
-    </script>
+          <div class="buyorcart">
+            <div class="col-10 d-grid">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-orangered w-50" id="buyNow"
+                  data-product-id="{{ .ProductId }}">购买</button>
+                <button type="button" class="btn btn-outline-success w-50" id="addToCart"
+                  data-product-id="{{ .ProductId }}">加入购物车</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{end}}
+    </div>
+    <hr class="container" />
+    <div class="p-3 container">
+
+      <h4>商品详情</h4>
+      <div class="row">
+        <div class="col-8">
+          <table class="table table-bordered product-detail">
+            {{range $idx, $param := .Product.ProductParams}}
+            {{if eq (iMod $idx 2) 0}}
+            <tr>
+              {{end}}
+              <td>{{$param.ParamName}}</td>
+              <td>{{$param.ParamValue}}</td>
+              {{if eq (iMod $idx 2) 1}}
+            </tr>
+            {{end}}
+            {{end}}
+            {{if eq (iMod (len .Product.ProductParams) 2) 1}}
+            <td></td>
+            <td></td>
+            </tr>
+            {{end}}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="placeholder-body"></div>
+  <hr class="container" />
+  <footer class="p-3 bg-white text-dark text-center">
+    <div class="container">
+      <span class="">Copyright &copy; 166-队就是队</span>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+  <script type="module" src="/static/js/product-page.js"></script>
+  <script>
+
+  </script>
 </body>
 
 </html>

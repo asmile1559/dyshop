@@ -1,0 +1,11 @@
+{
+  "home_page": "/test/",
+  "login_page":"/test/user/login/",
+  "register_page": "/test/user/register/",
+  "user_page":"/test/user/",
+  "product_page": "/test/product/",
+  "order_page":"/test/order/",
+  "cart_page": "/test/cart/",
+  "search_page":"/test/search/",
+  "payment_page": "/test/payment"
+}
