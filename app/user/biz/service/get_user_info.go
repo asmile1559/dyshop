@@ -10,12 +10,12 @@ import (
 
 )
 
-// GetUserInfoService 注册服务
+// GetUserInfoService 获取用户信息服务
 type GetUserInfoService struct {
 	ctx context.Context
 }
 
-// NewGetUserInfoService 创建注册服务实例
+// NewGetUserInfoService 创建获取用户信息服务实例
 func NewGetUserInfoService(c context.Context) *GetUserInfoService {
 	return &GetUserInfoService{ctx: c}
 }
@@ -32,7 +32,12 @@ func (s *GetUserInfoService) Run(req *pbuser.GetUserInfoReq) (*pbuser.GetUserInf
 	
 	// 2. 返回用户信息
 	return &pbuser.GetUserInfoResp{
-		UserId:  user.UserID,
-		Email:   user.Email,
+		UserId:   user.UserID,
+		Name:     user.Name,
+		Sign:     user.Sign,
+		Url:      user.Url,
+		Role:     []string{user.Role},
+		Gender:   user.Gender,
+		Birthday: user.Birthday.Format("2006年1月2日"),
 	}, nil
 }

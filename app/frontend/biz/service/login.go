@@ -28,8 +28,4 @@ func (s *LoginService) Run(req *user_page.LoginReq) (map[string]interface{}, err
 	return gin.H{
 		"token": resp.Token,
 	}, nil
-
-	//return gin.H{
-	//	"status": "login ok!",
-	//}, nil
 }

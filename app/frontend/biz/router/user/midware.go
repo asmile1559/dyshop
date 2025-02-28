@@ -17,22 +17,34 @@ func _loginMw() []gin.HandlerFunc {
 	return nil
 }
 
-func _logoutMw() []gin.HandlerFunc {
-	return []gin.HandlerFunc{middleware.Auth()}
-}
-
 func _registerMw() []gin.HandlerFunc {
 	return nil
 }
 
-func _updateMw() []gin.HandlerFunc {
-	return nil
+func _updateuserinfoMw() []gin.HandlerFunc {
+	return []gin.HandlerFunc{middleware.Auth()}
 }
 
-func _infoMw() []gin.HandlerFunc {
-	return nil
+func _getuserinfoMw() []gin.HandlerFunc {
+	return []gin.HandlerFunc{middleware.Auth()}
+}
+
+func _updateaccountinfoMw() []gin.HandlerFunc {
+	return []gin.HandlerFunc{middleware.Auth()}
+}
+
+func _getaccountinfoMw() []gin.HandlerFunc {
+	return []gin.HandlerFunc{middleware.Auth()}
+}
+
+func _uploadavatarMw() []gin.HandlerFunc {
+	return []gin.HandlerFunc{middleware.Auth()}
+}
+
+func _registermerchantMw() []gin.HandlerFunc {
+	return []gin.HandlerFunc{middleware.Auth()}
 }
 
 func _deleteMw() []gin.HandlerFunc {
-	return nil
+	return []gin.HandlerFunc{middleware.Auth()}
 }

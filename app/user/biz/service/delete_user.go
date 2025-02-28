@@ -36,7 +36,5 @@ func (s *DeleteUserService) Run(req *pbuser.DeleteUserReq) (*pbuser.DeleteUserRe
     }
     logrus.Info("delete user success")
     
-    return &pbuser.DeleteUserResp{
-        Success: true,
-    }, nil
+    return &pbuser.DeleteUserResp{}, nil
 }

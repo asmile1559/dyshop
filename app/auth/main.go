@@ -2,7 +2,6 @@ package main
 
 import (
 
-	"github.com/asmile1559/dyshop/app/auth/utils/casbin"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	 "github.com/asmile1559/dyshop/utils/mtl"
@@ -23,9 +22,9 @@ func init() {
 }
 
 func main() {
-	if err := initCasbin("conf/model.conf", "conf/policy.csv"); err != nil {
+	/* if err := initCasbin("conf/model.conf", "conf/policy.csv"); err != nil {
 		logrus.Fatal(err)
-	}
+	} */
 
 	// 获取 Etcd 配置
 	endpoints := viper.GetStringSlice("etcd.endpoints")
@@ -66,10 +65,10 @@ func main() {
 	)
 }
 
-func initCasbin(modelConf, policyConf string) error {
+/* func initCasbin(modelConf, policyConf string) error {
 	err := casbin.InitEnforcer(modelConf, policyConf)
 	if err != nil {
 		return err
 	}
 	return nil
-}
+} */

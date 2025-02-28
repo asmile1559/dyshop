@@ -18,15 +18,28 @@ func (s *UserServiceServer) Login(ctx context.Context, req *pbuser.LoginReq) (*p
 	return service.NewLoginService(ctx).Run(req)
 }
 
-func (s *UserServiceServer) Logout(ctx context.Context, req *pbuser.LogoutReq) (*pbuser.LogoutResp, error) {
-	return service.NewLogoutService(ctx).Run(req)
-}
-func (s *UserServiceServer) UpdateUser(ctx context.Context, req *pbuser.UpdateUserReq) (*pbuser.UpdateUserResp, error) {
-	return service.NewUpdateUserService(ctx).Run(req)
+func (s *UserServiceServer) UpdateUserInfo(ctx context.Context, req *pbuser.UpdateUserInfoReq) (*pbuser.UpdateUserInfoResp, error) {
+	return service.NewUpdateUserInfoService(ctx).Run(req)
 }
 
 func (s *UserServiceServer) GetUserInfo(ctx context.Context, req *pbuser.GetUserInfoReq) (*pbuser.GetUserInfoResp, error) {	
 	return service.NewGetUserInfoService(ctx).Run(req)
+}
+
+func (s *UserServiceServer) GetAccountInfo(ctx context.Context, req *pbuser.GetAccountInfoReq) (*pbuser.GetAccountInfoResp, error) {	
+	return service.NewGetAccountInfoService(ctx).Run(req)
+}
+
+func (s *UserServiceServer) UpdateAccount(ctx context.Context, req *pbuser.UpdateAccountReq) (*pbuser.UpdateAccountResp, error) {	
+	return service.NewUpdateAccountService(ctx).Run(req)
+}
+
+func (s *UserServiceServer) UploadAvatar(ctx context.Context, req *pbuser.UploadAvatarReq) (*pbuser.UploadAvatarResp, error) {	
+	return service.NewUploadAvatarService(ctx).Run(req)
+}
+
+func (s *UserServiceServer) RegisterMerchant(ctx context.Context, req *pbuser.RegisterMerchantReq) (*pbuser.RegisterMerchantResp, error) {	
+	return service.NewRegisterMerchantService(ctx).Run(req)
 }
 
 func (s *UserServiceServer) DeleteUser(ctx context.Context, req *pbuser.DeleteUserReq) (*pbuser.DeleteUserResp, error) {	

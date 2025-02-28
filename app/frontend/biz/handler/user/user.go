@@ -1,7 +1,8 @@
 package user
 
 import (
-	"strconv"
+	"fmt"
+	"os"
 
 	"github.com/asmile1559/dyshop/app/frontend/biz/model"
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
@@ -18,7 +19,7 @@ func Register(c *gin.Context) {
 	var err error
 	var req user_page.RegisterReq
 	var p model.ParamRegister
-	
+
 	// 参数校验
 	if err := c.Bind(&p); err != nil {
 		//请求参数有误，返回响应
@@ -28,19 +29,17 @@ func Register(c *gin.Context) {
 		if !ok {
 			// 非validator.ValidationErrors类型错误直接返回
 			logrus.WithError(err)
-			//c.String(http.StatusOK, "An error occurred: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code":    http.StatusBadRequest,
-				"message": "err",
+				"message": err.Error(),
 			})
 			return
 		}
 		// validator.ValidationErrors类型错误则进行翻译
 		logrus.Error(errs.Translate(trans))
-		//c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
-			"message": "err",
+			"message": errs.Translate(trans),
 		})
 		return
 	}
@@ -54,15 +53,14 @@ func Register(c *gin.Context) {
 	_, err = service.NewRegisterService(c).Run(&req)
 
 	if err != nil {
-		//c.String(http.StatusOK, "An error occurred: %v", err)
+		logrus.WithError(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
-			"message": "err",
+			"message": err.Error(),
 		})
 		return
 	}
 
-	//c.String(http.StatusOK, "%v", resp)
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "register ok!",
@@ -73,7 +71,7 @@ func Login(c *gin.Context) {
 	var err error
 	var req user_page.LoginReq
 	var p model.ParamLogin
-	
+
 	// 参数校验
 	if err := c.Bind(&p); err != nil {
 		//请求参数有误，返回响应
@@ -83,12 +81,18 @@ func Login(c *gin.Context) {
 		if !ok {
 			// 非validator.ValidationErrors类型错误直接返回
 			logrus.WithError(err)
-			c.String(http.StatusOK, "An error occurred: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": err.Error(),
+			})
 			return
 		}
 		// validator.ValidationErrors类型错误则进行翻译
 		logrus.Error(errs.Translate(trans))
-		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": errs.Translate(trans),
+		})
 		return
 	}
 
@@ -101,11 +105,14 @@ func Login(c *gin.Context) {
 	resp, err := service.NewLoginService(c).Run(&req)
 
 	if err != nil {
-		c.String(http.StatusOK, "%v", err)
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+		})
 		return
 	}
-	
-	//c.String(http.StatusOK, "%v", resp)
+
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "login ok!",
@@ -114,109 +121,315 @@ func Login(c *gin.Context) {
 
 }
 
-func UpdateUser(c *gin.Context) {
+func UpdateUserInfo(c *gin.Context) {
 	var err error
-	var req user_page.UpdateUserReq
-	var p model.ParamUpdateUser
-	
-	// 参数校验
-	if err := c.Bind(&p); err != nil {
-		//请求参数有误，返回响应
-		logrus.WithError(err).Error("register with invalid param")
-		// 获取validator.ValidationErrors类型的errors
-		errs, ok := err.(validator.ValidationErrors)
-		if !ok {
-			// 非validator.ValidationErrors类型错误直接返回
-			logrus.WithError(err)
-			c.String(http.StatusOK, "An error occurred: %v", err)
-			return
-		}
-		// validator.ValidationErrors类型错误则进行翻译
-		logrus.Error(errs.Translate(trans))
-		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
+	var req user_page.UpdateUserInfoReq
+
+	// 获取userid
+	userId, ok := c.Get("user_id")
+	if !ok {
+		logrus.Error("no user id error")
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
 		return
 	}
 
 	// 业务逻辑
-	req = user_page.UpdateUserReq{
-		UserId:   p.UserID,
-		Email:    p.Email,
-		Password: p.Password,
+	// 绑定JSON请求体
+	if err := c.Bind(&req); err != nil {
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "invalid request body",
+			"err":     err.Error(),
+		})
+		return
 	}
+	req.UserId = userId.(int64)
 
 	// 调用 Service 层的业务逻辑
-	resp, err := service.NewUpdateUserService(c).Run(&req)
+	resp, err := service.NewUpdateUserInfoService(c).Run(&req)
 
 	// 错误处理
 	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "internal server error",
+			"err":     err.Error(),
+		})
 		return
 	}
 
 	// 返回成功的响应
-	c.String(http.StatusOK, "%v", resp)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "update info ok",
+		"resp":    resp,
+	})
 }
 
-func GetUserInfo(c *gin.Context){
+func GetUserInfo(c *gin.Context) {
 	var err error
 	var req user_page.GetUserInfoReq
 
-	id := c.Param("id")
-	if id == "" {
-		c.String(http.StatusOK, "expect a product index")
+	// 获取userid
+	userId, ok := c.Get("user_id")
+	if !ok {
+		logrus.Error("no user id error")
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
 		return
 	}
 
-	i, err := strconv.Atoi(id)
-	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
-		return
-	}
-	req.UserId = int64(i)
-	
+	//i, err := strconv.Atoi(id)
+	req.UserId = userId.(int64)
 	resp, err := service.NewGetUserInfoService(c).Run(&req)
 
 	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "internal server error",
+		})
 		return
 	}
 
-	c.String(http.StatusOK, "%v", resp)
+	c.HTML(http.StatusOK, "info.html", gin.H{
+		"PageRouter": PageRouter,
+		"UserInfo":   resp,
+	})
 }
 
-func Delete(c *gin.Context){
+func GetAccountInfo(c *gin.Context) {
 	var err error
-	var req user_page.DeleteUserReq
-	var p model.ParamDeleteUser
-	
+	var req user_page.GetAccountInfoReq
+
+	// 获取userid
+	userId, ok := c.Get("user_id")
+	if !ok {
+		logrus.Error("no user id error")
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
+		return
+	}
+
+	req.UserId = userId.(int64)
+	resp, err := service.NewGetAccountInfoService(c).Run(&req)
+
+	if err != nil {
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "internal server error",
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "info.html", gin.H{
+		"PageRouter": PageRouter,
+		"UserInfo":   resp,
+	})
+}
+
+func UpdateAccount(c *gin.Context) {
+	var err error
+	var req user_page.UpdateAccountReq
+
 	// 参数校验
-	if err := c.Bind(&p); err != nil {
-		//请求参数有误，返回响应
-		logrus.WithError(err).Error("register with invalid param")
-		// 获取validator.ValidationErrors类型的errors
-		errs, ok := err.(validator.ValidationErrors)
-		if !ok {
-			// 非validator.ValidationErrors类型错误直接返回
+	// 未完成
+	userId, ok := c.Get("user_id")
+	if !ok {
+		logrus.Error("no user id error")
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
+		return
+	}
+
+	// 绑定JSON请求体
+	if err := c.Bind(&req); err != nil {
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "invalid request body",
+			"err":     err.Error(),
+		})
+		return
+	}
+
+	req.UserId = userId.(int64)
+	resp, err := service.NewUpdateAccountService(c).Run(&req)
+
+	if err != nil {
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "internal server error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "update info ok",
+		"resp":    resp,
+	})
+
+}
+
+func RegisterMerchant(c *gin.Context) {
+	var err error
+	var req user_page.RegisterMerchantReq
+	// 获取userid
+	userId, ok := c.Get("user_id")
+	if !ok {
+		logrus.Error("no user id error")
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
+		return
+	}
+
+	// 业务逻辑
+	req = user_page.RegisterMerchantReq{
+		UserId: userId.(int64),
+	}
+	_, err = service.NewRegisterMerchantService(c).Run(&req)
+
+	if err != nil {
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "internal server error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "update info ok",
+		"resp": gin.H{
+			"user_id": userId,
+		},
+	})
+
+}
+
+func UploadAvatar(c *gin.Context) {
+	var req user_page.UploadAvatarReq
+
+	if userId, ok := c.Get("user_id"); ok {
+		file, err := c.FormFile("Img")
+		if err != nil {
 			logrus.WithError(err)
-			c.String(http.StatusOK, "An error occurred: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "upload file error.",
+				"error":   err.Error(),
+			})
 			return
 		}
-		// validator.ValidationErrors类型错误则进行翻译
-		logrus.Error(errs.Translate(trans))
-		c.String(http.StatusOK, "An error occurred: %v", errs.Translate(trans))
+
+		fileDir := fmt.Sprintf("/static/src/user/%v/", userId)
+		saveDir := "." + fileDir
+		if _, err := os.Stat(saveDir); os.IsNotExist(err) {
+			err = os.Mkdir(saveDir, 0755)
+			if err != nil {
+				logrus.Error(err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"code":    http.StatusInternalServerError,
+					"message": "something went wrong, please try it later.",
+					"error":   err.Error(),
+				})
+				return
+			}
+		}
+
+		//filePath := fileDir + file.Filename
+		savePath := saveDir + file.Filename
+		if err = c.SaveUploadedFile(file, savePath); err != nil {
+			logrus.Error(err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": "something went wrong, please try it later.",
+				"error":   err.Error(),
+			})
+			return
+		}
+
+		req = user_page.UploadAvatarReq{
+			UserId: userId.(int64),
+			Url:    savePath,
+		}
+		resp, err := service.NewUploadAvatarService(c).Run(&req)
+
+		if err != nil {
+			logrus.WithError(err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "internal server error",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"code":    http.StatusOK,
+			"message": "upload ok!",
+			"resp":    resp,
+		})
+		return
+	}
+
+	c.JSON(http.StatusUnauthorized, gin.H{
+		"code":    http.StatusUnauthorized,
+		"message": "no user id error",
+	})
+}
+
+func Delete(c *gin.Context) {
+	var err error
+	var req user_page.DeleteUserReq
+
+	// 获取userid
+	userId, ok := c.Get("user_id")
+	if !ok {
+		logrus.Error("no user id error")
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
 		return
 	}
 
 	// 业务逻辑
 	req = user_page.DeleteUserReq{
-		UserId: p.UserID,
+		UserId: userId.(int64),
 	}
-	resp, err := service.NewDeleteUserService(c).Run(&req)
+	_, err = service.NewDeleteUserService(c).Run(&req)
 
 	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+		logrus.WithError(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "internal server error",
+		})
 		return
 	}
 
-	c.String(http.StatusOK, "%v", resp)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "del account ok",
+		"resp": gin.H{
+			"user_id": userId,
+		},
+	})
 }

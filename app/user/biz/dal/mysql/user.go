@@ -34,6 +34,10 @@ func CreateUser(user *model.User) error {
 	return nil
 }
 
+func UpdateUserEmailAndPassword(user *model.User) error {
+    return db.Model(user).Select("email", "password").Updates(user).Error
+}
+
 // UpdateUser 更新用户信息
 func UpdateUser(user *model.User) error {
 	return db.Save(user).Error
@@ -50,4 +54,14 @@ func DeleteUserByID(userID int64) error {
 		return err
 	}
 	return nil
+}
+
+// SetUserAsMerchant 将用户身份更新为商户
+func SetUserAsMerchant(userID int64) error {
+	return db.Model(&model.User{}).Where("user_id = ?", userID).Update("role", "merchant").Error
+}
+
+// UpdateUserAvatar 更新用户头像 URL
+func UpdateUserAvatar(userID int64, avatarURL string) error {
+	return db.Model(&model.User{}).Where("user_id = ?", userID).Update("url", avatarURL).Error
 }
