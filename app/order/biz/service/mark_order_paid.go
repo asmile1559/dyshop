@@ -24,7 +24,7 @@ func NewMarkOrderPaidService(c context.Context) *MarkOrderPaidService {
 
 func (s *MarkOrderPaidService) Run(req *pborder.MarkOrderPaidReq) (*pborder.MarkOrderPaidResp, error) {
 	var prePaidOrder model.PrePaidOrder
-	if err := s.DB.WithContext(s.ctx).First(&prePaidOrder, req.GetOrderId()).Error; err != nil {
+	if err := s.DB.Preload("Address").Preload("OrderItems").First(&prePaidOrder, req.GetOrderId()).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("order not found")
 		}
