@@ -18,7 +18,8 @@ func InitDB() {
 		Port:     viper.GetInt("database.port"),
 		DbName:   viper.GetString("database.dbname"),
 		Models: []any{&model.Cart{}, &model.CartItem{}, &model.Order{}, &model.Address{},
-			&model.OrderItem{}},
+			&model.OrderItem{}, &model.PrePaidOrder{}, &model.PrePaidAddress{},
+			&model.PrePaidOrderItem{}},
 	}
 
 	db, err := mysqlx.New(conf)
