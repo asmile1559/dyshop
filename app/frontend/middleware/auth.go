@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"errors"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
 	"github.com/sirupsen/logrus"
@@ -13,17 +15,18 @@ import (
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
+		authToken, err := c.Cookie("token")
+		logrus.Debug(authToken)
+		if errors.Is(err, http.ErrNoCookie) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code":    http.StatusBadRequest,
-				"message": "Authorization header is required",
+				"message": "No token provided",
 			})
 			c.Abort()
 			return
 		}
 
-		token := strings.Split(authHeader, " ")
+		token := strings.Split(authToken, " ")
 		if token[0] != "Bearer" {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code":    http.StatusBadRequest,
