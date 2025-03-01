@@ -74,10 +74,10 @@ func main() {
 	defer mtl.DeregisterMetrics(info)
 
 	// 启动服务实例并注册到 Etcd
-	services := map[string]any{"id": serviceId, "address": serviceAddr}
+	service := map[string]any{"id": serviceId, "address": serviceAddr}
 	registryx.StartEtcdServices(
 		[]string{endpoint},
-		[]any{services},
+		[]any{service},
 		prefix,
 		pbuser.RegisterUserServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbuser.UserServiceServer {

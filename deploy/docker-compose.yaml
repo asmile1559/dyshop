@@ -16,6 +16,11 @@ services:
     image: jiny14/mypromethues:latest
     depends_on:
       - etcd
+    environment:
+      - LOG_LEVEL=info
+      - ETCD_ENDPOINT=etcd:2379
+      - SERVICE_ID=prometheus-service-1
+      - SERVICE_ADDRESS=prometheus:9091
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       # - ./config/targets:/etc/prometheus/targets
@@ -46,7 +51,7 @@ services:
       - SERVICE_ID=user-service-1
       - SERVICE_ADDRESS=user:12166
   cart:
-    image: cart:latest
+    image: qiannian116/dyshop-cart:latest
     depends_on:
       - mysql
       - etcd
