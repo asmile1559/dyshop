@@ -13,10 +13,10 @@ const OperationRouters = {
   "updateAddress": "/example/user/address/", // POST
   "deleteAddress": "/example/user/address/delete/", // POST
   "setDefAddress": "/example/user/address/setDefault/", // POST
-  "updateProduct": "/example/user/product/", // POST
-  "deleteProduct": "/example/user/product/delete/", // POST
-  "getProduct": "/example/product/", // GET
-  "buy": "/example/product/buy/", // POST
+  "updateProduct": "/product/update", // POST
+  "deleteProduct": "/product/delete/", // POST
+  "getProduct": "/product/", // GET
+  "buy": "/product/buy/", // POST
   // "addToCart": "/example/product/add2cart/", // POST
   "addToCart": "/cart/add", // POST
   "getCart": "/cart/", // GET
@@ -28,9 +28,8 @@ const OperationRouters = {
   "checkout": "/example/checkout/", // GET
   "cancelCheckout": "/example/checkout/cancel/", // POST
   "payment": "/example/payment/", // POST
-  "search": "/example/search/", // GET
+  "search": "/product/search/", // GET
   "register": "/user/register/", // GET|POST
   "login": "/user/login/", // GET|POST
-
 }
 export { DefaultURL, OperationRouters }
