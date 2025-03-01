@@ -17,11 +17,11 @@ func init() {
 
 func main() {
 	// 1) 通过 etcd 发现 CartService
-	endpoints := viper.GetStringSlice("etcd.endpoints")
+	endpoint := viper.GetString("etcd.endpoint")
 	prefix := viper.GetString("etcd.prefix")
 
 	client, conn, err := registryx.DiscoverEtcdServices(
-		endpoints,
+		[]string{endpoint},
 		prefix,
 		pbcart.NewCartServiceClient,
 	)

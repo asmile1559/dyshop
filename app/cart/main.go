@@ -105,12 +105,9 @@ func main() {
 	logrus.Info("DB initialized successfully.")
 
 	// 获取 Etcd 配置
-	endpoints := viper.GetStringSlice("etcd.endpoints")
+	endpoint := viper.GetString("etcd.endpoint")
 	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]any)
-	if len(services) == 0 {
-		logrus.Fatal("No services found in config.")
-	}
+	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
 
 	// 注册 Metrics
 	host := viper.GetString("metrics.host")
@@ -128,9 +125,10 @@ func main() {
 	defer mtl.DeregisterMetrics(info)
 
 	// 注册服务实例到 etcd
+	services := map[string]any{"id": serviceId, "address": serviceAddr}
 	registryx.StartEtcdServices(
-		endpoints,
-		services,
+		[]string{endpoint},
+		[]any{services},
 		prefix,
 		pbcart.RegisterCartServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbcart.CartServiceServer {

@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-EXPOSE 12166
+EXPOSE 14166
 
-ENTRYPOINT ["bin/user"]
+ENTRYPOINT ["bin/cart"]
