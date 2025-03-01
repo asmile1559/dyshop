@@ -16,3 +16,56 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+  prometheus:
+    image: jiny14/mypromethues:latest
+    depends_on:
+      - etcd
+    environment:
+      - LOG_LEVEL=info
+      - ETCD_ENDPOINT=etcd:2379
+      - SERVICE_ID=prometheus-service-1
+      - SERVICE_ADDRESS=prometheus:9091
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      # - ./config/targets:/etc/prometheus/targets
+    ports:
+      - "9090:9090"
+      - "9091:9091"
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
+  user:
+    image: jiny14/dyshop-user:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+    ports:
+      - "12166:12166"
+    environment:
+      - LOG_LEVEL=info
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINT=etcd:2379
+      - METRICS_HOST=user
+      - SERVICE_ID=user-service-1
+      - SERVICE_ADDRESS=user:12166
+  cart:
+    image: qiannian116/dyshop-cart:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+    ports:
+      - "14166:14166"
+    environment:
+      - LOG_LEVEL=info
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINT=etcd:2379
+      - METRICS_HOST=cart
+      - SERVICE_ID=cart-service-1
+      - SERVICE_ADDRESS=cart:14166

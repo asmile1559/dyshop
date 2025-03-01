@@ -17,7 +17,6 @@ func NewAddItemService(c context.Context) *AddItemService {
 }
 
 func (s *AddItemService) Run(req *pbcart.AddItemReq) (*pbcart.AddItemResp, error) {
-	// user_id, product_id, quantity 都是 uint64/int
 	err := model.AddOrUpdateCartItem(
 		dal.DB,
 		uint64(req.UserId),
@@ -27,5 +26,7 @@ func (s *AddItemService) Run(req *pbcart.AddItemReq) (*pbcart.AddItemResp, error
 	if err != nil {
 		return nil, err
 	}
-	return &pbcart.AddItemResp{}, nil
+	return &pbcart.AddItemResp{
+		CartId: 0, // 仅占位
+	}, nil
 }

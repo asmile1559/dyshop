@@ -15,10 +15,11 @@ import (
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authToken, err := c.Cookie("token")
+		logrus.Debug(authToken)
 		if errors.Is(err, http.ErrNoCookie) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code":    http.StatusBadRequest,
-				"message": "No token provided.",
+				"message": "No token provided",
 			})
 			c.Abort()
 			return

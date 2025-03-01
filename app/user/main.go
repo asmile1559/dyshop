@@ -1,23 +1,20 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"net"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
 	"github.com/asmile1559/dyshop/app/user/biz/model"
-	"github.com/asmile1559/dyshop/app/user/utils"
+	"github.com/asmile1559/dyshop/app/user/utils/snowflake"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/utils/db/mysqlx"
 	"github.com/asmile1559/dyshop/utils/hookx"
-	"google.golang.org/grpc"
 
+	"github.com/asmile1559/dyshop/utils/mtl"
 	"github.com/asmile1559/dyshop/utils/registryx"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-
-	rpcclient "github.com/asmile1559/dyshop/app/user/rpc"
 )
 
 type userServer struct {
@@ -32,14 +29,12 @@ func init() {
 }
 
 func main() {
-	rpcclient.InitRPCClient()
-
-	utils.Init(viper.GetString("server.start_time"), int64(viper.GetInt("server.machine_id")))
+	snowflake.Init(viper.GetString("server.start_time"), int64(viper.GetInt("server.machine_id")))
 
 	go func() {
 		router := gin.Default()
 
-		router.StaticFS("/static", http.Dir("/static"))
+		router.StaticFS("/static", http.Dir("./static"))
 
 		err := router.Run(":12167")
 		if err != nil {
@@ -58,13 +53,10 @@ func main() {
 	mysql.Init(dbconf)
 	defer mysql.Close()
 
-	/* // 获取 Etcd 配置
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]any)
-	if len(services) == 0 {
-		logrus.Fatal("No services found in config")
-	}
+	// 获取 Etcd 配置
+	endpoint := viper.GetString("etcd.endpoint")
+	prefix := viper.GetString("etcd.prefix.this")
+	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
 
 	// 注册 Metrics
 	host := viper.GetString("metrics.host")
@@ -82,9 +74,10 @@ func main() {
 	defer mtl.DeregisterMetrics(info)
 
 	// 启动服务实例并注册到 Etcd
+	service := map[string]any{"id": serviceId, "address": serviceAddr}
 	registryx.StartEtcdServices(
-		endpoints,
-		services,
+		[]string{endpoint},
+		[]any{service},
 		prefix,
 		pbuser.RegisterUserServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbuser.UserServiceServer {
@@ -94,16 +87,5 @@ func main() {
 				connCount:   0,
 			}
 		},
-	) */
-	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	s := grpc.NewServer()
-
-	pbuser.RegisterUserServiceServer(s, &UserServiceServer{})
-	if err = s.Serve(cc); err != nil {
-		logrus.Fatal(err)
-	}
+	)
 }

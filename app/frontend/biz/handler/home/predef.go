@@ -4,13 +4,13 @@ import "github.com/gin-gonic/gin"
 
 var (
 	pageRouter = gin.H{
-		"HomePage":     "/example/",
-		"LoginPage":    "/example/user/login/",
-		"RegisterPage": "/example/user/register/",
-		"UserPage":     "/example/user/",
+		"HomePage":     "/",
+		"LoginPage":    "/user/login/",
+		"RegisterPage": "/user/register/",
+		"UserPage":     "/user/",
 		"ProductPage":  "/example/product/",
 		"OrderPage":    "/example/order/",
-		"CartPage":     "/example/cart/",
+		"CartPage":     "/cart/",
 		"SearchPage":   "/example/search/",
 		"PaymentPage":  "/example/payment/",
 	}

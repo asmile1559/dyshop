@@ -1,7 +1,6 @@
 package cart
 
 import (
-	"github.com/asmile1559/dyshop/app/frontend/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,7 +9,8 @@ func _rootMw() []gin.HandlerFunc {
 }
 
 func _cartMw() []gin.HandlerFunc {
-	return []gin.HandlerFunc{middleware.Auth()}
+	// return []gin.HandlerFunc{middleware.Auth()}
+	return nil
 }
 
 func _addCartMw() []gin.HandlerFunc {
@@ -26,5 +26,9 @@ func _emptyCartMw() []gin.HandlerFunc {
 }
 
 func _getCartMw() []gin.HandlerFunc {
+	return nil
+}
+
+func _deleteCartMw() []gin.HandlerFunc {
 	return nil
 }
