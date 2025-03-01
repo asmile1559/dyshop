@@ -1,9 +1,9 @@
-package home
+package user
 
 import "github.com/gin-gonic/gin"
 
 var (
-	pageRouter = gin.H{
+	PageRouter = gin.H{
 		"HomePage":     "/",
 		"LoginPage":    "/user/login/",
 		"RegisterPage": "/user/register/",
@@ -14,7 +14,7 @@ var (
 		"SearchPage":   "/example/search/",
 		"PaymentPage":  "/example/payment/",
 	}
-	categoryList = [][]string{
+	CategoryList = [][]string{
 		{"家用电器"},
 		{"手机", "运营商", "数码"},
 		{"电脑", "办公", "文具用品"},
@@ -29,7 +29,7 @@ var (
 		{"食品", "酒类", "生鲜", "特产"},
 		{"图书", "文娱", "教育", "电子书"},
 	}
-	carousels = []gin.H{
+	Carousels = []gin.H{
 		{"Category": "电子设备", "Img": "/static/src/carousel/carousel1.jpg"},
 		{"Category": "彩电", "Img": "/static/src/carousel/carousel2.jpg"},
 		{"Category": "空调", "Img": "/static/src/carousel/carousel3.jpg"},
