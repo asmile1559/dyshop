@@ -23,6 +23,7 @@ func (s *CreateProductService) Run(req *product_page.CreateProductReq) (map[stri
 		Description: req.Description,
 		Picture:     req.Picture,
 		Price:       req.Price,
+		Categories:  req.Categories,
 	})
 	if err != nil {
 		return nil, err
@@ -32,20 +33,22 @@ func (s *CreateProductService) Run(req *product_page.CreateProductReq) (map[stri
 
 // ModifyProductService 处理商品修改服务
 type ModifyProductService struct {
-	Ctx context.Context
+	c context.Context
 }
 
 func NewModifyProductService(c context.Context) *ModifyProductService {
-	return &ModifyProductService{Ctx: c}
+	return &ModifyProductService{c: c}
 }
 
 func (s *ModifyProductService) Run(req *product_page.ModifyProductReq) (map[string]interface{}, error) {
-	resp, err := rpcclient.ProductClient.ModifyProduct(s.Ctx, &pbproduct.ModifyProductReq{
+
+	resp, err := rpcclient.ProductClient.ModifyProduct(s.c, &pbproduct.ModifyProductReq{
 		Id:          req.GetId(),
 		Name:        req.Name,
 		Description: req.Description,
 		Picture:     req.Picture,
 		Price:       req.Price,
+		Categories:  req.Categories,
 	})
 	if err != nil {
 		return nil, err
