@@ -6,10 +6,10 @@ server:
 
 database:
   driver: mysql
-  host: "127.0.0.1"
+  host: "127.0.0.1" # ENV DATABASE_HOST
   port: 3306
   username: root
-  password: 123456
+  password: root
   dbname: dyshop
   max_idle_conns: 10
   max_open_conns: 100
@@ -22,23 +22,24 @@ redis:
   db: 0
 
 log:
-  level: debug
+  level: debug  # ENV LOG_LEVEL
   path: logs/app.log
   maxsize: 100
   maxage: 7
   maxbackups: 10
 
 etcd:
-  endpoints:
-    - "127.0.0.1:2379" # Etcd 节点地址
-  prefix: "/services/user" # 服务注册前缀
+  endpoint: "127.0.0.1:2379" # ENV ETCD_ENDPOINTS
+  prefix: 
+    this: "/services/user"
+    auth: "/services/auth"
 
-services:
-  - id: "user-service-1" # 服务实例ID
-    address: "127.0.0.1:12166" # 服务实例地址
+service:
+  id: "user-service-1" # ENV SERVICE_ID
+  address: "127.0.0.1:12166" # ENV SERVICE_ADDRESS
 
 prometheus: "/services/prometheus"
 
 metrics:
-  host: "127.0.0.1"
-  port: 12167 # 服务实例监控端口
+  host: "127.0.0.1" # ENV METRICS_HOST
+  port: 12168

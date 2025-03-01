@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
@@ -52,12 +54,9 @@ func main() {
 	defer mysql.Close()
 
 	// 获取 Etcd 配置
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]any)
-	if len(services) == 0 {
-		logrus.Fatal("No services found in config")
-	}
+	endpoint := viper.GetString("etcd.endpoint")
+	prefix := viper.GetString("etcd.prefix.this")
+	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
 
 	// 注册 Metrics
 	host := viper.GetString("metrics.host")
@@ -75,9 +74,10 @@ func main() {
 	defer mtl.DeregisterMetrics(info)
 
 	// 启动服务实例并注册到 Etcd
+	services := map[string]any{"id": serviceId, "address": serviceAddr}
 	registryx.StartEtcdServices(
-		endpoints,
-		services,
+		[]string{endpoint},
+		[]any{services},
 		prefix,
 		pbuser.RegisterUserServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbuser.UserServiceServer {
