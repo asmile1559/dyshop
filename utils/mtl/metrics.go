@@ -21,11 +21,11 @@ type MetricsInfo struct {
 
 func RegisterMetrics(info MetricsInfo) {
 	// 向 Prometheus 配置中心注册地址
-	endpoints := viper.GetStringSlice("etcd.endpoints")
+	endpoint := viper.GetString("etcd.endpoint")
 	prometheus := viper.GetString("prometheus")
 
 	client, conn, err := registryx.DiscoverEtcdServices(
-		endpoints,
+		[]string{endpoint},
 		prometheus,
 		pbmtl.NewMetricsServiceClient,
 	)
@@ -60,11 +60,11 @@ func RegisterMetrics(info MetricsInfo) {
 
 func DeregisterMetrics(info MetricsInfo) {
 	// 向 Prometheus 配置中心注册地址
-	endpoints := viper.GetStringSlice("etcd.endpoints")
+	endpoint := viper.GetString("etcd.endpoint")
 	prometheus := viper.GetString("prometheus")
 
 	client, conn, err := registryx.DiscoverEtcdServices(
-		endpoints,
+		[]string{endpoint},
 		prometheus,
 		pbmtl.NewMetricsServiceClient,
 	)
