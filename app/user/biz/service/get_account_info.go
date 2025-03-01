@@ -38,5 +38,6 @@ func (s *GetAccountInfoService) Run(req *pbuser.GetAccountInfoReq) (*pbuser.GetA
 		Role:   []string{user.Role},
 		Phone:  user.Phone,
 		Email:  user.Email,
+		Url:    "http://localhost:12167"+user.Url,
 	}, nil
 }

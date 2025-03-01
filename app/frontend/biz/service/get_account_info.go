@@ -33,7 +33,7 @@ func (s *GetAccountInfoService) Run(req *user_page.GetAccountInfoReq) (map[strin
 		"Name":  resp.Name,
 		"Sign":  resp.Sign,
 		// 暂时指定头像图片url
-		"Img":   "/static/src/user/snake.svg",
+		"Img":   resp.Url,
 		"Role":  resp.Role,
 		"Phone": resp.Phone,
 		"Email": resp.Email,

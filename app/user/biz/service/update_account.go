@@ -30,7 +30,7 @@ func (s *UpdateAccountService) Run(req *pbuser.UpdateAccountReq) (*pbuser.Update
 		return nil, fmt.Errorf("用户不存在: %v", err)
 	}
 
-	// 2. 如果提供了新邮箱，检查邮箱是否已被使用
+	// 如果提供了新邮箱，检查邮箱是否已被使用
 	if req.Email != "" && req.Email != user.Email {
 		existingUser, err := mysql.GetUserByEmail(req.Email)
 		if err == nil && existingUser != nil {
@@ -41,15 +41,26 @@ func (s *UpdateAccountService) Run(req *pbuser.UpdateAccountReq) (*pbuser.Update
 		user.Email = req.Email  // 更新邮箱
 	}
 
-	// 3. 如果提供了新密码，更新密码
+	// 如果提供了新密码，更新密码
 	if req.NewPassword != "" {
+		// 先判断旧密码是否正确
+		oldPassword,_:=bcrypt.HashPassword(req.Password);
+		if(oldPassword!=user.Password){
+			logrus.Error("密码错误")
+			return nil, fmt.Errorf("密码错误")
+		}
+
 		user.Password ,err = bcrypt.HashPassword(req.NewPassword)  // 记得对密码进行加密存储
 		if err != nil {
 			logrus.WithError(err).Error("密码加密失败")
 			return nil, fmt.Errorf("密码加密失败: %v", err)
 		}
 	}
-	user.Phone=req.Phone;
+
+	// 如果提供了新手机号，更新手机号
+	if req.Phone != ""{
+		user.Phone=req.Phone;
+	}
 	
 	// 4. 更新用户信息到数据库
 	err = mysql.UpdateUser(user)

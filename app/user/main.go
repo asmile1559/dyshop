@@ -1,15 +1,17 @@
 package main
 
 import (
+	"net/http"
 
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
 	"github.com/asmile1559/dyshop/app/user/biz/model"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/utils/db/mysqlx"
 	"github.com/asmile1559/dyshop/utils/hookx"
+	"github.com/gin-gonic/gin"
+
 	//"google.golang.org/grpc"
 	"github.com/asmile1559/dyshop/app/user/utils/snowflake"
-
 
 	"github.com/asmile1559/dyshop/utils/mtl"
 	"github.com/asmile1559/dyshop/utils/registryx"
@@ -34,6 +36,17 @@ func main() {
 	rpcclient.InitRPCClient()
 
 	snowflake.Init(viper.GetString("server.start_time"), int64(viper.GetInt("server.machine_id")))
+
+	go func() {
+		router := gin.Default()
+
+		router.StaticFS("/static", http.Dir("./static"))
+
+		err := router.Run(":12167")
+		if err != nil {
+			return
+		}
+	}()
 
 	dbconf := mysqlx.DbConfig{
 		User:     viper.GetString("database.username"),
@@ -83,15 +96,4 @@ func main() {
 			}
 		},
 	)
-	/* cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	
-	s := grpc.NewServer()
-
-	pbuser.RegisterUserServiceServer(s, &UserServiceServer{})
-	if err = s.Serve(cc); err != nil {
-		logrus.Fatal(err)
-	} */
 }

@@ -35,7 +35,7 @@ func (s *GetUserInfoService) Run(req *pbuser.GetUserInfoReq) (*pbuser.GetUserInf
 		UserId:   user.UserID,
 		Name:     user.Name,
 		Sign:     user.Sign,
-		Url:      user.Url,
+		Url:      "http://localhost:12167"+user.Url,
 		Role:     []string{user.Role},
 		Gender:   user.Gender,
 		Birthday: user.Birthday.Format("2006年1月2日"),

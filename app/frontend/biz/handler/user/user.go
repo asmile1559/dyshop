@@ -232,7 +232,7 @@ func GetAccountInfo(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "info.html", gin.H{
+	c.HTML(http.StatusOK, "account.html", gin.H{
 		"PageRouter": PageRouter,
 		"UserInfo":   resp,
 	})
