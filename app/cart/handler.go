@@ -25,3 +25,8 @@ func (s *CartServiceServer) GetCart(ctx context.Context, req *pbcart.GetCartReq)
 func (s *CartServiceServer) EmptyCart(ctx context.Context, req *pbcart.EmptyCartReq) (*pbcart.EmptyCartResp, error) {
 	return service.NewEmptyCartService(ctx).Run(req)
 }
+
+// 实现了 proto 中的 DeleteCart 方法
+func (s *CartServiceServer) DeleteCart(ctx context.Context, req *pbcart.DeleteCartReq) (*pbcart.DeleteCartResp, error) {
+	return service.NewDeleteCartService(ctx).Run(req)
+}

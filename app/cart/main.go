@@ -16,14 +16,14 @@ import (
 
 // CartServerWrapper 用于包装真正的 CartServiceServer，以便做一些统计或动态更新 etcd
 type CartServerWrapper struct {
-	pbcart.UnimplementedCartServiceServer
+	CartServiceServer
 
 	instanceID  string
 	etcdService *registryx.EtcdService
 	connCount   int64
 
 	// 实际的业务实现
-	server *CartServiceServer
+	// server *CartServiceServer
 }
 
 // 加一个通用方法，用于每个 RPC 统计连接数
@@ -47,7 +47,7 @@ func (s *CartServerWrapper) AddItem(ctx context.Context, req *pbcart.AddItemReq)
 		err  error
 	)
 	err = s.trackConnection(func() error {
-		r, e := s.server.AddItem(ctx, req)
+		r, e := s.CartServiceServer.AddItem(ctx, req)
 		resp = r
 		return e
 	})
@@ -60,7 +60,20 @@ func (s *CartServerWrapper) GetCart(ctx context.Context, req *pbcart.GetCartReq)
 		err  error
 	)
 	err = s.trackConnection(func() error {
-		r, e := s.server.GetCart(ctx, req)
+		r, e := s.CartServiceServer.GetCart(ctx, req)
+		resp = r
+		return e
+	})
+	return resp, err
+}
+
+func (s *CartServerWrapper) DeleteCart(ctx context.Context, req *pbcart.DeleteCartReq) (*pbcart.DeleteCartResp, error) {
+	var (
+		resp *pbcart.DeleteCartResp
+		err  error
+	)
+	err = s.trackConnection(func() error {
+		r, e := s.CartServiceServer.DeleteCart(ctx, req)
 		resp = r
 		return e
 	})
@@ -73,7 +86,7 @@ func (s *CartServerWrapper) EmptyCart(ctx context.Context, req *pbcart.EmptyCart
 		err  error
 	)
 	err = s.trackConnection(func() error {
-		r, e := s.server.EmptyCart(ctx, req)
+		r, e := s.CartServiceServer.EmptyCart(ctx, req)
 		resp = r
 		return e
 	})
@@ -125,7 +138,6 @@ func main() {
 			return &CartServerWrapper{
 				instanceID:  instanceID,
 				etcdService: etcdSvc,
-				server:      &CartServiceServer{},
 			}
 		},
 	)

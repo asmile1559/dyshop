@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/gin-gonic/gin"
@@ -11,9 +12,9 @@ type ListProductService struct {
 	Ctx context.Context
 }
 
-func init() {
-	rpcclient.InitRPCClient()
-}
+//	func init() {
+//		rpcclient.InitRPCClient()
+//	}
 func NewListProductService(c context.Context) *ListProductService {
 	return &ListProductService{
 		Ctx: c,

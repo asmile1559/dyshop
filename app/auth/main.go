@@ -1,10 +1,10 @@
 package main
 
 import (
-
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
 	"github.com/asmile1559/dyshop/utils/hookx"
-	 "github.com/asmile1559/dyshop/utils/mtl"
+	"github.com/asmile1559/dyshop/utils/mtl"
+
 	"github.com/asmile1559/dyshop/utils/registryx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -64,11 +64,3 @@ func main() {
 		},
 	)
 }
-
-/* func initCasbin(modelConf, policyConf string) error {
-	err := casbin.InitEnforcer(modelConf, policyConf)
-	if err != nil {
-		return err
-	}
-	return nil
-} */
