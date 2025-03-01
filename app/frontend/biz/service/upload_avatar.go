@@ -19,8 +19,9 @@ func NewUploadAvatarService(c context.Context) *UploadAvatarService {
 func (s *UploadAvatarService) Run(req *user_page.UploadAvatarReq) (map[string]interface{}, error) {
 	// 调用 user 微服务的更新接口
 	resp, err := rpcclient.UserClient.UploadAvatar(s.ctx, &pbuser.UploadAvatarReq{
-		UserId: req.UserId,
-		Url:    req.Url,
+		UserId:    req.UserId,
+		Filename:  req.Filename,
+		ImageData: req.ImageData,
 	})
 	if err != nil {
 		return nil, err

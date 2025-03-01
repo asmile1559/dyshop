@@ -34,10 +34,6 @@ func CreateUser(user *model.User) error {
 	return nil
 }
 
-func UpdateUserEmailAndPassword(user *model.User) error {
-    return db.Model(user).Select("email", "password").Updates(user).Error
-}
-
 // UpdateUser 更新用户信息
 func UpdateUser(user *model.User) error {
 	return db.Save(user).Error

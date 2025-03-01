@@ -3,6 +3,7 @@ package service
 import (
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
+	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/pb/frontend/home_page"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -36,27 +37,18 @@ func (s *VerifyHomepageStatusService) Run(req *home_page.VerifyHomepageStatusReq
 			},
 		}
 	}
-	//userInfoResp, err := rpcclient.UserClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{UserId: verifyTokenResp.GetUserId()})
-	//if err != nil {
-	//	logrus.Error(err)
-	//	return nil
-	//}
-
-	//return gin.H{
-	//	"resp": gin.H{
-	//		"ok":   verifyTokenResp.GetRes(),
-	//		"Id":   verifyTokenResp.GetUserId(),
-	//		"Name": userInfoResp.GetUserId(),
-	//		"Img":  "/static/src/user/snake.svg",
-	//	},
-	//}
+	userInfoResp, err := rpcclient.UserClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{UserId: verifyTokenResp.GetUserId()})
+	if err != nil {
+		logrus.Error(err)
+		return nil
+	}
 
 	return gin.H{
 		"resp": gin.H{
 			"ok":   verifyTokenResp.GetRes(),
 			"Id":   verifyTokenResp.GetUserId(),
-			"Name": "lixiaoming",
-			"Img":  "/static/src/user/snake.svg",
+			"Name": userInfoResp.GetName(),
+			"Img":  userInfoResp.GetUrl(),
 		},
 	}
 }

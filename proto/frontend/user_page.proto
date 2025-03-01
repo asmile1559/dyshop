@@ -69,7 +69,8 @@ message UpdateUserInfoResp {
 // -------------------- 上传用户头像 -------------------- //
 message UploadAvatarReq {
     int64 user_id = 1;
-    string url = 2;  // 头像url(未格式化)
+    string filename = 2;
+    bytes image_data = 3;  // **整个图片数据**
 }
 
 message UploadAvatarResp {

@@ -30,8 +30,4 @@ func (s *RegisterService) Run(req *user_page.RegisterReq) (map[string]interface{
 	return gin.H{
 		"resp": resp,
 	}, nil
-
-	//return gin.H{
-	//	"status": "register ok!",
-	//}, nil
 }

@@ -1,8 +1,7 @@
 package user
 
 import (
-	"fmt"
-	"os"
+	"io"
 
 	"github.com/asmile1559/dyshop/app/frontend/biz/model"
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
@@ -328,7 +327,7 @@ func UploadAvatar(c *gin.Context) {
 	var req user_page.UploadAvatarReq
 
 	if userId, ok := c.Get("user_id"); ok {
-		file, err := c.FormFile("Img")
+		fileHeader, err := c.FormFile("Img")
 		if err != nil {
 			logrus.WithError(err)
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -339,36 +338,48 @@ func UploadAvatar(c *gin.Context) {
 			return
 		}
 
-		fileDir := fmt.Sprintf("/static/src/user/%v/", userId)
-		saveDir := "." + fileDir
-		if _, err := os.Stat(saveDir); os.IsNotExist(err) {
-			err = os.Mkdir(saveDir, 0755)
-			if err != nil {
-				logrus.Error(err)
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"code":    http.StatusInternalServerError,
-					"message": "something went wrong, please try it later.",
-					"error":   err.Error(),
-				})
-				return
-			}
+		// **文件大小检查（如果超过 4MB，返回错误）**
+		const maxFileSize = 4 * 1024 * 1024 // 4MB
+		if fileHeader.Size > maxFileSize {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "File size exceeds 4MB limit",
+				"error": "File size exceeds 4MB limit",
+			})
+			return
 		}
+		// 打开文件
+		file, err := fileHeader.Open()
+		if err != nil {
+			logrus.WithError(err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "upload file error.",
+				"error":   err.Error(),
+			})
+			return
+		}
+		defer file.Close()
 
-		//filePath := fileDir + file.Filename
-		savePath := saveDir + file.Filename
-		if err = c.SaveUploadedFile(file, savePath); err != nil {
-			logrus.Error(err)
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"code":    http.StatusInternalServerError,
-				"message": "something went wrong, please try it later.",
+		
+
+		// 读取整个文件
+		imageData, err := io.ReadAll(file)
+		if err != nil {
+			logrus.WithError(err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": "read file error.",
 				"error":   err.Error(),
 			})
 			return
 		}
 
+		// 发送请求
 		req = user_page.UploadAvatarReq{
-			UserId: userId.(int64),
-			Url:    savePath,
+			UserId:    userId.(int64),
+			Filename:  fileHeader.Filename,
+			ImageData: imageData, // **一次性发送完整数据**
 		}
 		resp, err := service.NewUploadAvatarService(c).Run(&req)
 
