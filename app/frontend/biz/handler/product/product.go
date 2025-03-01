@@ -111,7 +111,7 @@ func SearchProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	c.HTML(http.StatusOK, "search.html", resp)
 }
 
 func ListProduct(c *gin.Context) {
