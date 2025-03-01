@@ -1455,6 +1455,7 @@ func registerExampleRouter(e *gin.Engine) {
 				"CurPage":   curPage,
 				"pageSize":  pgSize,
 				"TotalPage": totalPage,
+    "Category":  category,
 			}
 			fmt.Println(kw)
 			c.HTML(http.StatusOK, "search.html", &resp)
