@@ -10,8 +10,10 @@ func Register(e *gin.Engine) {
 	{
 		_cart := root.Group("/cart", _cartMw()...)
 		// TODO: cart front page
-		//_cart.GET("/", )
+		_cart.GET("/", append(_getCartMw(), c.GetCart)...)
 		_cart.POST("/add", append(_addCartMw(), c.AddItem)...)
-		_cart.GET("/empty", append(_emptyCartMw(), c.EmptyCart)...)
+		_cart.POST("/empty", append(_emptyCartMw(), c.EmptyCart)...)
+		_cart.POST("/delete", append(_deleteCartMw(), c.DeleteCart)...)
+		// TODO: cart checkout page
 	}
 }
