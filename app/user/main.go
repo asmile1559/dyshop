@@ -1,16 +1,15 @@
 package main
 
 import (
-	"net/http"
+	"github.com/gin-gonic/gin"
+	"net"
 
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
 	"github.com/asmile1559/dyshop/app/user/biz/model"
+	"github.com/asmile1559/dyshop/app/user/utils"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/utils/db/mysqlx"
 	"github.com/asmile1559/dyshop/utils/hookx"
-	"github.com/gin-gonic/gin"
-
-	//"google.golang.org/grpc"
 	"github.com/asmile1559/dyshop/app/user/utils/snowflake"
 
 	"github.com/asmile1559/dyshop/utils/mtl"
@@ -41,6 +40,17 @@ func main() {
 		router := gin.Default()
 
 		router.StaticFS("/static", http.Dir("./static"))
+
+		err := router.Run(":12167")
+		if err != nil {
+			return
+		}
+	}()
+
+	go func() {
+		router := gin.Default()
+
+		router.StaticFS("/static", http.Dir("/static"))
 
 		err := router.Run(":12167")
 		if err != nil {
