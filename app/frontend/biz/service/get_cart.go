@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	"github.com/asmile1559/dyshop/pb/frontend/cart_page"
@@ -23,10 +24,14 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) (map[string]interface{}, e
 		return nil, errors.New("no user id")
 	}
 
-	resp, err := rpcclient.CartClient.GetCart(s.ctx, &pbcart.GetCartReq{
+	cartClient, conn, err := rpcclient.GetCartClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := cartClient.GetCart(s.ctx, &pbcart.GetCartReq{
 		UserId: id,
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +39,4 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) (map[string]interface{}, e
 	return gin.H{
 		"resp": resp,
 	}, nil
-
-	//return gin.H{
-	//	"status": "get_cart ok",
-	//}, nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/pb/frontend/user_page"
@@ -17,7 +18,12 @@ func NewLoginService(c context.Context) *LoginService {
 }
 
 func (s *LoginService) Run(req *user_page.LoginReq) (map[string]interface{}, error) {
-	resp, err := rpcclient.UserClient.Login(s.ctx, &pbuser.LoginReq{
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := userClient.Login(s.ctx, &pbuser.LoginReq{
 		Email:    req.Email,
 		Password: req.Password,
 	})

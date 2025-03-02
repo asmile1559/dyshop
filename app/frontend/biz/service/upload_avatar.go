@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/pb/frontend/user_page"
@@ -17,8 +18,12 @@ func NewUploadAvatarService(c context.Context) *UploadAvatarService {
 }
 
 func (s *UploadAvatarService) Run(req *user_page.UploadAvatarReq) (map[string]interface{}, error) {
-	// 调用 user 微服务的更新接口
-	resp, err := rpcclient.UserClient.UploadAvatar(s.ctx, &pbuser.UploadAvatarReq{
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := userClient.UploadAvatar(s.ctx, &pbuser.UploadAvatarReq{
 		UserId:    req.UserId,
 		Filename:  req.Filename,
 		ImageData: req.ImageData,
@@ -27,10 +32,8 @@ func (s *UploadAvatarService) Run(req *user_page.UploadAvatarReq) (map[string]in
 		return nil, err
 	}
 
-	// 如果更新成功，返回响应
 	return gin.H{
 		"user_id": resp.UserId,
 		"url":     resp.Url,
 	}, nil
-
 }
