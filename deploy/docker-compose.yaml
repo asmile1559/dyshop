@@ -81,6 +81,21 @@ services:
       - METRICS_HOST=cart
       - SERVICE_ID=cart-service-1
       - SERVICE_ADDRESS=cart:14166
+  product:
+    image: jiny14/dyshop-product:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+    volumes:
+      - ./logs/product:/app/logs
+    environment:
+      - LOG_LEVEL=info
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINTS=etcd:2379
+      - METRICS_HOST=product
+      - SERVICE_ID=product-service-1
+      - SERVICE_ADDRESS=product:13166
   frontend:
     image: jiny14/dyshop-frontend:latest
     depends_on:
@@ -88,7 +103,7 @@ services:
       - user
       - cart
       # - order
-      # - product
+      - product
       # - checkout
     ports:
       - "10166:10166"
