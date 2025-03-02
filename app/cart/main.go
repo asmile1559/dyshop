@@ -106,7 +106,7 @@ func main() {
 	logrus.Info("DB initialized successfully.")
 
 	// 获取 Etcd 配置
-	prefix := viper.GetString("etcd.prefix")
+	prefix := viper.GetString("etcd.prefix.this")
 	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
 
 	// 注册 Metrics

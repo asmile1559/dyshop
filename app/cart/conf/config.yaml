@@ -17,7 +17,8 @@ log:
 
 etcd:
   endpoints: "127.0.0.1:2379" # ENV ETCD_ENDPOINTS
-  prefix: "/services/cart"  # 服务注册前缀
+  prefix:
+    this: "/services/cart"  # 服务注册前缀
 
 service:
   id: "cart-service-1"     # 服务实例ID
