@@ -120,7 +120,8 @@ import * as common from './common.js'
         }).then(res => {
             if (res.data.code === 200) {
                 // cookies.set('token', res.data.token)
-                token = "Bearer " + res.data.token
+                console.log(res.data.token)
+                const token = "Bearer " + res.data.token
                 localStorage.setItem('token', token)
                 common.setCookie('token', token, 1)
                 modal.style.display = 'block'
