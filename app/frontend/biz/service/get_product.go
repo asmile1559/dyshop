@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/asmile1559/dyshop/pb/frontend/product_page"
@@ -17,7 +18,14 @@ func NewGetProductService(c context.Context) *GetProductService {
 }
 
 func (s *GetProductService) Run(req *product_page.GetProductReq) (map[string]interface{}, error) {
-	resp, err := rpcclient.ProductClient.GetProduct(s.ctx, &pbproduct.GetProductReq{Id: req.GetId()})
+	productClient, conn, err := rpcclient.GetProductClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := productClient.GetProduct(s.ctx, &pbproduct.GetProductReq{
+		Id: req.GetId(),
+	})
 	if err != nil {
 		return nil, err
 	}

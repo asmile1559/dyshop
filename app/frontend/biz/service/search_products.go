@@ -3,12 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/asmile1559/dyshop/pb/frontend/product_page"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 type SearchProductService struct {
@@ -50,7 +51,12 @@ func (s *SearchProductService) Run(req *product_page.SearchProductsReq) (gin.H, 
 	}
 
 	// 调用RPC服务
-	rpcResp, err := rpcclient.ProductClient.SearchProducts(s.ctx, rpcReq)
+	productClient, conn, err := rpcclient.GetProductClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	rpcResp, err := productClient.SearchProducts(s.ctx, rpcReq)
 	if err != nil {
 		return nil, errors.Wrap(err, "RPC call failed")
 	}

@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"testing"
+
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	"github.com/asmile1559/dyshop/app/product/biz/dal"
@@ -14,7 +16,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"testing"
 )
 
 func init() {
@@ -25,7 +26,7 @@ func init() {
 	}
 	dsn := viper.GetString("mysql.dsn")
 	print(dsn)
-	if err := dal.InitDB(dsn); err != nil {
+	if err := dal.InitDB(); err != nil {
 		logrus.Fatalf("failed to init db: %v", err)
 	}
 }
@@ -40,7 +41,7 @@ func loadConfig() error {
 func setupTestDB(t *testing.T) *gorm.DB {
 	dsn := viper.GetString("mysql.dsn")
 	print(dsn)
-	if err := dal.InitDB(dsn); err != nil {
+	if err := dal.InitDB(); err != nil {
 		logrus.Fatalf("failed to init db: %v", err)
 	}
 	return dal.DB.Begin()

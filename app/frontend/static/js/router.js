@@ -17,7 +17,6 @@ const OperationRouters = {
   "deleteProduct": "/product/delete/", // POST
   "getProduct": "/product/", // GET
   "buy": "/product/buy/", // POST
-  // "addToCart": "/example/product/add2cart/", // POST
   "addToCart": "/cart/add", // POST
   "getCart": "/cart/", // GET
   "deleteCartItem": "/cart/delete/", // POST
