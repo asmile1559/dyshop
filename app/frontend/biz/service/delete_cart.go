@@ -19,7 +19,7 @@ func NewDeleteCartService(c context.Context) *DeleteCartService {
 }
 
 func (s *DeleteCartService) Run(req *cart_page.DeleteCartReq) (map[string]interface{}, error) {
-	id, ok := s.ctx.Value("user_id").(uint32)
+	id, ok := s.ctx.Value("user_id").(int64)
 	if !ok {
 		return nil, errors.New("no user id in context")
 	}
@@ -40,7 +40,7 @@ func (s *DeleteCartService) Run(req *cart_page.DeleteCartReq) (map[string]interf
 	}
 
 	resp, err := cartClient.DeleteCart(s.ctx, &pbcart.DeleteCartReq{
-		UserId: id,
+		UserId: uint32(id),
 		Items:  items,
 	})
 	if err != nil {
