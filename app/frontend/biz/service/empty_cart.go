@@ -19,10 +19,9 @@ func NewEmptyCartService(c context.Context) *EmptyCartService {
 }
 
 func (s *EmptyCartService) Run(_ *cart_page.EmptyCartReq) (map[string]interface{}, error) {
-
 	id, ok := s.ctx.Value("user_id").(uint32)
 	if !ok {
-		return nil, errors.New("no user id")
+		return nil, errors.New("no user id in context")
 	}
 
 	cartClient, conn, err := rpcclient.GetCartClient()
@@ -30,7 +29,10 @@ func (s *EmptyCartService) Run(_ *cart_page.EmptyCartReq) (map[string]interface{
 		return nil, err
 	}
 	defer conn.Close()
-	resp, err := cartClient.EmptyCart(s.ctx, &pbcart.EmptyCartReq{UserId: id})
+
+	resp, err := cartClient.EmptyCart(s.ctx, &pbcart.EmptyCartReq{
+		UserId: id,
+	})
 	if err != nil {
 		return nil, err
 	}
