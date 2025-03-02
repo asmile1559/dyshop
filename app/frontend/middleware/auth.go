@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
 	"github.com/sirupsen/logrus"
@@ -42,7 +43,18 @@ func Auth() gin.HandlerFunc {
 			"method": method,
 			"uri":    uri,
 		}).Debug("auth middleware token")
-		resp, err := rpcclient.AuthClient.VerifyTokenByRPC(c, &pbauth.VerifyTokenReq{
+		authClient, conn, err := rpcclient.GetAuthClient()
+		if err != nil {
+			logrus.WithError(err).Debug("GetAuthClient err")
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": "Something went wrong. Please try again later",
+			})
+			c.Abort()
+			return
+		}
+		defer conn.Close()
+		resp, err := authClient.VerifyTokenByRPC(c, &pbauth.VerifyTokenReq{
 			Token:  token[1],
 			Method: method,
 			Uri:    uri,

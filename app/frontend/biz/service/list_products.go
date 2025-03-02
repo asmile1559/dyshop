@@ -12,9 +12,6 @@ type ListProductService struct {
 	Ctx context.Context
 }
 
-//	func init() {
-//		rpcclient.InitRPCClient()
-//	}
 func NewListProductService(c context.Context) *ListProductService {
 	return &ListProductService{
 		Ctx: c,
