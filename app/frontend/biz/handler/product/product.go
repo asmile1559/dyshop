@@ -216,19 +216,37 @@ func ModifyProduct(c *gin.Context) {
 		req1.ProductImg = filePath
 	}
 
-	if req1.ProductId == "0" {
-		req1.ProductId = "3"
-	}
 	// 绑定JSON请求体
 	if err := c.ShouldBindJSON(&req1); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
+
+	var price = req1.ProductSold
+	if specPrice, ok := req1.ProductParams[0]["SpecPrice"].(string); ok {
+		price, err := strconv.Atoi(specPrice)
+		if err != nil {
+			fmt.Println("转换价格出错:", err)
+		} else {
+			fmt.Println("转换后的价格:", price)
+		}
+	} else {
+		fmt.Println("SpecPrice 不是字符串类型")
+	}
+	float64Price, err := strconv.ParseFloat(price, 32)
+	if err != nil {
+		fmt.Println("转换错误:", err)
+		return
+	}
+	// 把 float64 转换为 float32
+	float32Price := float32(float64Price)
+	id, _ := strconv.Atoi(req1.ProductId)
+	req.Id = uint32(id)
 	req.Name = &req1.ProductName
 	req.Description = &req1.ProductDesc
 	req.Categories = req1.ProductCategories
 	req.Picture = &req1.ProductImg
-	req.Price = nil
+	req.Price = &float32Price
 	// 调用服务层
 	_, err = service.NewModifyProductService(c.Request.Context()).Run(&req)
 	if err != nil {

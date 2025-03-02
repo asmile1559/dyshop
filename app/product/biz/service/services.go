@@ -83,6 +83,7 @@ func (s *ModifyProductService) Run(req *pbproduct.ModifyProductReq) (*pbproduct.
 		return nil, status.Error(codes.Internal, "database error")
 	}
 	newProduct := &model.Product{
+		ID:          uint(req.GetId()),
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
 		Picture:     req.GetPicture(),

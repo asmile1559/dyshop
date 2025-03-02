@@ -91,7 +91,7 @@ func (s *SearchProductService) Run(req *product_page.SearchProductsReq) (gin.H, 
 
 // 示例辅助函数（需要根据项目实际实现）
 func getPageRouter() string {
-	return "/example/search"
+	return "/search"
 }
 
 func getUserName(ctx context.Context) string {

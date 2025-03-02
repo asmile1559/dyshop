@@ -72,21 +72,15 @@ func CreateOrUpdateProduct(tx *gorm.DB, product *Product) error {
 	}
 	return tx.Transaction(func(tx *gorm.DB) error {
 
-		// 尝试查找现有产品
-		var existingProduct Product
-		err := tx.Where("id = ?", product.ID).First(&existingProduct).Error
-
 		// 处理查找结果
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if product.ID == 0 {
 			// 创建新记录
 			if err := tx.Create(product).Error; err != nil {
 				return err
 			}
-		} else if err != nil {
-			return err
 		} else {
 			// 更新现有记录（保留原始创建时间）
-			product.CreatedAt = existingProduct.CreatedAt
+
 			if err := tx.Save(product).Error; err != nil {
 				return err
 			}
