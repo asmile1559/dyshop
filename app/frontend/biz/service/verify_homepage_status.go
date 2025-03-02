@@ -19,7 +19,17 @@ func NewVerifyHomepageStatus(c context.Context) *VerifyHomepageStatusService {
 }
 
 func (s *VerifyHomepageStatusService) Run(req *home_page.VerifyHomepageStatusReq) gin.H {
-	verifyTokenResp, err := rpcclient.AuthClient.VerifyTokenByRPC(s.ctx, &pbauth.VerifyTokenReq{
+	authClient, conn, err := rpcclient.GetAuthClient()
+	if err != nil {
+		logrus.WithError(err).Debug("GetAuthClient err")
+		return gin.H{
+			"resp": gin.H{
+				"ok": false,
+			},
+		}
+	}
+	defer conn.Close()
+	verifyTokenResp, err := authClient.VerifyTokenByRPC(s.ctx, &pbauth.VerifyTokenReq{
 		Token:  req.GetToken(),
 		Method: "POST",
 		Uri:    "/",

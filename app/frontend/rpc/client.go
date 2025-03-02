@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"strings"
+
 	auth "github.com/asmile1559/dyshop/pb/backend/auth"
 	cart "github.com/asmile1559/dyshop/pb/backend/cart"
 	checkout "github.com/asmile1559/dyshop/pb/backend/checkout"
@@ -26,8 +28,6 @@ var (
 )
 
 func InitRPCClient() {
-	initAuthRPCClient()
-
 	initCartRPCClient()
 
 	initCheckoutRPCClient()
@@ -41,20 +41,30 @@ func InitRPCClient() {
 	initUserRPCClient()
 }
 
-func initAuthRPCClient() {
-	// cc, _ := grpc.NewClient(":11166", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// AuthClient = auth.NewAuthServiceClient(cc)
-	var err error
-	AuthClient, _, err = registryx.DiscoverEtcdServices(viper.GetStringSlice("etcd.endpoints"), viper.GetString("etcd.prefix.auth"), auth.NewAuthServiceClient)
+func GetAuthClient() (auth.AuthServiceClient, *grpc.ClientConn, error) {
+	client, conn, err := registryx.DiscoverEtcdServices(
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		viper.GetString("etcd.prefix.auth"),
+		auth.NewAuthServiceClient,
+	)
 	if err != nil {
 		logrus.Fatalf("Failed to discover service: %v", err)
+		return nil, nil, err
 	}
+	return client, conn, nil
 }
 
 func initUserRPCClient() {
 	// target need to get from register center
-	cc, _ := grpc.NewClient(":12166", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	UserClient = user.NewUserServiceClient(cc)
+	client, _, err := registryx.DiscoverEtcdServices(
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		viper.GetString("etcd.prefix.user"),
+		user.NewUserServiceClient,
+	)
+	if err != nil {
+		logrus.Fatalf("Failed to discover service: %v", err)
+	}
+	UserClient = client
 }
 
 func initProductRPCClient() {
@@ -65,15 +75,15 @@ func initProductRPCClient() {
 
 func initCartRPCClient() {
 	// target need to get from register center
-	// cc, _ := grpc.NewClient(":14166", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	// CartClient = cart.NewCartServiceClient(cc)
-	// TODO: conn close when exit
-	var err error
-	CartClient, _, err = registryx.DiscoverEtcdServices(viper.GetStringSlice("etcd.endpoints"), viper.GetString("etcd.prefix.cart"), cart.NewCartServiceClient)
+	client, _, err := registryx.DiscoverEtcdServices(
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		viper.GetString("etcd.prefix.cart"),
+		cart.NewCartServiceClient,
+	)
 	if err != nil {
 		logrus.Fatalf("Failed to discover service: %v", err)
 	}
-
+	CartClient = client
 }
 
 func initOrderRPCClient() {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -105,7 +106,6 @@ func main() {
 	logrus.Info("DB initialized successfully.")
 
 	// 获取 Etcd 配置
-	endpoint := viper.GetString("etcd.endpoint")
 	prefix := viper.GetString("etcd.prefix")
 	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
 
@@ -127,7 +127,7 @@ func main() {
 	// 注册服务实例到 etcd
 	services := map[string]any{"id": serviceId, "address": serviceAddr}
 	registryx.StartEtcdServices(
-		[]string{endpoint},
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
 		[]any{services},
 		prefix,
 		pbcart.RegisterCartServiceServer,
