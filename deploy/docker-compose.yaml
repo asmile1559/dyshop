@@ -22,7 +22,7 @@ services:
       - etcd
     environment:
       - LOG_LEVEL=info
-      - ETCD_ENDPOINT=etcd:2379
+      - ETCD_ENDPOINTS=etcd:2379
       - SERVICE_ID=prometheus-service-1
       - SERVICE_ADDRESS=prometheus:9091
     volumes:
@@ -50,7 +50,7 @@ services:
     environment:
       - LOG_LEVEL=info
       - DATABASE_HOST=mysql
-      - ETCD_ENDPOINT=etcd:2379
+      - ETCD_ENDPOINTS=etcd:2379
       - METRICS_HOST=user
       - SERVICE_ID=user-service-1
       - SERVICE_ADDRESS=user:12166
@@ -65,7 +65,7 @@ services:
     environment:
       - LOG_LEVEL=info
       - DATABASE_HOST=mysql
-      - ETCD_ENDPOINT=etcd:2379
+      - ETCD_ENDPOINTS=etcd:2379
       - METRICS_HOST=cart
       - SERVICE_ID=cart-service-1
       - SERVICE_ADDRESS=cart:14166

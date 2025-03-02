@@ -16,7 +16,7 @@ log:
   level: debug
 
 etcd:
-  endpoint: "127.0.0.1:2379" # ENV ETCD_ENDPOINTS
+  endpoints: "127.0.0.1:2379" # ENV ETCD_ENDPOINTS
   prefix: "/services/cart"  # 服务注册前缀
 
 service:

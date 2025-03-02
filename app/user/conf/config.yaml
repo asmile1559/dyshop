@@ -29,7 +29,7 @@ log:
   maxbackups: 10
 
 etcd:
-  endpoint: "127.0.0.1:2379" # ENV ETCD_ENDPOINT
+  endpoints: "127.0.0.1:2379" # ENV ETCD_ENDPOINT
   prefix: 
     this: "/services/user"
     auth: "/services/auth"
