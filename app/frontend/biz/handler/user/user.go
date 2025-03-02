@@ -52,7 +52,7 @@ func Register(c *gin.Context) {
 	_, err = service.NewRegisterService(c).Run(&req)
 
 	if err != nil {
-		logrus.WithError(err)
+		logrus.WithError(err).Error("register error")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": err.Error(),
@@ -344,7 +344,7 @@ func UploadAvatar(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"code":    http.StatusBadRequest,
 				"message": "File size exceeds 4MB limit",
-				"error": "File size exceeds 4MB limit",
+				"error":   "File size exceeds 4MB limit",
 			})
 			return
 		}
@@ -360,8 +360,6 @@ func UploadAvatar(c *gin.Context) {
 			return
 		}
 		defer file.Close()
-
-		
 
 		// 读取整个文件
 		imageData, err := io.ReadAll(file)
