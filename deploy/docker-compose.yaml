@@ -109,6 +109,7 @@ services:
       - "10166:10166"
     volumes:
       - ./logs/frontend:/app/logs
+      - ../app/frontend:/app
     environment:
       - LOG_LEVEL=info
       - ETCD_ENDPOINTS=etcd:2379
