@@ -61,9 +61,9 @@ func (s *GetProductService) Run(req *product_page.GetProductReq) (map[string]int
 			"ProductName": resp.Product.Name,
 			"ProductDesc": resp.Product.Description,
 			"ProductSpecs": []gin.H{
-				{"SpecName": "500g装", "SpecPrice": resp.Product.Price, "SpecStock": "120"},
-				{"SpecName": "1000g装", "SpecPrice": resp.Product.Price, "SpecStock": "130"},
-				{"SpecName": "2000g装", "SpecPrice": resp.Product.Price, "SpecStock": "140"},
+				{"SpecName": resp.Product.Name, "SpecPrice": resp.Product.Price, "SpecStock": "120"},
+				{"SpecName": resp.Product.Name, "SpecPrice": resp.Product.Price, "SpecStock": "130"},
+				{"SpecName": resp.Product.Name, "SpecPrice": resp.Product.Price, "SpecStock": "140"},
 			},
 			"ProductCategories": resp.Product.Categories,
 			"ProductParams": []gin.H{
