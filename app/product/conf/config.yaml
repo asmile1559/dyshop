@@ -1,5 +1,6 @@
 server:
     port: 13166
+
 database:
     driver: mysql
     host: "127.0.0.1"
@@ -11,12 +12,15 @@ database:
     max_open_conns: 100
     conn_max_lifetime: 3600
 
+log:
+  level: debug  # ENV LOG_LEVEL
+
 etcd:
     endpoints: "127.0.0.1:2379" # Etcd 节点地址
     prefix: 
         this: "/services/product" # 服务注册前缀
 
-services:
+service:
     id: "prodcut-service-1" # 服务实例ID
     address: "127.0.0.1:13166" # 服务实例地址
 
