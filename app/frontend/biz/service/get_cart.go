@@ -19,7 +19,7 @@ func NewGetCartService(c context.Context) *GetCartService {
 }
 
 func (s *GetCartService) Run(_ *cart_page.GetCartReq) (map[string]interface{}, error) {
-	id, ok := s.ctx.Value("user_id").(uint32)
+	id, ok := s.ctx.Value("user_id").(int64)
 	if !ok {
 		return nil, errors.New("no user id in context")
 	}
@@ -31,7 +31,7 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) (map[string]interface{}, e
 	defer conn.Close()
 
 	resp, err := cartClient.GetCart(s.ctx, &pbcart.GetCartReq{
-		UserId: id,
+		UserId: uint32(id),
 	})
 	if err != nil {
 		return nil, err

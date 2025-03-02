@@ -126,7 +126,7 @@ func DeleteCart(c *gin.Context) {
 	}
 
 	req := struct {
-		ItemIds []int32 `json:"item_ids"`
+		ItemIds []uint32 `json:"item_ids"`
 	}{}
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -142,7 +142,7 @@ func DeleteCart(c *gin.Context) {
 		ItemIds: make([]uint32, 0, len(req.ItemIds)),
 	}
 	for _, id := range req.ItemIds {
-		reqGrpc.ItemIds = append(reqGrpc.ItemIds, uint32(id))
+		reqGrpc.ItemIds = append(reqGrpc.ItemIds, id)
 	}
 
 	resp, err := service.NewDeleteCartService(c).Run(&reqGrpc)
