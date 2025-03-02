@@ -1,13 +1,13 @@
 package service
 
 import (
+	"context"
 	"errors"
 
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	"github.com/asmile1559/dyshop/pb/frontend/cart_page"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/context"
 )
 
 type GetCartService struct {
@@ -21,7 +21,7 @@ func NewGetCartService(c context.Context) *GetCartService {
 func (s *GetCartService) Run(_ *cart_page.GetCartReq) (map[string]interface{}, error) {
 	id, ok := s.ctx.Value("user_id").(uint32)
 	if !ok {
-		return nil, errors.New("no user id")
+		return nil, errors.New("no user id in context")
 	}
 
 	cartClient, conn, err := rpcclient.GetCartClient()
@@ -29,6 +29,7 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) (map[string]interface{}, e
 		return nil, err
 	}
 	defer conn.Close()
+
 	resp, err := cartClient.GetCart(s.ctx, &pbcart.GetCartReq{
 		UserId: id,
 	})
