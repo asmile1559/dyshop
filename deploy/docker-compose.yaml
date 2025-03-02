@@ -15,7 +15,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
   prometheus:
-    image: jiny14/mypromethues:latest
+    image: jiny14/dyshop-prometheus:latest
     depends_on:
       - etcd
     environment:
@@ -59,6 +59,8 @@ services:
       - auth
     volumes:
       - ./logs/user:/app/logs
+    ports:
+      - "12167:12167"
     environment:
       - LOG_LEVEL=info
       - DATABASE_HOST=mysql
@@ -109,7 +111,7 @@ services:
       - "10166:10166"
     volumes:
       - ./logs/frontend:/app/logs
-      - /home/virsh/dyshop/app/frontend:/app
+      - ../app/frontend:/app
     environment:
       - LOG_LEVEL=info
       - ETCD_ENDPOINTS=etcd:2379

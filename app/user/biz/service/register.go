@@ -28,7 +28,7 @@ func (s *RegisterService) Run(req *pbuser.RegisterReq) (*pbuser.RegisterResp, er
 	// 1. 检查邮箱是否已注册
 	existingUser, err := mysql.GetUserByEmail(req.Email)
 	if err == nil && existingUser != nil {
-		logrus.WithField("register_email",req.Email).Error("邮箱已被注册")
+		logrus.WithField("register_email", req.Email).Error("邮箱已被注册")
 		return nil, fmt.Errorf("邮箱已被注册")
 	}
 
@@ -41,14 +41,14 @@ func (s *RegisterService) Run(req *pbuser.RegisterReq) (*pbuser.RegisterResp, er
 
 	// 3. 存储用户信息到数据库
 	userID := snowflake.GenID()
-	defaultBirthday,_:= time.Parse("2006年1月2日","2006年1月2日")
+	defaultBirthday, _ := time.Parse("2006年1月2日", "2006年1月2日")
 	newUser := &model.User{
 		UserID:   userID,
 		Email:    req.Email,
 		Password: hashedPassword,
 		Name:     "default",
 		Sign:     "该用户未写签名",
-		Url:      "/static/src/user/snake.svg",
+		Url:      "/static/src/user/default.svg",
 		Role:     "role",
 		Gender:   "notshow",
 		Birthday: defaultBirthday,
