@@ -156,7 +156,7 @@ function checkout() {
   }
 
   items.forEach((item) => {
-    const itemId = item.dataset['itemId']
+    const itemId = Number(item.dataset['itemId'])
     data.cart_items.push(getCartItemInfo(itemId))
   })
 
@@ -187,7 +187,7 @@ function checkout() {
     const items = document.querySelectorAll('.cart-item input[type=checkbox][data-role="choose"]:checked')
     const itemIds = []
     items.forEach((item) => {
-      itemIds.push(item.dataset['itemId'])
+      itemIds.push(Number(item.dataset['itemId']))
     })
     console.log(itemIds)
     axios({
@@ -215,7 +215,7 @@ function checkout() {
         method: 'post',
         url: router.OperationRouters['deleteCartItem'],
         data: {
-          item_ids: [itemId]
+          item_ids: [Number(itemId)]
         }
       }).then((res) => {
         console.log(res)
