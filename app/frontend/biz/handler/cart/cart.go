@@ -99,18 +99,19 @@ func GetCart(c *gin.Context) {
 
 	reqGrpc := cart_page.GetCartReq{}
 
-	resp, err := service.NewGetCartService(c).Run(&reqGrpc)
+	resp, userinfo, err := service.NewGetCartService(c).Run(&reqGrpc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Get cart success",
-		"resp": gin.H{
-			"user_id": userId,
-			"content": resp,
+	c.HTML(http.StatusOK, "cart.html", gin.H{
+		"PageRouter": PageRouter,
+		"UserInfo": gin.H{
+			"UserId": userId,
+			"Name":   userinfo["Name"],
 		},
+		"CartItems": resp,
 	})
 }
 
@@ -141,9 +142,7 @@ func DeleteCart(c *gin.Context) {
 	reqGrpc := cart_page.DeleteCartReq{
 		ItemIds: make([]uint32, 0, len(req.ItemIds)),
 	}
-	for _, id := range req.ItemIds {
-		reqGrpc.ItemIds = append(reqGrpc.ItemIds, id)
-	}
+	reqGrpc.ItemIds = append(reqGrpc.ItemIds, req.ItemIds...)
 
 	resp, err := service.NewDeleteCartService(c).Run(&reqGrpc)
 	if err != nil {
