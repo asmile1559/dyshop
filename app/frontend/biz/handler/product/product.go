@@ -18,7 +18,7 @@ import (
 func GetProduct(c *gin.Context) {
 	var err error
 	var req product_page.GetProductReq
-	userId, _ := c.Get("user_id")
+	//userId, _ := c.Get("user_id")
 	productId := c.Query("product_id")
 
 	if productId == "" {
@@ -40,18 +40,7 @@ func GetProduct(c *gin.Context) {
 		return
 	}
 
-	resp1 := gin.H{
-		"PageRouter": PageRouter,
-		"UserInfo": gin.H{
-			"Id":   userId,
-			"Name": "lixiaoming",
-			"Sign": "许仙给老婆买了一顶帽子，白娘子戴上之后就死了，因为那是顶鸭（压）舌（蛇）帽。",
-			"Img":  "/static/src/user/snake.svg",
-			"Role": []string{"user", "merchant"},
-		},
-		"Products": []gin.H{resp},
-	}
-	c.HTML(http.StatusOK, "product-page.html", resp1)
+	c.HTML(http.StatusOK, "product-page.html", resp)
 }
 
 func SearchProduct(c *gin.Context) {
@@ -209,19 +198,37 @@ func ModifyProduct(c *gin.Context) {
 		req1.ProductImg = filePath
 	}
 
-	if req1.ProductId == "0" {
-		req1.ProductId = "3"
-	}
 	// 绑定JSON请求体
 	if err := c.ShouldBindJSON(&req1); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
+
+	var price = req1.ProductSold
+	if specPrice, ok := req1.ProductParams[0]["SpecPrice"].(string); ok {
+		price, err := strconv.Atoi(specPrice)
+		if err != nil {
+			fmt.Println("转换价格出错:", err)
+		} else {
+			fmt.Println("转换后的价格:", price)
+		}
+	} else {
+		fmt.Println("SpecPrice 不是字符串类型")
+	}
+	float64Price, err := strconv.ParseFloat(price, 32)
+	if err != nil {
+		fmt.Println("转换错误:", err)
+		return
+	}
+	// 把 float64 转换为 float32
+	float32Price := float32(float64Price)
+	id, _ := strconv.Atoi(req1.ProductId)
+	req.Id = uint32(id)
 	req.Name = &req1.ProductName
 	req.Description = &req1.ProductDesc
 	req.Categories = req1.ProductCategories
 	req.Picture = &req1.ProductImg
-	req.Price = nil
+	req.Price = &float32Price
 	// 调用服务层
 	_, err = service.NewModifyProductService(c.Request.Context()).Run(&req)
 	if err != nil {
