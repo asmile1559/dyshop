@@ -19,8 +19,12 @@ func NewListProductService(c context.Context) *ListProductService {
 }
 
 func (s *ListProductService) Run(req *pbproduct.ListProductsReq) (map[string]interface{}, error) {
-	print("调用服务list_product")
-	resp, err := rpcclient.ProductClient.ListProducts(s.Ctx, &pbproduct.ListProductsReq{
+	productClient, conn, err := rpcclient.GetProductClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := productClient.ListProducts(s.Ctx, &pbproduct.ListProductsReq{
 		Page:         req.Page,
 		PageSize:     req.GetPageSize(),
 		CategoryName: req.GetCategoryName(),

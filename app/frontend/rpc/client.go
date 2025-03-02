@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	ProductClient  product.ProductCatalogServiceClient
+	// ProductClient  product.ProductCatalogServiceClient
 	OrderClient    order.OrderServiceClient
 	CheckoutClient checkout.CheckoutServiceClient
 	PaymentClient  payment.PaymentServiceClient
@@ -30,8 +30,6 @@ func InitRPCClient() {
 	initOrderRPCClient()
 
 	initPaymentRPCClient()
-
-	initProductRPCClient()
 }
 
 func GetAuthClient() (auth.AuthServiceClient, *grpc.ClientConn, error) {
@@ -73,10 +71,17 @@ func GetCartClient() (cart.CartServiceClient, *grpc.ClientConn, error) {
 	return client, conn, nil
 }
 
-func initProductRPCClient() {
-	// target need to get from register center
-	cc, _ := grpc.NewClient(":13166", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	ProductClient = product.NewProductCatalogServiceClient(cc)
+func GetProductClient() (product.ProductCatalogServiceClient, *grpc.ClientConn, error) {
+	client, conn, err := registryx.DiscoverEtcdServices(
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		viper.GetString("etcd.prefix.product"),
+		product.NewProductCatalogServiceClient,
+	)
+	if err != nil {
+		logrus.WithField("app", "product").WithError(err).Fatal("Failed to discover service")
+		return nil, nil, err
+	}
+	return client, conn, nil
 }
 
 func initOrderRPCClient() {
