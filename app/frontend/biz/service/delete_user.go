@@ -20,14 +20,18 @@ func NewDeleteUserService(c context.Context) *DeleteUserService {
 }
 
 func (s *DeleteUserService) Run(req *user_page.DeleteUserReq) (map[string]interface{}, error) {
-   
-	_, err := rpcclient.UserClient.DeleteUser(s.ctx, &pbuser.DeleteUserReq{
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	_, err = userClient.DeleteUser(s.ctx, &pbuser.DeleteUserReq{
 		UserId: req.UserId,
-	})  
-    if err != nil {
-        return nil, err
-    }
+	})
+	if err != nil {
+		return nil, err
+	}
 
-    return gin.H{}, nil
+	return gin.H{}, nil
 
 }

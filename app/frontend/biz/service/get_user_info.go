@@ -21,15 +21,19 @@ func NewGetUserInfoService(c context.Context) *GetUserInfoService {
 }
 
 func (s *GetUserInfoService) Run(req *user_page.GetUserInfoReq) (map[string]interface{}, error) {
-
-	resp, err := rpcclient.UserClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := userClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{
 		UserId: req.UserId,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	birthday,_:=time.Parse("2006年1月2日", resp.Birthday)
+	birthday, _ := time.Parse("2006年1月2日", resp.Birthday)
 	return gin.H{
 		"Id":       resp.UserId,
 		"Name":     resp.Name,
@@ -39,5 +43,4 @@ func (s *GetUserInfoService) Run(req *user_page.GetUserInfoReq) (map[string]inte
 		"Gender":   resp.Gender,
 		"Birthday": birthday,
 	}, nil
-
 }

@@ -24,7 +24,12 @@ func (s *DeleteCartService) Run(_ *cart_page.DeleteCartReq) (map[string]interfac
 		return nil, errors.New("no user id")
 	}
 
-	resp, err := rpcclient.CartClient.DeleteCart(s.ctx, &pbcart.DeleteCartReq{UserId: id})
+	cartClient, conn, err := rpcclient.GetCartClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := cartClient.DeleteCart(s.ctx, &pbcart.DeleteCartReq{UserId: id})
 	if err != nil {
 		return nil, err
 	}

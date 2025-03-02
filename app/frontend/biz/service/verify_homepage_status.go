@@ -34,7 +34,6 @@ func (s *VerifyHomepageStatusService) Run(req *home_page.VerifyHomepageStatusReq
 		Method: "POST",
 		Uri:    "/",
 	})
-
 	if err != nil {
 		logrus.Error(err)
 		return nil
@@ -47,7 +46,16 @@ func (s *VerifyHomepageStatusService) Run(req *home_page.VerifyHomepageStatusReq
 			},
 		}
 	}
-	userInfoResp, err := rpcclient.UserClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{UserId: verifyTokenResp.GetUserId()})
+
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		logrus.WithError(err).Error("rpcclient.GetUserClient fail")
+		return nil
+	}
+	defer conn.Close()
+	userInfoResp, err := userClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{
+		UserId: verifyTokenResp.GetUserId(),
+	})
 	if err != nil {
 		logrus.Error(err)
 		return nil
