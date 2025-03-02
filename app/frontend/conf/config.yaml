@@ -27,9 +27,9 @@ log:
   maxbackups: 10
 
 etcd:
-  endpoints:
-    - "127.0.0.1:2379" # Etcd 节点地址
-  prefix: 
-    auth: "/services/auth" # 服务注册前缀
+  endpoints: "127.0.0.1:2379" # Etcd 节点地址
+  prefix:
+    auth: "/services/auth"
+    user: "/services/user"
     cart: "/services/cart"
-    
+    product: "/services/product"

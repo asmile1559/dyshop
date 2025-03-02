@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"strings"
+
 	auth "github.com/asmile1559/dyshop/pb/backend/auth"
 	cart "github.com/asmile1559/dyshop/pb/backend/cart"
 	checkout "github.com/asmile1559/dyshop/pb/backend/checkout"
@@ -26,7 +28,7 @@ var (
 
 func GetAuthClient() (auth.AuthServiceClient, *grpc.ClientConn, error) {
 	client, conn, err := registryx.DiscoverEtcdServices(
-		[]string{viper.GetString("etcd.endpoint")},
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
 		viper.GetString("etcd.prefix.auth"),
 		auth.NewAuthServiceClient,
 	)

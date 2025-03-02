@@ -3,15 +3,16 @@ package product
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"strconv"
+
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
 	"github.com/asmile1559/dyshop/pb/frontend/product_page"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"net/http"
-	"os"
-	"strconv"
 )
 
 func GetProduct(c *gin.Context) {
@@ -86,18 +87,10 @@ func SearchProduct(c *gin.Context) {
 		})
 		return
 	}
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "page must be a number",
-			"error":   err.Error(),
-		})
-		return
-	}
 	if curPage <= 0 {
 		curPage = 1
 	}
-	pagesize, err := strconv.Atoi(ps)
+	pagesize, _ := strconv.Atoi(ps)
 	//totalPage := 8
 	req.Page = int32(curPage)
 	req.Query = kw
@@ -262,7 +255,6 @@ func ModifyProduct(c *gin.Context) {
 		},
 	})
 	return
-
 }
 
 // DeleteProduct 删除产品 Handler

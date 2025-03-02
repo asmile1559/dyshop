@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
-	"github.com/asmile1559/dyshop/utils/hookx"
-	"github.com/sirupsen/logrus"
 	"html/template"
 	"net/http"
 	"unicode/utf8"
+
+	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
+	"github.com/asmile1559/dyshop/utils/hookx"
+	"github.com/sirupsen/logrus"
 
 	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
@@ -63,7 +64,7 @@ func main() {
 		// 2. 方式 2
 		c.HTML(http.StatusOK, "pong.html", gin.H{
 			"Code": http.StatusOK,
-			"Host": "192.168.191.130:10166",
+			"Host": "localhost:10166",
 			"Pong": "Pong",
 		})
 	})

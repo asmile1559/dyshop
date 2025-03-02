@@ -20,8 +20,12 @@ func NewGetAccountInfoService(c context.Context) *GetAccountInfoService {
 }
 
 func (s *GetAccountInfoService) Run(req *user_page.GetAccountInfoReq) (map[string]interface{}, error) {
-
-	resp, err := rpcclient.UserClient.GetAccountInfo(s.ctx, &pbuser.GetAccountInfoReq{
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := userClient.GetAccountInfo(s.ctx, &pbuser.GetAccountInfoReq{
 		UserId: req.UserId,
 	})
 	if err != nil {
@@ -32,11 +36,9 @@ func (s *GetAccountInfoService) Run(req *user_page.GetAccountInfoReq) (map[strin
 		"Id":    resp.UserId,
 		"Name":  resp.Name,
 		"Sign":  resp.Sign,
-		// 暂时指定头像图片url
-		"Img":   resp.Url,
+		"Img":   resp.Url, // 暂时指定头像图片url
 		"Role":  resp.Role,
 		"Phone": resp.Phone,
 		"Email": resp.Email,
 	}, nil
-
 }

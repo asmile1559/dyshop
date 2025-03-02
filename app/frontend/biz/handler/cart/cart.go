@@ -41,10 +41,6 @@ func AddItem(c *gin.Context) {
 		ProductId: uint32(req.ProductId),
 		Quantity:  int32(req.Quantity),
 	}
-	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
 
 	resp, err := service.NewAddItemService(c).Run(&reqGrpc)
 	if err != nil {
@@ -52,7 +48,6 @@ func AddItem(c *gin.Context) {
 		return
 	}
 
-	// resp 是 gin.H{"resp": ...} 的结构，你也可以直接返回 resp["resp"]
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "Add item success",
@@ -65,11 +60,18 @@ func AddItem(c *gin.Context) {
 
 // EmptyCart 清空购物车
 func EmptyCart(c *gin.Context) {
-	var req cart_page.EmptyCartReq
-	// 如有需要从请求体获取参数, 可用 c.BindJSON(&req)
-	// 目前该 Proto/Req 可能是空的
+	userId, ok := c.Get("user_id")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
+		return
+	}
 
-	resp, err := service.NewEmptyCartService(c).Run(&req)
+	reqGrpc := cart_page.EmptyCartReq{}
+
+	resp, err := service.NewEmptyCartService(c).Run(&reqGrpc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -77,18 +79,27 @@ func EmptyCart(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Empty cart success",
-		"data":    resp,
+		"resp": gin.H{
+			"user_id": userId,
+			"content": resp,
+		},
 	})
 }
 
 // GetCart 获取购物车
 func GetCart(c *gin.Context) {
-	var req cart_page.GetCartReq
+	userId, ok := c.Get("user_id")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
+		return
+	}
 
-	// 如果你需要从URL/Query里拿参数，可做: c.BindQuery(&req) 或 c.Bind(&req)
-	// 这里暂时不需要, 直接调用后端
+	reqGrpc := cart_page.GetCartReq{}
 
-	resp, err := service.NewGetCartService(c).Run(&req)
+	resp, err := service.NewGetCartService(c).Run(&reqGrpc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -96,17 +107,45 @@ func GetCart(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Get cart success",
-		"data":    resp, // resp 里通常是 { "resp": {Cart: {...}} }
+		"resp": gin.H{
+			"user_id": userId,
+			"content": resp,
+		},
 	})
 }
 
-// DeleteCart 删除购物车
+// DeleteCart 删除购物车部分条目
 func DeleteCart(c *gin.Context) {
-	var req cart_page.DeleteCartReq
-	// 如有需要从请求体获取参数, 可用 c.BindJSON(&req)
-	// 目前该 Proto/Req 可能是空的
+	userId, ok := c.Get("user_id")
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "no user id error",
+		})
+		return
+	}
 
-	resp, err := service.NewDeleteCartService(c).Run(&req)
+	req := struct {
+		ItemIds []uint32 `json:"item_ids"`
+	}{}
+	err := c.BindJSON(&req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "StatusBadRequest",
+			"err":     err.Error(),
+		})
+		return
+	}
+
+	reqGrpc := cart_page.DeleteCartReq{
+		ItemIds: make([]uint32, 0, len(req.ItemIds)),
+	}
+	for _, id := range req.ItemIds {
+		reqGrpc.ItemIds = append(reqGrpc.ItemIds, id)
+	}
+
+	resp, err := service.NewDeleteCartService(c).Run(&reqGrpc)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -114,6 +153,9 @@ func DeleteCart(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Delete cart success",
-		"data":    resp,
+		"resp": gin.H{
+			"user_id": userId,
+			"content": resp,
+		},
 	})
 }

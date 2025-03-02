@@ -19,12 +19,21 @@ func NewVerifyHomepageStatus(c context.Context) *VerifyHomepageStatusService {
 }
 
 func (s *VerifyHomepageStatusService) Run(req *home_page.VerifyHomepageStatusReq) gin.H {
-	verifyTokenResp, err := rpcclient.AuthClient.VerifyTokenByRPC(s.ctx, &pbauth.VerifyTokenReq{
+	authClient, conn, err := rpcclient.GetAuthClient()
+	if err != nil {
+		logrus.WithError(err).Debug("GetAuthClient err")
+		return gin.H{
+			"resp": gin.H{
+				"ok": false,
+			},
+		}
+	}
+	defer conn.Close()
+	verifyTokenResp, err := authClient.VerifyTokenByRPC(s.ctx, &pbauth.VerifyTokenReq{
 		Token:  req.GetToken(),
 		Method: "POST",
 		Uri:    "/",
 	})
-
 	if err != nil {
 		logrus.Error(err)
 		return nil
@@ -37,7 +46,16 @@ func (s *VerifyHomepageStatusService) Run(req *home_page.VerifyHomepageStatusReq
 			},
 		}
 	}
-	userInfoResp, err := rpcclient.UserClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{UserId: verifyTokenResp.GetUserId()})
+
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		logrus.WithError(err).Error("rpcclient.GetUserClient fail")
+		return nil
+	}
+	defer conn.Close()
+	userInfoResp, err := userClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{
+		UserId: verifyTokenResp.GetUserId(),
+	})
 	if err != nil {
 		logrus.Error(err)
 		return nil
