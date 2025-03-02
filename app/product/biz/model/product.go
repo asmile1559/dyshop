@@ -74,8 +74,16 @@ func CreateOrUpdateProduct(tx *gorm.DB, product *Product) error {
 
 		// 处理查找结果
 		if product.ID == 0 {
+			// 创建一个新的 Product 实例，不设置 ID 字段
+			newProduct := Product{
+				Name:        product.Name,
+				Description: product.Description,
+				Picture:     product.Picture,
+				Price:       product.Price,
+				Categories:  product.Categories,
+			}
 			// 创建新记录
-			if err := tx.Create(product).Error; err != nil {
+			if err := tx.Create(newProduct).Error; err != nil {
 				return err
 			}
 		} else {
@@ -160,6 +168,55 @@ func ListProducts(db *gorm.DB, page int32, pageSize int32, category string) ([]*
 	}
 
 	return products, total, err
+}
+func SearchProducts(db *gorm.DB, page int32, pageSize int32, keyword string) ([]*Product, int64, error) {
+	const (
+		defaultPage     = 1
+		defaultPageSize = 20
+		maxPageSize     = 100
+	)
+
+	// 参数校验与修正
+	if page < 1 {
+		page = defaultPage
+	}
+	if pageSize < 1 || pageSize > maxPageSize {
+		pageSize = defaultPageSize
+	}
+
+	var (
+		products []*Product
+		total    int64
+		query    = db
+	)
+
+	// 根据关键词搜索
+	if keyword != "" {
+		query = query.Where("name LIKE ?", fmt.Sprintf("%%%s%%", keyword))
+	}
+
+	// 获取总数（在分页前）
+	if err := query.Model(&Product{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 计算分页偏移量（防止溢出）
+	offset := (int(page) - 1) * int(pageSize)
+	if offset < 0 {
+		offset = 0
+	}
+
+	// 执行分页查询
+	err := query.Order("id DESC").
+		Offset(offset).
+		Limit(int(pageSize)).
+		Find(&products).Error
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return products, total, nil
 }
 
 // ToProto 转换数据库模型到 Protobuf 结构（用于 service 层）

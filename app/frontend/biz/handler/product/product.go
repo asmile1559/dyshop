@@ -18,7 +18,7 @@ import (
 func GetProduct(c *gin.Context) {
 	var err error
 	var req product_page.GetProductReq
-	userId, _ := c.Get("user_id")
+	//userId, _ := c.Get("user_id")
 	productId := c.Query("product_id")
 
 	if productId == "" {
@@ -40,18 +40,7 @@ func GetProduct(c *gin.Context) {
 		return
 	}
 
-	resp1 := gin.H{
-		"PageRouter": PageRouter,
-		"UserInfo": gin.H{
-			"Id":   userId,
-			"Name": "lixiaoming",
-			"Sign": "许仙给老婆买了一顶帽子，白娘子戴上之后就死了，因为那是顶鸭（压）舌（蛇）帽。",
-			"Img":  "/static/src/user/snake.svg",
-			"Role": []string{"user", "merchant"},
-		},
-		"Products": []gin.H{resp},
-	}
-	c.HTML(http.StatusOK, "product-page.html", resp1)
+	c.HTML(http.StatusOK, "product-page.html", resp)
 }
 
 func SearchProduct(c *gin.Context) {
