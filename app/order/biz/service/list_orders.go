@@ -23,6 +23,7 @@ func NewListOrdersService(c context.Context) *ListOrdersService {
 
 func (s *ListOrdersService) Run(req *pborder.ListOrderReq) (*pborder.ListOrderResp, error) {
 	var orders []model.Order
+	// 使用 Preload 加载关联的 Address 和 OrderItems
 	if err := s.DB.Preload("Address").Preload("OrderItems").Find(&orders).Error; err != nil {
 		logrus.Error("Failed to fetch orders:", err)
 		return nil, fmt.Errorf("failed to fetch orders: %v", err)

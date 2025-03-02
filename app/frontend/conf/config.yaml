@@ -21,7 +21,14 @@ redis:
 
 log:
   level: debug
-  filename: ./logs/app.log
+  path: logs/app.log
   maxsize: 100
   maxage: 7
   maxbackups: 10
+
+etcd:
+  endpoints: "127.0.0.1:2379" # Etcd 节点地址
+  prefix:
+    auth: "/services/auth"
+    user: "/services/user"
+    cart: "/services/cart"

@@ -3,12 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func registerExampleRouter(e *gin.Engine) {
@@ -1455,6 +1456,7 @@ func registerExampleRouter(e *gin.Engine) {
 				"CurPage":   curPage,
 				"pageSize":  pgSize,
 				"TotalPage": totalPage,
+    "Category":  category,
 			}
 			fmt.Println(kw)
 			c.HTML(http.StatusOK, "search.html", &resp)

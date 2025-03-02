@@ -23,47 +23,70 @@ func NewMarkOrderPaidService(c context.Context) *MarkOrderPaidService {
 }
 
 func (s *MarkOrderPaidService) Run(req *pborder.MarkOrderPaidReq) (*pborder.MarkOrderPaidResp, error) {
-	var order model.Order
-	if err := s.DB.First(&order, req.GetOrderId()).Error; err != nil {
+	var prePaidOrder model.PrePaidOrder
+	if err := s.DB.Preload("Address").Preload("OrderItems").First(&prePaidOrder, req.GetOrderId()).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("order not found")
 		}
-		logrus.Error("Failed to fetch order:", err)
-		return nil, fmt.Errorf("failed to fetch order: %v", err)
+		logrus.Error("Failed to fetch prepaid order:", err)
+		return nil, fmt.Errorf("failed to fetch prepaid order: %v", err)
 	}
 
-	// 检查订单是否已被支付
-	if order.Paid {
-		// 如果订单已经被支付，则不需要再次更新 paid_at 字段
-	} else {
-		// 更新订单状态
-		order.Paid = true
-		order.PaidAt = time.Now()
+	// 创建新的 Order 对象并复制数据
+	newOrder := model.Order{
+		ID:           prePaidOrder.ID,
+		UserId:       prePaidOrder.UserId,
+		UserCurrency: prePaidOrder.UserCurrency,
+		Address:      model.Address(prePaidOrder.Address),
+		Email:        prePaidOrder.Email,
+		Paid:         true,
+		OrderItems:   make([]model.OrderItem, len(prePaidOrder.OrderItems)),
+		CreatedAt:    prePaidOrder.CreatedAt,
+		UpdatedAt:    time.Now(),
+		PaidAt:       time.Now(),
 	}
 
-	if err := s.DB.Save(&order).Error; err != nil {
-		logrus.Error("Failed to update order status:", err)
-		return nil, fmt.Errorf("failed to update order status: %v", err)
+	for i, item := range prePaidOrder.OrderItems {
+		newOrder.OrderItems[i] = model.OrderItem(item)
+	}
+
+	err := s.DB.Transaction(func(tx *gorm.DB) error {
+		// 创建正式订单
+		if err := tx.Create(&newOrder).Error; err != nil {
+			logrus.Error("Failed to create order:", err)
+			return err
+		}
+
+		// 删除预支付订单
+		if err := tx.Delete(&prePaidOrder).Error; err != nil {
+			logrus.Error("Failed to delete prepaid order:", err)
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	// 构建响应
 	respOrders := make([]*pborder.Order, 1)
 	respOrders[0] = &pborder.Order{
-		OrderId:      strconv.FormatUint(order.ID, 10),
-		UserId:       uint32(order.UserId), // 确保类型匹配
-		UserCurrency: order.UserCurrency,
+		OrderId:      strconv.FormatUint(newOrder.ID, 10),
+		UserId:       uint32(newOrder.UserId), // 确保类型匹配
+		UserCurrency: newOrder.UserCurrency,
 		Address: &pborder.Address{
-			StreetAddress: order.Address.StreetAddress,
-			City:          order.Address.City,
-			State:         order.Address.State,
-			Country:       order.Address.Country,
-			ZipCode:       order.Address.ZipCode,
+			StreetAddress: newOrder.Address.StreetAddress,
+			City:          newOrder.Address.City,
+			State:         newOrder.Address.State,
+			Country:       newOrder.Address.Country,
+			ZipCode:       newOrder.Address.ZipCode,
 		},
-		Email:     order.Email,
-		CreatedAt: int32(order.CreatedAt.Unix()), // 确保类型匹配
+		Email:     newOrder.Email,
+		CreatedAt: int32(newOrder.CreatedAt.Unix()), // 确保类型匹配
 		OrderItems: func() []*pborder.OrderItem {
-			items := make([]*pborder.OrderItem, len(order.OrderItems))
-			for i, item := range order.OrderItems {
+			items := make([]*pborder.OrderItem, len(newOrder.OrderItems))
+			for i, item := range newOrder.OrderItems {
 				items[i] = &pborder.OrderItem{
 					Item: &pbcart.CartItem{
 						ProductId: uint32(item.ProductId),

@@ -8,10 +8,10 @@ var (
 		"LoginPage":    "/example/user/login/",
 		"RegisterPage": "/example/user/register/",
 		"UserPage":     "/example/user/",
-		"ProductPage":  "/example/product/",
+		"ProductPage":  "/product/",
 		"OrderPage":    "/example/order/",
 		"CartPage":     "/example/cart/",
-		"SearchPage":   "/example/search/",
+		"SearchPage":   "/search/",
 		"PaymentPage":  "/example/payment/",
 	}
 	CategoryList = [][]string{

@@ -8,12 +8,20 @@ service CartService {
   rpc AddItem(AddItemReq) returns (AddItemResp) {};
   rpc EmptyCart(EmptyCartReq) returns (EmptyCartResp) {};
   rpc GetCart(GetCartReq) returns (GetCartResp) {};
+  rpc DeleteCart(DeleteCartReq) returns (DeleteCartResp) {};
   rpc ListCart(ListCartReq) returns (ListCartResp) {};
 }
 
 message AddItemReq {
-  uint32 product_id = 1;
-  int32 quantity = 2;
+  uint32 product_id = 2;
+  int32  quantity = 3;
+}
+
+message CartItem {
+  int32 id = 1;
+  int32 user_id = 2;
+  uint32 product_id = 3;
+  int32  quantity = 4;
 }
 
 message AddItemResp {
@@ -29,10 +37,18 @@ message EmptyCartResp {
 }
 
 message GetCartReq {
-
+  
 }
 
 message GetCartResp {
+  repeated CartItem items = 1;
+}
+
+message DeleteCartReq {
+  repeated uint32 item_ids = 1;
+}
+
+message DeleteCartResp {
 
 }
 

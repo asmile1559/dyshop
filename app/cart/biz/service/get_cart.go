@@ -17,33 +17,34 @@ func NewGetCartService(c context.Context) *GetCartService {
 }
 
 func (s *GetCartService) Run(req *pbcart.GetCartReq) (*pbcart.GetCartResp, error) {
-	cart, err := model.GetCartByUserID(dal.DB, uint64(req.UserId))
+	userID := uint64(req.UserId)
+
+	// 取所有 cart_items
+	items, err := model.GetCartItemsByUserID(dal.DB, userID)
 	if err != nil {
 		return nil, err
 	}
-	if cart == nil {
-		// 用户还没有 cart，返回空
+	if len(items) == 0 {
+		// 没有记录
 		return &pbcart.GetCartResp{
-			Cart: &pbcart.Cart{
-				UserId: req.UserId,
-				Items:  []*pbcart.CartItem{},
-			},
+			UserId: req.UserId,
+			Items:  []*pbcart.CartItem{},
 		}, nil
 	}
 
-	// 将 CartItems 转成 protobuf 里的 repeated CartItem
-	pbItems := make([]*pbcart.CartItem, 0, len(cart.CartItems))
-	for _, it := range cart.CartItems {
+	// 转换为 proto 结构
+	var pbItems []*pbcart.CartItem
+	for _, it := range items {
 		pbItems = append(pbItems, &pbcart.CartItem{
+			Id:        int32(it.ID),
+			UserId:    int32(it.UID),
 			ProductId: uint32(it.ProductId),
 			Quantity:  int32(it.Quantity),
 		})
 	}
 
 	return &pbcart.GetCartResp{
-		Cart: &pbcart.Cart{
-			UserId: uint32(cart.UserId),
-			Items:  pbItems,
-		},
+		UserId: req.UserId,
+		Items:  pbItems,
 	}, nil
 }

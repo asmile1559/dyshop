@@ -16,13 +16,12 @@ log:
   level: debug
 
 etcd:
-  endpoints:
-    - "127.0.0.1:2379"       # Etcd 节点地址
+  endpoints: "127.0.0.1:2379" # ENV ETCD_ENDPOINTS
   prefix: "/services/cart"  # 服务注册前缀
 
-services:
-  - id: "cart-service-1"     # 服务实例ID
-    address: "127.0.0.1:14166" # 服务实例地址
+service:
+  id: "cart-service-1"     # 服务实例ID
+  address: "127.0.0.1:14166" # ENV SERVICE_ADDRESS
 
 prometheus: "/services/prometheus"
 

@@ -10,21 +10,90 @@ services:
     image: "mysql:latest"
     ports:
       - "3306:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
   prometheus:
     image: jiny14/mypromethues:latest
+    depends_on:
+      - etcd
+    environment:
+      - LOG_LEVEL=info
+      - ETCD_ENDPOINTS=etcd:2379
+      - SERVICE_ID=prometheus-service-1
+      - SERVICE_ADDRESS=prometheus:9091
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-      # - ./config/targets:/etc/prometheus/targets
-    ports:
-      - "9090:9090"
-      - "9091:9091"
   grafana:
     image: grafana/grafana:latest
+    depends_on:
+      - prometheus
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     ports:
       - "3000:3000"
+  auth:
+    image: jiny14/dyshop-auth:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+    volumes:
+      - ./logs/auth:/app/logs
+    environment:
+      - LOG_LEVEL=info
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINTS=etcd:2379
+      - METRICS_HOST=auth
+      - SERVICE_ID=auth-service-1
+      - SERVICE_ADDRESS=auth:11166
+  user:
+    image: jiny14/dyshop-user:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+      - auth
+    volumes:
+      - ./logs/user:/app/logs
+    environment:
+      - LOG_LEVEL=info
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINTS=etcd:2379
+      - METRICS_HOST=user
+      - SERVICE_ID=user-service-1
+      - SERVICE_ADDRESS=user:12166
+  cart:
+    image: qiannian116/dyshop-cart:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+    volumes:
+      - ./logs/cart:/app/logs
+    environment:
+      - LOG_LEVEL=info
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINTS=etcd:2379
+      - METRICS_HOST=cart
+      - SERVICE_ID=cart-service-1
+      - SERVICE_ADDRESS=cart:14166
+  frontend:
+    image: jiny14/dyshop-frontend:latest
+    depends_on:
+      - auth
+      - user
+      - cart
+      # - order
+      # - product
+      # - checkout
+    ports:
+      - "10166:10166"
+    volumes:
+      - ./logs/frontend:/app/logs
+    environment:
+      - LOG_LEVEL=info
+      - ETCD_ENDPOINTS=etcd:2379
