@@ -108,15 +108,13 @@ func init() {
 
 func main() {
 	// 获取 Etcd 配置
-	endpoint := viper.GetString("etcd.endpoint")
-	prefix := viper.GetString("etcd.prefix")
 	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
-
 	service := map[string]any{"id": serviceId, "address": serviceAddr}
+
 	registryx.StartEtcdServices(
-		[]string{endpoint},
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
 		[]any{service},
-		prefix,
+		viper.GetString("etcd.prefix"),
 		pbmtl.RegisterMetricsServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbmtl.MetricsServiceServer {
 			return &server{

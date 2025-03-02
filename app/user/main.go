@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -33,9 +34,7 @@ func main() {
 
 	go func() {
 		router := gin.Default()
-
 		router.StaticFS("/static", http.Dir("./static"))
-
 		err := router.Run(":12167")
 		if err != nil {
 			return
@@ -54,7 +53,6 @@ func main() {
 	defer mysql.Close()
 
 	// 获取 Etcd 配置
-	endpoint := viper.GetString("etcd.endpoint")
 	prefix := viper.GetString("etcd.prefix.this")
 	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
 
@@ -76,7 +74,7 @@ func main() {
 	// 启动服务实例并注册到 Etcd
 	service := map[string]any{"id": serviceId, "address": serviceAddr}
 	registryx.StartEtcdServices(
-		[]string{endpoint},
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
 		[]any{service},
 		prefix,
 		pbuser.RegisterUserServiceServer,
