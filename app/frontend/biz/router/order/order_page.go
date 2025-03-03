@@ -121,7 +121,7 @@ func Register(e *gin.Engine) {
 					"user_id":        userId,
 					"order_id":       req.OrderId,
 					"transaction_id": 123,
-				},
+				}, //TODO transaction_id改为rpc调用后的数据
 			})
 		}) /**/
 
