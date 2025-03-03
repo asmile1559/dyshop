@@ -32,3 +32,4 @@ etcd:
     auth: "/services/auth"
     user: "/services/user"
     cart: "/services/cart"
+    product: "/services/product"

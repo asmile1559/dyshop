@@ -17,15 +17,14 @@ const OperationRouters = {
   "deleteProduct": "/product/delete/", // POST
   "getProduct": "/product/", // GET
   "buy": "/product/buy/", // POST
-  // "addToCart": "/example/product/add2cart/", // POST
   "addToCart": "/cart/add", // POST
   "getCart": "/cart/", // GET
   "deleteCartItem": "/cart/delete/", // POST
   "cartCheckout": "/example/cart/checkout/", // POST
-  "getOrder": "/example/order/", // GET
-  "cancelOrder": "/example/order/cancel/", // POST
-  "submitOrder": "/example/order/submit/", // POST
-  "checkout": "/checkout/", // GET
+  "getOrder": "/order/", // GET
+  "cancelOrder": "/order/cancel/", // POST
+  "submitOrder": "/order/submit/", // POST
+  "checkout": "/example/checkout/", // GET
   "cancelCheckout": "/example/checkout/cancel/", // POST
   "payment": "/payment/", // POST
   "search": "/product/search/", // GET

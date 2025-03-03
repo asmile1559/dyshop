@@ -591,11 +591,9 @@ func registerExampleRouter(e *gin.Engine) {
 				})
 				return
 			}
-
 			req := struct {
 				AddressId string `json:"address_id"`
 			}{}
-
 			if err := c.BindJSON(&req); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"code":    http.StatusBadRequest,
@@ -604,7 +602,6 @@ func registerExampleRouter(e *gin.Engine) {
 				})
 				return
 			}
-
 			c.JSON(http.StatusOK, gin.H{
 				"code":    http.StatusOK,
 				"message": "del account ok",

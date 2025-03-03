@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
@@ -17,11 +18,11 @@ func init() {
 
 func main() {
 	// 1) 通过 etcd 发现 CartService
-	endpoint := viper.GetString("etcd.endpoint")
-	prefix := viper.GetString("etcd.prefix")
+	endpoint := strings.Split(viper.GetString("etcd.endpoints"), ",")
+	prefix := viper.GetString("etcd.prefix.this")
 
 	client, conn, err := registryx.DiscoverEtcdServices(
-		[]string{endpoint},
+		endpoint,
 		prefix,
 		pbcart.NewCartServiceClient,
 	)

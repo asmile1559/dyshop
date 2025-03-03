@@ -21,10 +21,10 @@ func NewSearchProductService(c context.Context) *SearchProductService {
 func (s *SearchProductService) Run(req *pbproduct.SearchProductsReq) (*pbproduct.SearchProductsResp, error) {
 	// 参数处理
 	page, pageSize := validatePagination(req.GetPage(), req.GetPageSize())
-	category := extractCategory(req.GetQuery())
+	Name := req.GetQuery()
 
 	// 执行数据库查询
-	products, total, err := model.ListProducts(dal.DB, page, pageSize, category)
+	products, total, err := model.SearchProducts(dal.DB, page, pageSize, Name)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "database error: %v", err)
 	}
@@ -74,13 +74,4 @@ func validatePagination(page, pageSize int32) (int32, int32) {
 		pageSize = defaultPageSize
 	}
 	return page, pageSize
-}
-
-// 从查询字符串解析分类参数（示例格式：category:电子数码）
-func extractCategory(query string) string {
-	const categoryPrefix = "category:"
-	if len(query) > len(categoryPrefix) && query[:len(categoryPrefix)] == categoryPrefix {
-		return query[len(categoryPrefix):]
-	}
-	return ""
 }

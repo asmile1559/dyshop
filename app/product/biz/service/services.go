@@ -65,24 +65,18 @@ func NewModifyProductService(c context.Context) *ModifyProductService {
 }
 
 func (s *ModifyProductService) Run(req *pbproduct.ModifyProductReq) (*pbproduct.ModifyProductResp, error) {
-
-	if req.Id == 0 {
-		return nil, status.Error(codes.InvalidArgument, "product ID is required")
-	}
-
-	// 验证至少有一个字段需要更新
-	if req.Name == nil && req.Description == nil && req.Picture == nil && req.Price == nil && req.Categories == nil {
-		return nil, status.Error(codes.InvalidArgument, "no fields provided for update")
-	}
-
-	// 检查产品是否存在
-	if _, err := model.GetProductByID(dal.DB, uint(req.GetId())); err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, status.Error(codes.NotFound, "product not found")
-		}
-		return nil, status.Error(codes.Internal, "database error")
-	}
+	//
+	////if req.Id == 0 {
+	//	return nil, status.Error(codes.InvalidArgument, "product ID is required")
+	//}
+	//
+	//// 验证至少有一个字段需要更新
+	//if req.Name == nil && req.Description == nil && req.Picture == nil && req.Price == nil && req.Categories == nil {
+	//	return nil, status.Error(codes.InvalidArgument, "no fields provided for update")
+	//}
+	//
 	newProduct := &model.Product{
+		ID:          uint(req.GetId()),
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
 		Picture:     req.GetPicture(),
