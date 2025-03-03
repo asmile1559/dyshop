@@ -21,9 +21,9 @@ const OperationRouters = {
   "getCart": "/cart/", // GET
   "deleteCartItem": "/cart/delete/", // POST
   "cartCheckout": "/example/cart/checkout/", // POST
-  "getOrder": "/example/order/", // GET
-  "cancelOrder": "/example/order/cancel/", // POST
-  "submitOrder": "/example/order/submit/", // POST
+  "getOrder": "/order/", // GET
+  "cancelOrder": "/order/cancel/", // POST
+  "submitOrder": "/order/submit/", // POST
   "checkout": "/example/checkout/", // GET
   "cancelCheckout": "/example/checkout/cancel/", // POST
   "payment": "/example/payment/", // POST

@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pborder "github.com/asmile1559/dyshop/pb/backend/order"
 	"github.com/asmile1559/dyshop/pb/frontend/order_page"
@@ -18,13 +17,12 @@ func NewMarkOrderPaidService(c context.Context) *MarkOrderPaidService {
 }
 
 func (s *MarkOrderPaidService) Run(req *order_page.MarkOrderPaidReq) (map[string]interface{}, error) {
-	id, ok := s.ctx.Value("user_id").(uint32)
-	if ok == false {
-		return nil, errors.New("expect user id")
+	orderClient, conn, err := rpcclient.GetOrderClient()
+	if err != nil {
+		return nil, err
 	}
-
-	_, err := rpcclient.OrderClient.MarkOrderPaid(s.ctx, &pborder.MarkOrderPaidReq{
-		UserId:  id,
+	defer conn.Close()
+	_, err = orderClient.MarkOrderPaid(s.ctx, &pborder.MarkOrderPaidReq{
 		OrderId: req.GetOrderId(),
 	})
 
