@@ -26,6 +26,7 @@ func main() {
 	cli := pbcheckout.NewCheckoutServiceClient(cc)
 	resp, err := cli.Checkout(context.TODO(), &pbcheckout.CheckoutReq{
 		UserId:    123,
+		OrderId:   "OR1234",
 		Firstname: "hua",
 		Lastname:  "li",
 		Email:     "123@abc.com",

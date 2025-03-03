@@ -3,6 +3,7 @@ package payment
 import (
 	p "github.com/asmile1559/dyshop/app/frontend/biz/handler/payment"
 	"github.com/gin-gonic/gin"
+	
 )
 
 func Register(e *gin.Engine) {
@@ -12,5 +13,7 @@ func Register(e *gin.Engine) {
 		// TODO: payment front page
 		// _payment.Get("/", )
 		_payment.POST("/charge", append(_chargeMw(), p.Charge)...)
+
+		
 	}
 }

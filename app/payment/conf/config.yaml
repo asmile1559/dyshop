@@ -2,7 +2,7 @@ server:
   port: 17166
 
 database:
-  dsn: "djj:123456@tcp(127.0.0.1:3306)/payment?charset=utf8mb4&parseTime=True&loc=Local"
+  dsn: "root:root1234@tcp(127.0.0.1:3306)/payment?charset=utf8mb4&parseTime=True&loc=Local"
 
 etcd:
   endpoints:

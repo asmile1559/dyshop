@@ -14,15 +14,27 @@ func Charge(c *gin.Context) {
 
 	err = c.BindJSON(&req)
 	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "StatusBadRequest",
+			"err":     err.Error(),
+		})
 		return
 	}
 
 	resp, err := service.NewChargeService(c).Run(&req)
 	if err != nil {
-		c.String(http.StatusOK, "An error occurred: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "StatusBadRequest",
+			"err":     err.Error(),
+		})
 		return
 	}
 
-	c.String(http.StatusOK, "%v", resp)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "charge ok!",
+		"resp": resp,
+	})
 }

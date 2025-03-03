@@ -34,13 +34,11 @@ func (s *ChargeService) Run(req *pbpayment.ChargeReq) (*pbpayment.ChargeResp, er
 	// 2. 模拟调用第三方支付平台进行扣款
 	transactionID, err := s.callPaymentGateway(req)
 	if err != nil {
-		// 若支付失败，可考虑记录失败流水（此处省略）
 		return nil, err
 	}
 
-	// 3. 支付成功后，记录支付流水到数据库
+	// 3. 记录支付流水到数据库
 	if err := s.recordPayment(req, transactionID); err != nil {
-		// 若记录流水失败，根据业务逻辑可选择回滚或重试，此处直接返回错误
 		return nil, err
 	}
 
@@ -52,14 +50,11 @@ func (s *ChargeService) validateRequest(req *pbpayment.ChargeReq) error {
 	if req == nil {
 		return errors.New("请求不能为空")
 	}
-	if req.Amount <= 0 {
-		return errors.New("支付金额必须大于0")
+	if req.FinalPrice == "" {
+		return errors.New("支付金额不能为空")
 	}
-	if req.OrderId == "" {
-		return errors.New("订单号不能为空")
-	}
-	if req.UserId == 0 {
-		return errors.New("用户ID不能为空")
+	if _, err := strconv.ParseFloat(req.FinalPrice, 64); err != nil {
+		return errors.New("支付金额格式不正确")
 	}
 
 	// 校验信用卡信息
@@ -67,18 +62,17 @@ func (s *ChargeService) validateRequest(req *pbpayment.ChargeReq) error {
 	if cc == nil {
 		return errors.New("信用卡信息不能为空")
 	}
-	// 简单校验：卡号非空且长度在合理范围内（例如13~19位）
+	// 校验卡号长度
 	ccNumber := strings.TrimSpace(cc.CreditCardNumber)
 	if len(ccNumber) < 13 || len(ccNumber) > 19 {
 		return errors.New("无效的信用卡号码")
 	}
-	// 校验 CVV，一般为3或4位数字
+	// 校验 CVV
 	cvvStr := strconv.Itoa(int(cc.CreditCardCvv))
 	if len(cvvStr) < 3 || len(cvvStr) > 4 {
 		return errors.New("无效的信用卡CVV")
 	}
-
-	// 校验过期时间：不能早于当前年月
+	// 校验过期时间
 	now := time.Now()
 	expYear := int(cc.CreditCardExpirationYear)
 	expMonth := int(cc.CreditCardExpirationMonth)
@@ -89,18 +83,20 @@ func (s *ChargeService) validateRequest(req *pbpayment.ChargeReq) error {
 	return nil
 }
 
-// callPaymentGateway 模拟调用第三方支付平台进行扣款处理
+// callPaymentGateway 模拟调用第三方支付平台进行扣款
 func (s *ChargeService) callPaymentGateway(req *pbpayment.ChargeReq) (string, error) {
-	// 模拟支付耗时
 	time.Sleep(500 * time.Millisecond)
 
-	// 模拟 10% 的支付失败概率
+	// 10% 的失败概率
 	if rand.Float32() < 0.1 {
 		return "", errors.New("支付平台处理失败，请稍后重试")
 	}
 
-	// 生成一个模拟的交易ID（时间戳 + 随机数）
-	transactionID := generateTransactionID()
+	// 如果请求中已有 transaction_id，则复用，否则生成新的
+	transactionID := req.TransactionId
+	if transactionID == "" {
+		transactionID = generateTransactionID()
+	}
 	return transactionID, nil
 }
 
@@ -112,19 +108,16 @@ func generateTransactionID() string {
 	return fmt.Sprintf("TXN%d%06d", now, randomPart)
 }
 
-// recordPayment 记录支付流水到数据库（使用 dal.DB）
+// recordPayment 记录支付流水到数据库
 func (s *ChargeService) recordPayment(req *pbpayment.ChargeReq, transactionID string) error {
-	// 构造支付流水记录（这里使用 dal/model 中定义的 PaymentRecord 模型）
 	record := model.PaymentRecord{
-		OrderID:       req.OrderId,
-		UserID:        req.UserId,
-		Amount:        req.Amount,
 		TransactionID: transactionID,
+		Amount:        req.FinalPrice,
 		Status:        "SUCCESS",
 		CreatedAt:     time.Now(),
 	}
 
-	// 将记录插入数据库
+	// 写入数据库
 	if err := dal.DB.Create(&record).Error; err != nil {
 		return fmt.Errorf("记录支付流水失败：%v", err)
 	}

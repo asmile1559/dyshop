@@ -24,15 +24,14 @@ func main() {
 
 	cli := pbpayment.NewPaymentServiceClient(cc)
 	resp, err := cli.Charge(context.TODO(), &pbpayment.ChargeReq{
-		Amount: 123,
+		TransactionId: "TXN123456", // 这里可以换成实际的交易 ID，不给的话payment会自动生成
 		CreditCard: &pbpayment.CreditCardInfo{
 			CreditCardNumber:          "9876543210001",
 			CreditCardCvv:             1234,
 			CreditCardExpirationYear:  2099,
 			CreditCardExpirationMonth: 12,
 		},
-		OrderId: "1",
-		UserId:  1,
+		FinalPrice: "68.59",
 	})
 
 	if err != nil {

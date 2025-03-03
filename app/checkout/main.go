@@ -63,7 +63,7 @@ func init() {
 	}
 
 	// 自动迁移 OrderRecord 表结构（正式环境建议在单独的迁移脚本中执行）
-	if err := dal.DB.AutoMigrate(&model.OrderRecord{}); err != nil {
+	if err := dal.DB.AutoMigrate(&model.OrderRecord{}, &model.OrderItem{}); err != nil {
 		logrus.Fatal("数据库迁移失败:", err)
 	}
 }

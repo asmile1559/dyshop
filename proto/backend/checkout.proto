@@ -20,11 +20,12 @@ message Address {
 
 message CheckoutReq {
   uint32 user_id = 1;
-  string firstname = 2;
-  string lastname = 3;
-  string email = 4;
-  Address address = 5;
-  payment.CreditCardInfo credit_card = 6;
+  string order_id = 2;
+  string firstname = 3;
+  string lastname = 4;
+  string email = 5;
+  Address address = 6;
+  payment.CreditCardInfo credit_card = 7;
 }
 
 message CheckoutResp {

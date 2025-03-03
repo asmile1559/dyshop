@@ -2,154 +2,97 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
-
+	"math/rand"
 	"github.com/asmile1559/dyshop/app/checkout/biz/dal"
 	"github.com/asmile1559/dyshop/app/checkout/biz/model"
 	pbcheckout "github.com/asmile1559/dyshop/pb/backend/checkout"
-	pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
-	pborder "github.com/asmile1559/dyshop/pb/backend/order"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"google.golang.org/grpc"
-	//"google.golang.org/grpc/credentials/insecure"
-	"github.com/asmile1559/dyshop/utils/registryx"
 )
 
-// CheckoutService 结算服务，通过 etcd 发现依赖服务
+// CheckoutService 结算服务
 type CheckoutService struct {
 	ctx        context.Context
-	// 通过 etcd 服务发现获得 Payment 和 Order 客户端
-	paymentCli pbpayment.PaymentServiceClient
-	orderCli   pborder.OrderServiceClient
 }
 
-// NewCheckoutService 创建结算服务实例，使用 registryx.DiscoverEtcdServices 发现 Payment 和 Order 服务
+// NewCheckoutService 创建结算服务实例
 func NewCheckoutService(ctx context.Context) *CheckoutService {
-	etcdEndpoints := viper.GetStringSlice("etcd.endpoints")
-
-	// 发现 Payment 服务
-	paymentClient, _, err := registryx.DiscoverEtcdServices[pbpayment.PaymentServiceClient](
-		etcdEndpoints,
-		"/services/payment",
-		func(conn grpc.ClientConnInterface) pbpayment.PaymentServiceClient {
-			return pbpayment.NewPaymentServiceClient(conn)
-		},
-	)
-	if err != nil {
-		logrus.Fatalf("Failed to discover payment service: %v", err)
-	}
-	// 如果需要，请在服务关闭时关闭 paymentConn
-
-	// 发现 Order 服务
-	orderClient, _, err := registryx.DiscoverEtcdServices[pborder.OrderServiceClient](
-		etcdEndpoints,
-		"/services/order",
-		func(conn grpc.ClientConnInterface) pborder.OrderServiceClient {
-			return pborder.NewOrderServiceClient(conn)
-		},
-	)
-	if err != nil {
-		logrus.Fatalf("Failed to discover order service: %v", err)
-	}
-	// 同样，orderConn 关闭由调用方负责
-
-	return &CheckoutService{
-		ctx:        ctx,
-		paymentCli: paymentClient,
-		orderCli:   orderClient,
-	}
+	return &CheckoutService{ctx: ctx}
 }
 
-// Run 处理结算请求
+// Checkout 处理结算请求
 func (s *CheckoutService) Run(req *pbcheckout.CheckoutReq) (*pbcheckout.CheckoutResp, error) {
-	// 校验请求
-	if err := validateCheckoutRequest(req); err != nil {
-		return nil, err
+
+	transactionId := generateTransactionID()
+	address := req.Address
+
+	// 存订单记录
+    orderRecord := model.OrderRecord{
+        OrderID:       req.OrderId,
+        UserID:        req.UserId,
+        TransactionID: transactionId, // 记录 TransactionID
+        Recipient:     req.Lastname + req.Firstname,
+        Phone:         "12345678901",
+        Province:      address.State,
+        City:          address.City,
+        District:      "海淀区",
+        Street:        address.StreetAddress,
+        FullAddress:   "北京北京市海淀区知春路甲48号抖音视界",
+        TotalQuantity: 3,
+        TotalPrice:    58.59,
+        Postage:       10,
+        FinalPrice:    68.59,
+        CreatedAt:     time.Now(),
+    }
+
+    if err := dal.DB.Create(&orderRecord).Error; err != nil {
+        return nil, fmt.Errorf("failed to save order: %v", err)
+    }
+
+	orderItem := model.OrderItem{
+		OrderID:       req.OrderId,
+		TransactionID: transactionId, // 记录 TransactionID
+		ProductID:     "1",
+		ProductImg:    "/static/src/product/bearcookie.webp",
+		ProductName:   "超级无敌好吃的小熊饼干",
+		SpecName:      "500g装",
+		SpecPrice:     18.80,
+		Quantity:      2,
+		Postage:       10,
+		Currency:      "CNY",
 	}
 
-	// 通过 Order 服务获取订单信息
-	orderResp, err := s.getOrderFromOrderService(req.UserId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get orders: %v", err)
-	}
-	if len(orderResp.Orders) == 0 {
-		return nil, errors.New("no orders found")
-	}
-	order := orderResp.Orders[0] // 取第一笔订单
-	orderID := order.OrderId
-
-	// 计算订单总金额
-	totalAmount, err := calculateTotalAmount(order.OrderItems)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("Order total:", totalAmount)
-
-	// 调用 Payment 服务进行支付
-	paymentResp, err := s.paymentCli.Charge(context.TODO(), &pbpayment.ChargeReq{
-		Amount: float32(totalAmount),
-		CreditCard: &pbpayment.CreditCardInfo{
-			CreditCardNumber:          req.CreditCard.CreditCardNumber,
-			CreditCardCvv:             req.CreditCard.CreditCardCvv,
-			CreditCardExpirationYear:  req.CreditCard.CreditCardExpirationYear,
-			CreditCardExpirationMonth: req.CreditCard.CreditCardExpirationMonth,
-		},
-		OrderId: orderID,
-		UserId:  req.UserId,
-	})
-	if err != nil || paymentResp.TransactionId == "" {
-		return nil, errors.New("payment failed")
+	if err := dal.DB.Create(&orderItem).Error; err != nil {
+		return nil, fmt.Errorf("failed to save order item: %v", err)
 	}
 
-	// 存储订单记录到数据库
-	record := model.OrderRecord{
-		OrderID:       orderID,
-		UserID:        req.UserId,
-		Amount:        totalAmount,
-		TransactionID: paymentResp.TransactionId,
-		Status:        "SUCCESS",
-		CreatedAt:     time.Now(),
+	orderItem = model.OrderItem{
+		OrderID:       req.OrderId,
+		TransactionID: transactionId, // 记录 TransactionID
+		ProductID:     "2",
+		ProductImg:    "/static/src/product/bearsweet.webp",
+		ProductName:   "超级无敌好吃的小熊软糖值得品尝大力推荐",
+		SpecName:      "9分软",
+		SpecPrice:     20.99,
+		Quantity:      1,
+		Postage:       0,
+		Currency:      "",
 	}
-	if err := dal.DB.Create(&record).Error; err != nil {
-		return nil, fmt.Errorf("failed to save order: %v", err)
+
+	if err := dal.DB.Create(&orderItem).Error; err != nil {
+		return nil, fmt.Errorf("failed to save order item: %v", err)
 	}
+
 
 	return &pbcheckout.CheckoutResp{
-		OrderId:       orderID,
-		TransactionId: paymentResp.TransactionId,
+		OrderId:       req.OrderId,
+		TransactionId: transactionId,
 	}, nil
 }
 
-// getOrderFromOrderService 调用 Order 服务的 ListOrder 方法获取订单数据
-func (s *CheckoutService) getOrderFromOrderService(userId uint32) (*pborder.ListOrderResp, error) {
-	resp, err := s.orderCli.ListOrder(context.TODO(), &pborder.ListOrderReq{UserId: userId})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get order data: %v", err)
-	}
-	fmt.Printf("Orders: %+v\n", resp)
-	return resp, nil
-}
-
-func validateCheckoutRequest(req *pbcheckout.CheckoutReq) error {
-	if req.UserId == 0 || req.Firstname == "" || req.Lastname == "" || req.Email == "" {
-		return errors.New("missing required fields")
-	}
-	if req.Address.StreetAddress == "" || req.Address.City == "" || req.Address.ZipCode == "" {
-		return errors.New("invalid address")
-	}
-	if req.CreditCard.CreditCardNumber == "" || req.CreditCard.CreditCardCvv == 0 {
-		return errors.New("invalid credit card info")
-	}
-	return nil
-}
-
-func calculateTotalAmount(items []*pborder.OrderItem) (float64, error) {
-	var total float64
-	for _, item := range items {
-		total += float64(item.Cost)
-	}
-	return total, nil
+func generateTransactionID() string {
+	now := time.Now().UnixNano()
+	rand.Seed(now)
+	randomPart := rand.Intn(1000000)
+	return fmt.Sprintf("TXN%d%06d", now, randomPart)
 }
