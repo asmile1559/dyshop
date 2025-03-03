@@ -24,7 +24,13 @@ func (s *ListOrdersService) Run(_ *order_page.ListOrdersReq) (map[string]interfa
 		return nil, errors.New("expect user id")
 	}
 
-	resp, err := rpcclient.OrderClient.ListOrder(s.ctx, &pborder.ListOrderReq{UserId: id})
+	//resp, err := rpcclient.OrderClient.ListOrder(s.ctx, &pborder.ListOrderReq{UserId: id})
+	orderClient, conn, err := rpcclient.GetOrderClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := orderClient.ListOrder(s.ctx, &pborder.ListOrderReq{UserId: id})
 
 	if err != nil {
 		return nil, err

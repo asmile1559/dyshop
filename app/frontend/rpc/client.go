@@ -1,12 +1,12 @@
 package rpc
 
 import (
+	"github.com/asmile1559/dyshop/pb/backend/order"
 	"strings"
 
 	auth "github.com/asmile1559/dyshop/pb/backend/auth"
 	cart "github.com/asmile1559/dyshop/pb/backend/cart"
 	checkout "github.com/asmile1559/dyshop/pb/backend/checkout"
-	order "github.com/asmile1559/dyshop/pb/backend/order"
 	payment "github.com/asmile1559/dyshop/pb/backend/payment"
 	product "github.com/asmile1559/dyshop/pb/backend/product"
 	user "github.com/asmile1559/dyshop/pb/backend/user"
@@ -19,7 +19,7 @@ import (
 
 var (
 	// ProductClient  product.ProductCatalogServiceClient
-	OrderClient    order.OrderServiceClient
+	//OrderClient    order.OrderServiceClient
 	CheckoutClient checkout.CheckoutServiceClient
 	PaymentClient  payment.PaymentServiceClient
 )
@@ -27,7 +27,7 @@ var (
 func InitRPCClient() {
 	initCheckoutRPCClient()
 
-	initOrderRPCClient()
+	//initOrderRPCClient()
 
 	initPaymentRPCClient()
 }
@@ -83,12 +83,24 @@ func GetProductClient() (product.ProductCatalogServiceClient, *grpc.ClientConn, 
 	}
 	return client, conn, nil
 }
+func GetOrderClient() (order.OrderServiceClient, *grpc.ClientConn, error) {
+	client, conn, err := registryx.DiscoverEtcdServices(
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		viper.GetString("etcd.prefix.product"),
+		order.NewOrderServiceClient,
+	)
+	if err != nil {
+		logrus.WithField("app", "order").WithError(err).Fatal("Failed to discover service")
+		return nil, nil, err
+	}
+	return client, conn, nil
+}
 
-func initOrderRPCClient() {
+/*func initOrderRPCClient() {
 	// target need to get from register center
 	cc, _ := grpc.NewClient(":15166", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	OrderClient = order.NewOrderServiceClient(cc)
-}
+}*/
 
 func initCheckoutRPCClient() {
 	cc, _ := grpc.NewClient(":16166", grpc.WithTransportCredentials(insecure.NewCredentials()))

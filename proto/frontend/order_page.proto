@@ -14,11 +14,11 @@ service OrderService {
 }
 
 message ListOrdersReq {
-
+  uint32 user_id = 1;
 }
 
 message ListOrdersResp {
-
+  repeated Order orders = 1;
 }
 
 message OrderItem {
@@ -91,5 +91,5 @@ message MarkOrderPaidReq {
 }
 
 message MarkOrderPaidResp {
-
+  Order order = 1;
 }

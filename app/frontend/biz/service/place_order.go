@@ -37,7 +37,12 @@ func (s *PlaceOrderService) Run(req *order_page.PlaceOrderReq) (map[string]inter
 		})
 	}
 
-	resp, err := rpcclient.OrderClient.PlaceOrder(s.ctx, &pborder.PlaceOrderReq{
+	orderClient, conn, err := rpcclient.GetOrderClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := orderClient.PlaceOrder(s.ctx, &pborder.PlaceOrderReq{
 		UserId:       id,
 		UserCurrency: req.GetUserCurrency(),
 		Address: &pborder.Address{
@@ -54,7 +59,6 @@ func (s *PlaceOrderService) Run(req *order_page.PlaceOrderReq) (map[string]inter
 	if err != nil {
 		return nil, err
 	}
-
 	return gin.H{
 		"order_id": resp.Order.GetOrderId(),
 	}, nil

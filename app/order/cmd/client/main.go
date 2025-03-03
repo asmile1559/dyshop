@@ -68,7 +68,7 @@ func main() {
 	// 测试 MarkOrderPaid
 	markOrderPaidResp, err := cli.MarkOrderPaid(context.TODO(), &pborder.MarkOrderPaidReq{
 		UserId:  123,                   // 示例用户ID
-		OrderId: "1739000420646373757", // 示例订单ID
+		OrderId: "1740914145858850108", // 示例订单ID
 	})
 	if err != nil {
 		logrus.Fatal(err)
