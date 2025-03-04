@@ -81,5 +81,4 @@ func main() {
 	if err := router.Run(":" + viper.GetString("server.port")); err != nil {
 		logrus.Fatal(err)
 	}
-	//router.Run(":10166")
 }

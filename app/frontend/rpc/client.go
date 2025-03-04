@@ -1,8 +1,9 @@
 package rpc
 
 import (
-	"github.com/asmile1559/dyshop/pb/backend/order"
 	"strings"
+
+	"github.com/asmile1559/dyshop/pb/backend/order"
 
 	auth "github.com/asmile1559/dyshop/pb/backend/auth"
 	cart "github.com/asmile1559/dyshop/pb/backend/cart"
@@ -18,16 +19,12 @@ import (
 )
 
 var (
-	// ProductClient  product.ProductCatalogServiceClient
-	//OrderClient    order.OrderServiceClient
 	CheckoutClient checkout.CheckoutServiceClient
 	PaymentClient  payment.PaymentServiceClient
 )
 
 func InitRPCClient() {
 	initCheckoutRPCClient()
-
-	//initOrderRPCClient()
 
 	initPaymentRPCClient()
 }

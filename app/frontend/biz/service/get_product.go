@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/pb/frontend/product_page"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 )
 
 type GetProductService struct {
@@ -25,19 +25,16 @@ func (s *GetProductService) Run(req *product_page.GetProductReq) (map[string]int
 		return nil, err
 	}
 	defer conn.Close()
-	UserClient, conn, err := rpcclient.GetUserClient()
+	userClient, conn, err := rpcclient.GetUserClient()
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
-	if err != nil {
-		return nil, errors.Wrap(err, "RPC call failed")
-	}
 	// 构造RPC请求
 	rpcReq2 := &pbuser.GetUserInfoReq{
 		UserId: int64(id),
 	}
-	rpcResp2, err := UserClient.GetUserInfo(s.ctx, rpcReq2)
+	rpcResp2, err := userClient.GetUserInfo(s.ctx, rpcReq2)
 	resp, err := productClient.GetProduct(s.ctx, &pbproduct.GetProductReq{
 		Id: req.GetId(),
 	})
