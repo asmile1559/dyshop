@@ -5,6 +5,7 @@ import (
 	"github.com/asmile1559/dyshop/pb/frontend/checkout_page"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"fmt"
 )
 
 func Checkout(c *gin.Context) {
@@ -17,6 +18,7 @@ func Checkout(c *gin.Context) {
 
 
 	err = c.BindJSON(&req)
+	fmt.Printf("结算请求：", req)
 	if err != nil {
 		c.String(http.StatusOK, "An error occurred: %v", err)
 		return
