@@ -8,5 +8,6 @@ type PaymentRecord struct {
 	TransactionID string    `gorm:"transaction_id;type:varchar(64);not null"`    // 交易 ID
 	Amount        string    `gorm:"not null"`               // 支付金额（字符串）
 	Status        string    `gorm:"not null"`               // 交易状态
+	ErrorMessage  string  									// 存储失败原因（成功的交易为空）
 	CreatedAt     time.Time `gorm:"autoCreateTime"`         // 记录创建时间
 }
