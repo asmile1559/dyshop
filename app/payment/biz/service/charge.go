@@ -28,17 +28,20 @@ func NewChargeService(c context.Context) *ChargeService {
 func (s *ChargeService) Run(req *pbpayment.ChargeReq) (*pbpayment.ChargeResp, error) {
 	// 1. 校验请求参数
 	if err := s.validateRequest(req); err != nil {
+		_ = s.recordPayment(req, "", "FAILED", fmt.Sprintf("请求参数错误: %v", err))
 		return nil, err
 	}
 
 	// 2. 模拟调用第三方支付平台进行扣款
 	transactionID, err := s.callPaymentGateway(req)
 	if err != nil {
+		// 记录失败的交易
+		_ = s.recordPayment(req, "", "FAILED", fmt.Sprintf("支付失败: %v", err))
 		return nil, err
 	}
 
 	// 3. 记录支付流水到数据库
-	if err := s.recordPayment(req, transactionID); err != nil {
+	if err := s.recordPayment(req, transactionID, "SUCCESS", ""); err != nil {
 		return nil, err
 	}
 
@@ -89,7 +92,7 @@ func (s *ChargeService) callPaymentGateway(req *pbpayment.ChargeReq) (string, er
 
 	// 10% 的失败概率
 	if rand.Float32() < 0.1 {
-		return "", errors.New("支付平台处理失败，请稍后重试")
+		return "", errors.New("支付平台处理失败, 请稍后重试(10%概率失败)")
 	}
 
 	// 如果请求中已有 transaction_id，则复用，否则生成新的
@@ -109,11 +112,12 @@ func generateTransactionID() string {
 }
 
 // recordPayment 记录支付流水到数据库
-func (s *ChargeService) recordPayment(req *pbpayment.ChargeReq, transactionID string) error {
+func (s *ChargeService) recordPayment(req *pbpayment.ChargeReq, transactionID, status, errorMsg string) error {
 	record := model.PaymentRecord{
 		TransactionID: transactionID,
 		Amount:        req.FinalPrice,
-		Status:        "SUCCESS",
+		Status:        status, // 可能是 "SUCCESS" 或 "FAILED"
+		ErrorMessage:  errorMsg,
 		CreatedAt:     time.Now(),
 	}
 

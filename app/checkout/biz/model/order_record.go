@@ -6,7 +6,7 @@ import "time"
 type OrderRecord struct {
 	ID              uint      `gorm:"primaryKey"`
 	OrderID         string    `gorm:"type:varchar(255);uniqueIndex"` // 订单号
-	UserID          uint32    `gorm:"index"`       // 用户ID
+	UserID          int64    `gorm:"index"`       // 用户ID
 	TransactionID   string    `gorm:"index"`       // 交易ID（用于查询）
 	Recipient       string    // 收件人
 	Phone           string    // 手机号
