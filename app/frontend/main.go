@@ -2,7 +2,9 @@ package main
 
 import (
 	"html/template"
+	"io"
 	"net/http"
+	"os"
 	"unicode/utf8"
 
 	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
@@ -30,6 +32,10 @@ func main() {
 	}
 
 	router := gin.Default()
+	// 设置日志输出文件
+	f, _ := os.Create("logs/gin.log")
+	gin.DefaultWriter = io.MultiWriter(f)
+	router.Use(gin.Logger())
 	router.Use(cors.Default())
 	router.SetFuncMap(template.FuncMap{
 		"realLen":    utf8.RuneCountInString,
