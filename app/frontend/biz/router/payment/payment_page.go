@@ -12,7 +12,7 @@ func Register(e *gin.Engine) {
 		_payment := _root.Group("/payment", _paymentMW()...)
 		// TODO: payment front page
 		// _payment.Get("/", )
-		_payment.POST("/charge", append(_chargeMw(), p.Charge)...)
+		_payment.POST("/", append(_chargeMw(), p.Charge)...)
 
 		
 	}
