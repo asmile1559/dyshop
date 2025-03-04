@@ -18,7 +18,7 @@ func NewGetProductService(c context.Context) *GetProductService {
 	return &GetProductService{ctx: c}
 }
 
-func (s *GetProductService) Run(req *product_page.GetProductReq) (map[string]interface{}, error) {
+func (s *GetProductService) Run(req *product_page.GetProductReq) (map[string]any, error) {
 	productClient, conn, err := rpcclient.GetProductClient()
 	id, _ := s.ctx.Value("user_id").(uint32)
 	if err != nil {

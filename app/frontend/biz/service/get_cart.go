@@ -10,6 +10,7 @@ import (
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/asmile1559/dyshop/pb/frontend/cart_page"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type GetCartService struct {
@@ -37,6 +38,7 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) ([]gin.H, gin.H, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	logrus.Debug(resp)
 
 	productClient, conn, err := rpcclient.GetProductClient()
 	if err != nil {
@@ -51,6 +53,7 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) ([]gin.H, gin.H, error) {
 		if err != nil {
 			return nil, nil, err
 		}
+		logrus.Debug(productInfo)
 		itemMap := gin.H{
 			"ItemId":      item.Id,
 			"ProductId":   item.ProductId,

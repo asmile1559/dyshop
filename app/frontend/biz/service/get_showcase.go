@@ -1,8 +1,11 @@
 package service
 
 import (
+	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
+	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/asmile1559/dyshop/pb/frontend/home_page"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 )
 
@@ -14,68 +17,33 @@ func NewGetShowcaseService(c context.Context) *GetShowcaseService {
 	return &GetShowcaseService{ctx: c}
 }
 
-func (s *GetShowcaseService) Run(req *home_page.GetShowcaseReq) gin.H {
-	//listProductsResp, err := rpcclient.ProductClient.ListProducts(s.ctx, &pbproduct.ListProductsReq{
-	//	Page:         1,
-	//	PageSize:     30,
-	//	CategoryName: req.Which,
-	//})
-	//if err != nil {
-	//	logrus.Error(err)
-	//	return nil
-	//}
-	//
-	//products := make([]gin.H, 0)
-	//for _, product := range listProductsResp.Products {
-	//	products = append(products, gin.H{
-	//		"Id":      product.GetId(),
-	//		"Name":    product.GetName(),
-	//		"Picture": product.GetPicture(),
-	//		"Price":   product.GetPrice(),
-	//		"Sold":    "0",
-	//	})
-	//}
-	//
-	//return gin.H{
-	//	"resp": products,
-	//}
-	var products []gin.H
-	if req.GetWhich() == "hot" || req.GetWhich() == "discount" {
-		products = []gin.H{
-			{
-				"Id":      "2",
-				"Picture": "/static/src/product/bearsweet.webp",
-				"Name":    "超级无敌好吃的小熊软糖值得品尝大力推荐",
-				"Price":   20.99,
-				"Sold":    "1000",
-			},
-			{
-				"Id":      "1",
-				"Picture": "/static/src/product/bearcookie.webp",
-				"Name":    "超级无敌好吃的小熊饼干",
-				"Price":   18.80,
-				"Sold":    "200",
-			},
-		}
-	} else {
-		products = []gin.H{
-			{
-				"Id":      "1",
-				"Picture": "/static/src/product/bearcookie.webp",
-				"Name":    "超级无敌好吃的小熊饼干",
-				"Price":   18.80,
-				"Sold":    "200",
-			},
-			{
-				"Id":      "2",
-				"Picture": "/static/src/product/bearsweet.webp",
-				"Name":    "超级无敌好吃的小熊软糖值得品尝大力推荐",
-				"Price":   20.99,
-				"Sold":    "1000",
-			},
-		}
+func (s *GetShowcaseService) Run(req *home_page.GetShowcaseReq) []gin.H {
+	productClient, conn, err := rpcclient.GetProductClient()
+	if err != nil {
+		logrus.WithError(err).Error("failed to create product client")
+		return nil
 	}
-	return gin.H{
-		"resp": products,
+	defer conn.Close()
+	listProductsResp, err := productClient.ListProducts(s.ctx, &pbproduct.ListProductsReq{
+		Page:         1,
+		PageSize:     30,
+		CategoryName: req.Which,
+	})
+	if err != nil {
+		logrus.Error(err)
+		return nil
 	}
+
+	products := make([]gin.H, 0)
+	for _, product := range listProductsResp.Products {
+		products = append(products, gin.H{
+			"Id":      product.Id,
+			"Name":    product.Name,
+			"Picture": product.Picture,
+			"Price":   product.Price,
+			"Sold":    "1k",
+		})
+	}
+
+	return products
 }

@@ -2,12 +2,13 @@ package home
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
 	"github.com/asmile1559/dyshop/pb/frontend/home_page"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
 )
 
 func Homepage(c *gin.Context) {
@@ -19,7 +20,7 @@ func Homepage(c *gin.Context) {
 		"PageRouter":   pageRouter,
 		"CategoryList": categoryList,
 		"Carousels":    carousels,
-		"Products":     ghpResp["resp"],
+		"Products":     ghpResp,
 	}
 	c.HTML(http.StatusOK, "index.html", &resp)
 }
@@ -35,7 +36,7 @@ func GetShowcase(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":     http.StatusOK,
 		"message":  fmt.Sprintf("获取新橱窗成功, 新的橱窗类别为: %v", which),
-		"products": gsResp["resp"],
+		"products": gsResp,
 	})
 }
 
