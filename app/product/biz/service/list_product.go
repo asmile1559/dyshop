@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/asmile1559/dyshop/app/product/biz/dal"
 	"github.com/asmile1559/dyshop/app/product/biz/model"
@@ -21,7 +22,6 @@ func NewListProductService(c context.Context) *ListProductService {
 }
 
 func (s *ListProductService) Run(req *pbproduct.ListProductsReq) (*pbproduct.ListProductsResp, error) {
-	// TODO: finish your business code...
 	if req.Page < 1 || req.PageSize < 1 {
 		return nil, status.Error(codes.InvalidArgument, "分页参数无效")
 	}
@@ -34,7 +34,7 @@ func (s *ListProductService) Run(req *pbproduct.ListProductsReq) (*pbproduct.Lis
 		req.CategoryName,
 	)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "database error: ")
+		return nil, status.Error(codes.Internal, fmt.Sprintf("database error: %s", err.Error()))
 	}
 	// 转换数据到 Protobuf 格式
 	pbProducts := make([]*pbproduct.Product, 0, len(products))

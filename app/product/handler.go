@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/asmile1559/dyshop/app/product/biz/dao"
+	"github.com/asmile1559/dyshop/app/product/biz/dal"
 	service "github.com/asmile1559/dyshop/app/product/biz/service"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/gin-gonic/gin"
@@ -45,12 +45,12 @@ func (s *ProductServiceServer) DeleteProduct(ctx context.Context, req *pbproduct
 
 // handler.go
 func HealthCheck(c *gin.Context) {
-	if dao.Db == nil {
+	if dal.DB == nil {
 		c.JSON(500, gin.H{"status": "database not initialized"})
 		return
 	}
 
-	sqlDB, _ := dao.Db.DB()
+	sqlDB, _ := dal.DB.DB()
 	if err := sqlDB.Ping(); err != nil {
 		c.JSON(500, gin.H{"status": "database ping failed"})
 		return

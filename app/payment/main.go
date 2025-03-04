@@ -2,19 +2,16 @@ package main
 
 import (
 	"context"
+	"strings"
 	"sync/atomic"
 	"time"
-	"net"
 
+	"github.com/asmile1559/dyshop/app/payment/biz/dal"
 	pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
 	"github.com/asmile1559/dyshop/utils/hookx"
-	"github.com/asmile1559/dyshop/utils/registryx"
-	"github.com/asmile1559/dyshop/app/payment/biz/dal"
-	"github.com/asmile1559/dyshop/app/payment/biz/model"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 	"github.com/asmile1559/dyshop/utils/mtl"
+	"github.com/asmile1559/dyshop/utils/registryx"
+	"github.com/spf13/viper"
 )
 
 // PaymentServerWrapper 用于包装真正的 PaymentServiceServer，以便做统计或动态更新 etcd
@@ -59,25 +56,12 @@ func (s *PaymentServerWrapper) Charge(ctx context.Context, req *pbpayment.Charge
 
 func init() {
 	hookx.Init(hookx.DefaultHook)
-
-	// 初始化数据库连接
-	if err := dal.Init(); err != nil {
-		logrus.Fatal("初始化数据库连接失败:", err)
-	}
-	// 自动迁移 PaymentRecord 表结构（正式环境建议在单独的迁移脚本中执行）
-	if err := dal.DB.AutoMigrate(&model.PaymentRecord{}); err != nil {
-		logrus.Fatal("自动迁移 PaymentRecord 失败:", err)
-	}
 }
 
 func main() {
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]interface{})
-	if len(services) == 0 {
-		logrus.Fatal("No services found in config.")
-	}
+	dal.Init()
 
+	prefix := viper.GetString("etcd.prefix.this")
 	// 注册 Metrics
 	host := viper.GetString("metrics.host")
 	port := viper.GetInt32("metrics.port")
@@ -87,16 +71,20 @@ func main() {
 		Port:   port,
 		Labels: map[string]string{
 			"type": "apps",
-			"app":  "auth",
+			"app":  "payment",
 		},
 	}
 	mtl.RegisterMetrics(info)
 	defer mtl.DeregisterMetrics(info)
 
 	// 注册服务实例到 etcd
+	service := map[string]any{
+		"id":      viper.GetString("service.id"),
+		"address": viper.GetString("service.address"),
+	}
 	registryx.StartEtcdServices(
-		endpoints,
-		services,
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		[]any{service},
 		prefix,
 		pbpayment.RegisterPaymentServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbpayment.PaymentServiceServer {
@@ -108,16 +96,4 @@ func main() {
 			}
 		},
 	)
-
-	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	
-	s := grpc.NewServer()
-
-	// pbpayment.RegisterPaymentServiceServer(s, &PaymentServiceServer{})
-	if err = s.Serve(cc); err != nil {
-		logrus.Fatal(err)
-	}
 }

@@ -33,3 +33,6 @@ etcd:
     user: "/services/user"
     cart: "/services/cart"
     product: "/services/product"
+    order: "/services/order"
+    checkout: "/services/checkout"
+    frontend: "/services/frontend"

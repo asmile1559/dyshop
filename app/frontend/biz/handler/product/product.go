@@ -21,6 +21,8 @@ func GetProduct(c *gin.Context) {
 	//userId, _ := c.Get("user_id")
 	productId := c.Query("product_id")
 
+	logrus.Debug("product_id:", productId)
+
 	if productId == "" {
 		c.String(http.StatusOK, "expect a product index")
 		return
@@ -34,11 +36,12 @@ func GetProduct(c *gin.Context) {
 	req.Id = uint32(i)
 
 	resp, err := service.NewGetProductService(c).Run(&req)
-
 	if err != nil {
 		c.String(http.StatusOK, "An error occurred: %v", err)
 		return
 	}
+
+	logrus.Debug("resp:", resp)
 
 	c.HTML(http.StatusOK, "product-page.html", resp)
 }

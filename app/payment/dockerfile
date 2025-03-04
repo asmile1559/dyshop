@@ -1,0 +1,9 @@
+FROM ubuntu:jammy
+
+WORKDIR /app
+
+COPY . .
+
+EXPOSE 17166
+
+ENTRYPOINT ["bin/payment"]

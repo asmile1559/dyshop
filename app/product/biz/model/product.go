@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/asmile1559/dyshop/pb/backend/product"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -142,20 +144,18 @@ func ListProducts(db *gorm.DB, page int32, pageSize int32, category string) ([]*
 	)
 
 	// 分类过滤（MySQL JSON_CONTAINS 语法）
-	if category != "" {
+	query = query.Model(&Product{})
+	if category != "" && category != "all" {
 		query = query.Where("JSON_CONTAINS(categories, ?)", fmt.Sprintf(`"%s"`, category))
 	}
 
-	// 获取总数（在分页前）
 	if err := query.Count(&total).Error; err != nil {
+		logrus.WithError(err).Error("failed to count products")
 		return nil, 0, err
 	}
 
 	// 计算分页偏移量（防止溢出）
-	offset := (int(page) - 1) * int(pageSize)
-	if offset < 0 {
-		offset = 0
-	}
+	offset := max((int(page)-1)*int(pageSize), 0)
 
 	// 执行分页查询
 	err := query.Order("id DESC").
@@ -164,10 +164,12 @@ func ListProducts(db *gorm.DB, page int32, pageSize int32, category string) ([]*
 		Find(&products).Error
 
 	if err != nil {
+		logrus.WithError(err).Error("failed to list products")
 		return nil, 0, err
 	}
 
-	return products, total, err
+	logrus.WithField("total", total).WithField("products", products).Debug("list products")
+	return products, total, nil
 }
 func SearchProducts(db *gorm.DB, page int32, pageSize int32, keyword string) ([]*Product, int64, error) {
 	const (
