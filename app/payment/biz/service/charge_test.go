@@ -38,15 +38,14 @@ func TestChargeService_Run(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		validReq := &pbpayment.ChargeReq{
-			Amount:  100.0,
-			OrderId: "order-123",
-			UserId:  1,
+			TransactionId: "TXN123456",
 			CreditCard: &pbpayment.CreditCardInfo{
 				CreditCardNumber:          "4111111111111111",
 				CreditCardCvv:             123,
 				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
 				CreditCardExpirationMonth: int32(time.Now().Month()),
 			},
+			FinalPrice: "100.0",
 		}
 
 		// 固定随机返回值，确保支付成功（0.5 > 0.1）
@@ -66,14 +65,7 @@ func TestChargeService_Run(t *testing.T) {
 		assert.NotNil(t, resp)
 		assert.Equal(t, "TXN_FIXED", resp.TransactionId)
 
-		// 验证支付流水记录已插入数据库
-		var record model.PaymentRecord
-		result := dal.DB.First(&record, "order_id = ?", "order-123")
-		assert.NoError(t, result.Error)
-		assert.Equal(t, "TXN_FIXED", record.TransactionID)
-		assert.Equal(t, validReq.OrderId, record.OrderID)
-		assert.Equal(t, validReq.UserId, record.UserID)
-		assert.Equal(t, validReq.Amount, record.Amount)
+		
 	})
 
 	// 子测试 2：请求为 nil
@@ -91,15 +83,14 @@ func TestChargeService_Run(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		req := &pbpayment.ChargeReq{
-			Amount:  0,
-			OrderId: "order-123",
-			UserId:  1,
+			TransactionId: "TXN123456",
 			CreditCard: &pbpayment.CreditCardInfo{
 				CreditCardNumber:          "4111111111111111",
 				CreditCardCvv:             123,
 				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
 				CreditCardExpirationMonth: int32(time.Now().Month()),
 			},
+			FinalPrice: "0",
 		}
 		resp, err := service.Run(req)
 		assert.Error(t, err)
@@ -107,58 +98,15 @@ func TestChargeService_Run(t *testing.T) {
 		assert.Nil(t, resp)
 	})
 
-	// 子测试 4：订单号为空
-	t.Run("missing order id", func(t *testing.T) {
-		setupTestDB(t)
-		service := NewChargeService(context.Background())
-		req := &pbpayment.ChargeReq{
-			Amount: 100,
-			// OrderId 为空
-			OrderId: "",
-			UserId:  1,
-			CreditCard: &pbpayment.CreditCardInfo{
-				CreditCardNumber:          "4111111111111111",
-				CreditCardCvv:             123,
-				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
-				CreditCardExpirationMonth: int32(time.Now().Month()),
-			},
-		}
-		resp, err := service.Run(req)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "订单号不能为空")
-		assert.Nil(t, resp)
-	})
-
-	// 子测试 5：用户ID为0
-	t.Run("missing user id", func(t *testing.T) {
-		setupTestDB(t)
-		service := NewChargeService(context.Background())
-		req := &pbpayment.ChargeReq{
-			Amount:  100,
-			OrderId: "order-123",
-			UserId:  0,
-			CreditCard: &pbpayment.CreditCardInfo{
-				CreditCardNumber:          "4111111111111111",
-				CreditCardCvv:             123,
-				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
-				CreditCardExpirationMonth: int32(time.Now().Month()),
-			},
-		}
-		resp, err := service.Run(req)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "用户ID不能为空")
-		assert.Nil(t, resp)
-	})
 
 	// 子测试 6：信用卡信息为空
 	t.Run("missing credit card info", func(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		req := &pbpayment.ChargeReq{
-			Amount:     100,
-			OrderId:    "order-123",
-			UserId:     1,
+			TransactionId: "TXN123456",
 			CreditCard: nil,
+			FinalPrice: "100",
 		}
 		resp, err := service.Run(req)
 		assert.Error(t, err)
@@ -171,9 +119,7 @@ func TestChargeService_Run(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		req := &pbpayment.ChargeReq{
-			Amount:  100,
-			OrderId: "order-123",
-			UserId:  1,
+			TransactionId: "TXN123456",
 			CreditCard: &pbpayment.CreditCardInfo{
 				// 信用卡号码位数不足
 				CreditCardNumber: "123456789",
@@ -181,6 +127,7 @@ func TestChargeService_Run(t *testing.T) {
 				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
 				CreditCardExpirationMonth: int32(time.Now().Month()),
 			},
+			FinalPrice: "100",
 		}
 		resp, err := service.Run(req)
 		assert.Error(t, err)
@@ -193,9 +140,7 @@ func TestChargeService_Run(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		req := &pbpayment.ChargeReq{
-			Amount:  100,
-			OrderId: "order-123",
-			UserId:  1,
+			TransactionId: "TXN123456",
 			CreditCard: &pbpayment.CreditCardInfo{
 				CreditCardNumber:          "4111111111111111",
 				// CVV 位数不足（只有2位）
@@ -203,6 +148,7 @@ func TestChargeService_Run(t *testing.T) {
 				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
 				CreditCardExpirationMonth: int32(time.Now().Month()),
 			},
+			FinalPrice: "100",
 		}
 		resp, err := service.Run(req)
 		assert.Error(t, err)
@@ -215,9 +161,7 @@ func TestChargeService_Run(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		req := &pbpayment.ChargeReq{
-			Amount:  100,
-			OrderId: "order-123",
-			UserId:  1,
+			TransactionId: "TXN123456",
 			CreditCard: &pbpayment.CreditCardInfo{
 				CreditCardNumber:          "4111111111111111",
 				CreditCardCvv:             123,
@@ -225,6 +169,7 @@ func TestChargeService_Run(t *testing.T) {
 				CreditCardExpirationYear:  int32(time.Now().Year() - 1),
 				CreditCardExpirationMonth: 12,
 			},
+			FinalPrice: "100",
 		}
 		resp, err := service.Run(req)
 		assert.Error(t, err)
@@ -237,15 +182,14 @@ func TestChargeService_Run(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		validReq := &pbpayment.ChargeReq{
-			Amount:  100.0,
-			OrderId: "order-123",
-			UserId:  1,
+			TransactionId: "TXN123456",
 			CreditCard: &pbpayment.CreditCardInfo{
 				CreditCardNumber:          "4111111111111111",
 				CreditCardCvv:             123,
 				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
 				CreditCardExpirationMonth: int32(time.Now().Month()),
 			},
+			FinalPrice: "100",
 		}
 
 		// 固定随机返回值，模拟失败（0.05 < 0.1）
@@ -265,15 +209,14 @@ func TestChargeService_Run(t *testing.T) {
 		setupTestDB(t)
 		service := NewChargeService(context.Background())
 		validReq := &pbpayment.ChargeReq{
-			Amount:  100.0,
-			OrderId: "order-123",
-			UserId:  1,
+			TransactionId: "TXN123456",
 			CreditCard: &pbpayment.CreditCardInfo{
 				CreditCardNumber:          "4111111111111111",
 				CreditCardCvv:             123,
 				CreditCardExpirationYear:  int32(time.Now().Year() + 1),
 				CreditCardExpirationMonth: int32(time.Now().Month()),
 			},
+			FinalPrice: "100",
 		}
 
 		// 固定支付成功

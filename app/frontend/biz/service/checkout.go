@@ -2,64 +2,71 @@ package service
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbcheckout "github.com/asmile1559/dyshop/pb/backend/checkout"
-	pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
-
-	"github.com/asmile1559/dyshop/pb/frontend/checkout_page"
 	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc/status"
 )
 
-type CheckoutService struct {
+type GetOrderWithItemsService struct {
 	ctx context.Context
 }
 
-func NewCheckoutService(c context.Context) *CheckoutService {
-	return &CheckoutService{ctx: c}
+// NewGetOrderWithItemsService 创建订单查询服务实例
+func NewGetOrderWithItemsService(ctx context.Context) *GetOrderWithItemsService {
+	return &GetOrderWithItemsService{ctx: ctx}
 }
 
-func (s *CheckoutService) Run(req *checkout_page.CheckoutReq) (map[string]interface{}, error) {
-
-	var id uint32
-	var ok bool
-
-	if id, ok = s.ctx.Value("user_id").(uint32); !ok {
-		return nil, errors.New("expect user id")
-	}
-
-	reqAddr := req.GetAddress()
-	reqCred := req.GetCreditCard()
-
-	resp, err := rpcclient.CheckoutClient.Checkout(s.ctx, &pbcheckout.CheckoutReq{
-		UserId:    id,
-		OrderId:   req.GetOrderId(),
-		Firstname: req.GetFirstname(),
-		Lastname:  req.GetLastname(),
-		Email:     req.GetEmail(),
-		Address: &pbcheckout.Address{
-			StreetAddress: reqAddr.GetStreetAddress(),
-			City:          reqAddr.GetCity(),
-			State:         reqAddr.GetState(),
-			Country:       reqAddr.GetCountry(),
-			ZipCode:       reqAddr.GetZipCode(),
-		},
-		CreditCard: &pbpayment.CreditCardInfo{
-			CreditCardNumber:          reqCred.GetCreditCardNumber(),
-			CreditCardCvv:             reqCred.GetCreditCardCvv(),
-			CreditCardExpirationYear:  reqCred.GetCreditCardExpirationYear(),
-			CreditCardExpirationMonth: reqCred.GetCreditCardExpirationMonth(),
-		},
+// Run 方法返回 gin.H 结构
+func (s *GetOrderWithItemsService) Run(orderId string) (gin.H, error) {
+	// 调用 gRPC 查询订单
+	resp, err := rpcclient.CheckoutClient.GetOrderWithItems(s.ctx, &pbcheckout.GetOrderReq{
+		OrderId: orderId,
 	})
 	if err != nil {
-		return nil, err
+		st, _ := status.FromError(err)
+		return nil, st.Err()
 	}
 
+	// 组装 gin.H 作为返回
 	return gin.H{
-		"resp": resp,
+		"OrderId":    resp.Order.OrderId,
+		"UserId":     resp.Order.UserId,
+		"TransactionId": resp.Order.TransactionId,
+		"Address": gin.H{
+			"Recipient":   resp.Order.Recipient,
+			"Phone":       resp.Order.Phone,
+			"Province":    resp.Order.Province,
+			"City":        resp.Order.City,
+			"District":    resp.Order.District,
+			"Street":      resp.Order.Street,
+			"FullAddress": resp.Order.FullAddress,
+		},
+		"Products": buildOrderItems(resp.Items),
+		"OrderQuantity":   resp.Order.TotalQuantity,
+		"OrderPostage":    resp.Order.Postage,
+		"OrderPrice":      resp.Order.TotalPrice,
+		"OrderFinalPrice": resp.Order.FinalPrice,
 	}, nil
+}
 
-	//return gin.H{
-	//	"status": "checkout ok",
-	//}, nil
+// buildOrderItems 转换订单商品信息
+func buildOrderItems(items []*pbcheckout.OrderItem) []gin.H {
+	var orderItems []gin.H
+	for _, item := range items {
+		orderItems = append(orderItems, gin.H{
+			"ProductId":   item.ProductId,
+			"ProductImg":  item.ProductImg,
+			"ProductName": item.ProductName,
+			"ProductSpec": gin.H{
+				"Name":  item.SpecName,
+				"Price": fmt.Sprintf("%.2f", item.SpecPrice),
+			},
+			"Quantity": fmt.Sprintf("%d", item.Quantity),
+			"Currency": item.Currency,
+			"Postage":  item.Postage,
+		})
+	}
+	return orderItems
 }
