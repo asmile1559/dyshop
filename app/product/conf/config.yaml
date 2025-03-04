@@ -7,7 +7,7 @@ database:
     port: 3306
     username: root
     password: root
-    dbname: cart_db
+    dbname: dyshop
     max_idle_conns: 10
     max_open_conns: 100
     conn_max_lifetime: 3600
