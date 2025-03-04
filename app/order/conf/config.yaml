@@ -16,13 +16,13 @@ log:
   level: debug
 
 etcd:
-  endpoints:
-    - "127.0.0.1:2379"       # Etcd 节点地址
-  prefix: "/services/order"  # 服务注册前缀
+  endpoints: "127.0.0.1:2379"       # Etcd 节点地址
+  prefix: 
+    this: "/services/order"  # 服务注册前缀
 
-services:
-  - id: "order-service-1"     # 服务实例ID
-    address: "127.0.0.1:15166" # 服务实例地址
+service:
+  id: "order-service-1"     # 服务实例ID
+  address: "127.0.0.1:15166" # 服务实例地址
 
 prometheus: "/services/prometheus"
 
