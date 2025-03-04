@@ -39,6 +39,6 @@ func discoverService(client *clientv3.Client, prefix string) (map[string]string,
 		}
 	}
 
-	logrus.Infof("Discovered services under %s: %v\n", prefix, services)
+	logrus.Debugf("Discovered services under %s: %v\n", prefix, services)
 	return services, nil
 }
