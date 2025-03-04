@@ -23,10 +23,10 @@ const OperationRouters = {
   "cartCheckout": "/example/cart/checkout/", // POST
   "getOrder": "/order/", // GET
   "cancelOrder": "/order/cancel/", // POST
-  "submitOrder": "/order/submit/", // POST
-  "checkout": "/example/checkout/", // GET
+  "submitOrder": "/example/order/submit/", // POST
+  "checkout": "/checkout/", // GET
   "cancelCheckout": "/example/checkout/cancel/", // POST
-  "payment": "/example/payment/", // POST
+  "payment": "/payment/", // POST
   "search": "/product/search/", // GET
   "register": "/user/register/", // GET|POST
   "login": "/user/login/", // GET|POST

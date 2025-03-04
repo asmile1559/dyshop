@@ -1,16 +1,16 @@
-package main
+package checkout
 
 import "github.com/gin-gonic/gin"
 
 var (
 	PageRouter = gin.H{
-		"HomePage":     "/example/",
-		"LoginPage":    "/example/user/login/",
-		"RegisterPage": "/example/user/register/",
-		"UserPage":     "/example/user/",
-		"ProductPage":  "/example/product/",
+		"HomePage":     "/",
+		"LoginPage":    "/user/login/",
+		"RegisterPage": "/user/register/",
+		"UserPage":     "/user/",
+		"ProductPage":  "/product/",
 		"OrderPage":    "/order/",
-		"CartPage":     "/cart/",
+		"CartPage":     "/example/cart/",
 		"SearchPage":   "/search/",
 		"PaymentPage":  "/payment/",
 	}

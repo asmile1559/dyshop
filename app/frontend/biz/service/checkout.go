@@ -33,6 +33,7 @@ func (s *CheckoutService) Run(req *checkout_page.CheckoutReq) (map[string]interf
 
 	resp, err := rpcclient.CheckoutClient.Checkout(s.ctx, &pbcheckout.CheckoutReq{
 		UserId:    id,
+		OrderId:   req.GetOrderId(),
 		Firstname: req.GetFirstname(),
 		Lastname:  req.GetLastname(),
 		Email:     req.GetEmail(),

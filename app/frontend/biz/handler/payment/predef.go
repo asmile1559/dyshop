@@ -1,4 +1,4 @@
-package main
+package payment
 
 import "github.com/gin-gonic/gin"
 
@@ -8,9 +8,9 @@ var (
 		"LoginPage":    "/example/user/login/",
 		"RegisterPage": "/example/user/register/",
 		"UserPage":     "/example/user/",
-		"ProductPage":  "/example/product/",
-		"OrderPage":    "/order/",
-		"CartPage":     "/cart/",
+		"ProductPage":  "/product/",
+		"OrderPage":    "/example/order/",
+		"CartPage":     "/example/cart/",
 		"SearchPage":   "/search/",
 		"PaymentPage":  "/payment/",
 	}
