@@ -1,29 +1,30 @@
 package dal
 
 import (
-	"fmt"
-	"log"
-
+	"github.com/asmile1559/dyshop/app/payment/biz/model"
+	"github.com/asmile1559/dyshop/utils/db/mysqlx"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB // 全局数据库连接
 
 // Init 初始化数据库连接
-func Init() error {
-	dsn := viper.GetString("database.dsn")
-	if dsn == "" {
-		return fmt.Errorf("数据库连接串未配置")
+func Init() {
+	conf := mysqlx.DbConfig{
+		User:     viper.GetString("database.username"),
+		Password: viper.GetString("database.password"),
+		Host:     viper.GetString("database.host"),
+		Port:     viper.GetInt("database.port"),
+		DbName:   viper.GetString("database.dbname"),
+		Models:   []any{&model.PaymentRecord{}},
 	}
 
-	var err error
-	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := mysqlx.New(conf)
 	if err != nil {
-		return fmt.Errorf("数据库连接失败: %w", err)
+		logrus.WithError(err).Fatal("database conn fail")
+		return
 	}
-
-	log.Println("数据库连接成功")
-	return nil
+	DB = db
 }
