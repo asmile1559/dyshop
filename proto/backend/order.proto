@@ -15,48 +15,38 @@ service OrderService {
 }
 
 message Address {
-  string AddressId = 1;
-  string Recipient = 2;
-  string Phone = 3;
-  string Province = 4;
-  string City = 5;
-  string District = 6;
-  string Street = 7;
-  string FullAddress = 8;
+  uint32 id = 1;
+  int64 user_id = 2;
+  string recipient = 3;
+  string phone = 4;
+  string province = 5;
+  string city = 6;
+  string district = 7;
+  string street = 8;
+  string full_address = 9;
 }
 
 message PlaceOrderReq {
-  uint32 user_id = 1;
-  string user_currency = 2;
-  Address address = 3;
-  string email = 4;
-  repeated Product products = 5;
-  double discount = 6; // 新增折扣字段
-  double order_price = 7;
-  double order_postage = 8;
-  double order_final_price = 9;
+  int64 user_id = 1;
+  uint32 address_id = 2;
+  repeated uint32 product_ids = 3;
+  double price = 4;
 }
 
 message PlaceOrderResp {
-  string order_id = 1;
+  uint32 order_id = 1;
 }
 
 message ListOrderReq {
-  uint32 user_id = 1;
+  int64 user_id = 1;
 }
 
 message Order {
-  repeated Product products = 1;
-  string order_id = 2;
-  uint32 user_id = 3;
-  string user_currency = 4;
-  Address address = 5;
-  string email = 6;
-  int32 created_at = 7;
-  string order_price = 8;
-  string order_postage = 9;
-  string order_discount = 10;
-  string order_final_price = 11;
+  uint32 id = 1;
+  int64 user_id = 2;
+  Address address = 3;
+  repeated uint32 product_ids = 4;
+  double price = 5;
 }
 
 message ListOrderResp {
@@ -72,17 +62,11 @@ message AddressInfo {
 // 定义 GetOrderReq 和 GetOrderResp 消息类型
 message GetOrderReq {
   //uint32 user_id = 1;
-  //string order_id = 2;
+  uint32 order_id = 1;
 }
 
 message GetOrderResp {
-  UserInfo user_info = 2; // 添加用户信息
-  AddressInfo address_info = 3; // 添加地址信息
-  repeated Product products = 4; // 添加产品信息
-  string order_price = 8;
-  string order_postage = 9;
-  string order_discount = 10;
-  string order_final_price = 11; // 添加消息字段用于返回状态信息
+  Order order = 1;
 }
 
 // 定义 ModifyOrderReq 和 ModifyOrderResp 消息类型

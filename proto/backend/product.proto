@@ -22,11 +22,12 @@ message ListProductsReq{
 
 message Product {
   uint32 id = 1;
-  string name = 2;
-  string description = 3;
-  string picture = 4;
-  float price = 5;
-  repeated string categories = 6;
+  int64 uid = 2;
+  string name = 3;
+  string description = 4;
+  string picture = 5;
+  float price = 6;
+  repeated string categories = 7;
 }
 
 message ListProductsResp {
