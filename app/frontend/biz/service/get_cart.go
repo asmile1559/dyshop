@@ -21,28 +21,28 @@ func NewGetCartService(c context.Context) *GetCartService {
 	return &GetCartService{ctx: c}
 }
 
-func (s *GetCartService) Run(_ *cart_page.GetCartReq) ([]gin.H, gin.H, error) {
+func (s *GetCartService) Run(_ *cart_page.GetCartReq) (gin.H, error) {
 	id, ok := s.ctx.Value("user_id").(int64)
 	if !ok {
-		return nil, nil, errors.New("no user id in context")
+		return nil, errors.New("no user id in context")
 	}
 
 	cartClient, conn, err := rpcclient.GetCartClient()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer conn.Close()
 	resp, err := cartClient.GetCart(s.ctx, &pbcart.GetCartReq{
 		UserId: uint32(id),
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	logrus.Debug(resp)
 
 	productClient, conn, err := rpcclient.GetProductClient()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer conn.Close()
 	respList := []gin.H{}
@@ -51,7 +51,7 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) ([]gin.H, gin.H, error) {
 			Id: item.ProductId,
 		})
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 		logrus.Debug(productInfo)
 		itemMap := gin.H{
@@ -70,18 +70,26 @@ func (s *GetCartService) Run(_ *cart_page.GetCartReq) ([]gin.H, gin.H, error) {
 	}
 	userClient, conn, err := rpcclient.GetUserClient()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer conn.Close()
 	userInfo, err := userClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{
 		UserId: id,
 	})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	userResp := gin.H{
-		"Name": userInfo.Name,
+		"Id":   userInfo.GetUserId(),
+		"Name": userInfo.GetName(),
+		"Sign": userInfo.GetSign(),
+		"Img":  userInfo.GetUrl(),
+		"Role": userInfo.GetRole(),
 	}
 
-	return respList, userResp, nil
+	return gin.H{
+		"PageRouter": PageRouter,
+		"UserInfo":   userResp,
+		"CartItems":  respList,
+	}, nil
 }

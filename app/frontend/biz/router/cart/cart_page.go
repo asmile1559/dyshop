@@ -14,6 +14,7 @@ func Register(e *gin.Engine) {
 		_cart.POST("/add", append(_addCartMw(), c.AddItem)...)
 		_cart.POST("/empty", append(_emptyCartMw(), c.EmptyCart)...)
 		_cart.POST("/delete", append(_deleteCartMw(), c.DeleteCart)...)
+		_cart.POST("/checkout", c.CheckoutCart)
 		// TODO: cart checkout page
 	}
 }
