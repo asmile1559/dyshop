@@ -78,7 +78,7 @@ go test -file example_test.go -v # 运行某个测试文件的所有测试函数
 
 > 💡 这种方式能够在本地得到 service 函数的执行结果，并且可以设置测试样例，进行覆盖测试。  
 > 💡 这也是一种在`非main包`情况下运行某个函数的方式。 2. 本地 RPC 调用测试  
->  我们已经提供了本地的 RPC 客户端的实现，就在当前微服务的 cmd/client 目录下。
+> 我们已经提供了本地的 RPC 客户端的实现，就在当前微服务的 cmd/client 目录下。
 
 ```go
 package main
@@ -257,10 +257,10 @@ dyshop/ # 工程根目录
 │   └── frontend
 ├── utils
 │    ├── balancerx # 负载均衡
-│    ├── configx # 配置
+│    ├── cmd # 运行组件
 │    ├── ctool # 加密
 │    ├── db # 数据库
-│    ├── example # 示例
+│    ├── example # utils 组件使用示例
 │    ├── filex # 文件操作
 │    ├── registryx # 服务注册
 │    ├── jwt # token
@@ -274,12 +274,12 @@ dyshop/ # 工程根目录
 └── Makefile # 常用命令
 ```
 
-# Framework:
+# Framework
 
 ![Framework](./assets/framework.jpg)
 
-1. 外部请求通过 RESTful API 发送至 gateway(frontend)
-2. 当一个 app 启动时，会向注册中心进行注册
+1. 外部请求通过 RESTful API 发送至 gateway (frontend)
+2. 当一个 app 启动时，会向注册中心进行注册（同时被 Prometheus 捕获）
 3. 内部服务之间的访问，通过注册中心找到对应的服务，并通过 grpc 调用传输。
 4. 建议每一个微服务使用自己独立的数据库，这样一方面加快数据库的查找速度，另一方面更加安全。
 
@@ -505,17 +505,10 @@ var (
 - [x] 鉴权和认证
   - [x] jwt
   - [x] casbin
-  - [ ] <del>satoken<del>
+  - [ ] <del>satoken</del>
 - [ ] 负载均衡
 - [ ] 前端页面
-- [ ] 可观测性
+- [x] 可观测性
   - [x] 日志（日志初始化函数）
   - [x] Metrics：Prometheus (with auto detection service)
-  - [ ] Trace
-
-## Auth
-
-- [x] rpc 通信
-- [x] Token 的生成与分发
-- [x] Token 验证，并通过 casbin 进行访问控制
-- [ ] 服务注册
+  - [ ] <del>Trace</del>
