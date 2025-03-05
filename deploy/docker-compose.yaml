@@ -25,6 +25,8 @@ services:
       - SERVICE_ADDRESS=prometheus:9091
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
   grafana:
     image: grafana/grafana:latest
     depends_on:
@@ -44,7 +46,7 @@ services:
     volumes:
       - ./logs/auth:/app/logs
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=debug
       - DATABASE_HOST=mysql
       - ETCD_ENDPOINTS=etcd:2379
       - METRICS_HOST=auth
@@ -62,14 +64,14 @@ services:
     ports:
       - "12167:12167"
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=debug
       - DATABASE_HOST=mysql
       - ETCD_ENDPOINTS=etcd:2379
       - METRICS_HOST=user
       - SERVICE_ID=user-service-1
       - SERVICE_ADDRESS=user:12166
   cart:
-    image: qiannian116/dyshop-cart:latest
+    image: jiny14/dyshop-cart:latest
     depends_on:
       - mysql
       - etcd
@@ -77,7 +79,7 @@ services:
     volumes:
       - ./logs/cart:/app/logs
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=debug
       - DATABASE_HOST=mysql
       - ETCD_ENDPOINTS=etcd:2379
       - METRICS_HOST=cart
@@ -92,7 +94,7 @@ services:
     volumes:
       - ./logs/product:/app/logs
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=debug
       - DATABASE_HOST=mysql
       - ETCD_ENDPOINTS=etcd:2379
       - METRICS_HOST=product
@@ -109,12 +111,45 @@ services:
     volumes:
       - ./logs/order:/app/logs
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=debug
       - DATABASE_HOST=mysql
       - ETCD_ENDPOINTS=etcd:2379
       - METRICS_HOST=order
       - SERVICE_ID=order-service-1
       - SERVICE_ADDRESS=order:15166
+  checkout:
+    image: jiny14/dyshop-checkout:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+      - order
+    volumes:
+      - ./logs/checkout:/app/logs
+    environment:
+      - LOG_LEVEL=debug
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINTS=etcd:2379
+      - METRICS_HOST=checkout
+      - SERVICE_ID=checkout-service-1
+      - SERVICE_ADDRESS=checkout:16166
+  payment:
+    image: jiny14/dyshop-payment:latest
+    depends_on:
+      - mysql
+      - etcd
+      - prometheus
+      - order
+      - checkout
+    volumes:
+      - ./logs/payment:/app/logs
+    environment:
+      - LOG_LEVEL=debug
+      - DATABASE_HOST=mysql
+      - ETCD_ENDPOINTS=etcd:2379
+      - METRICS_HOST=payment
+      - SERVICE_ID=payment-service-1
+      - SERVICE_ADDRESS=payment:17166
   frontend:
     image: jiny14/dyshop-frontend:latest
     depends_on:
@@ -123,12 +158,13 @@ services:
       - cart
       - order
       - product
-      # - checkout
+      - checkout
+      - payment
     ports:
       - "10166:10166"
     volumes:
       - ./logs/frontend:/app/logs
       - ../app/frontend:/app
     environment:
-      - LOG_LEVEL=info
+      - LOG_LEVEL=debug
       - ETCD_ENDPOINTS=etcd:2379
