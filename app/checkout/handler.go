@@ -16,3 +16,10 @@ func (s *CheckoutServiceServer) Checkout(ctx context.Context, req *pbcheckout.Ch
 
 	return resp, err
 }
+
+func (s *CheckoutServiceServer) GetOrderWithItems(ctx context.Context, req *pbcheckout.GetOrderReq) (*pbcheckout.GetOrderResp, error) {
+
+	resp, err := service.NewGetOrderWithItemsService(ctx).Run(req)
+
+	return resp, err
+}

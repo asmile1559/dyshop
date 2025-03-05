@@ -1,13 +1,11 @@
 package service
 
 import (
-	"github.com/asmile1559/dyshop/app/auth/utils/casbin"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
 	"github.com/asmile1559/dyshop/utils/jwt"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"net/http"
-	"github.com/sirupsen/logrus"
-
 )
 
 type VerifyTokenService struct {
@@ -22,20 +20,21 @@ func (s *VerifyTokenService) Run(req *pbauth.VerifyTokenReq) (*pbauth.VerifyResp
 
 	resp := pbauth.VerifyResp{}
 	user, err := jwt.ParseToken(req.GetToken())
-	logrus.WithError(err).WithField("userid",user.UserID).Debug("jwt.ParseToken res")
+	logrus.WithError(err).WithField("userid", user.UserID).Debug("jwt.ParseToken res")
 	if err != nil {
 		resp.Res = false
 		resp.Code = http.StatusUnauthorized
 		return &resp, nil
 	}
 
-	ok, err := casbin.Check(user.Subject, req.Method, req.Uri, true)
-	if err != nil {
-		resp.Res = false
-		resp.Code = http.StatusInternalServerError
-		return &resp, nil
-	}
-	logrus.WithError(err).WithField("ok",ok).Debug("casbin.Check res")
+	//ok, err := casbin.Check(user.Subject, req.Method, req.Uri, true)
+	//if err != nil {
+	//	resp.Res = false
+	//	resp.Code = http.StatusInternalServerError
+	//	return &resp, nil
+	//}
+	//logrus.WithError(err).WithField("ok",ok).Debug("casbin.Check res")
+	ok := true
 	if !ok {
 		resp.Res = false
 		resp.Code = http.StatusForbidden

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/asmile1559/dyshop/app/order/utils/db"
 	pborder "github.com/asmile1559/dyshop/pb/backend/order"
 	"github.com/asmile1559/dyshop/utils/hookx"
@@ -25,14 +27,7 @@ func main() {
 	db.InitDB()
 	logrus.Info("database connect success")
 
-	// 获取 Etcd 配置
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]any)
-	if len(services) == 0 {
-		logrus.Fatal("No services found in config.")
-	}
-
+	prefix := viper.GetString("etcd.prefix.this")
 	// 注册 Metrics
 	host := viper.GetString("metrics.host")
 	port := viper.GetInt32("metrics.port")
@@ -49,9 +44,13 @@ func main() {
 	defer mtl.DeregisterMetrics(info)
 
 	// 注册服务实例到 etcd
+	service := map[string]any{
+		"id":      viper.GetString("service.id"),
+		"address": viper.GetString("service.address"),
+	}
 	registryx.StartEtcdServices(
-		endpoints,
-		services,
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		[]any{service},
 		prefix,
 		pborder.RegisterOrderServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pborder.OrderServiceServer {

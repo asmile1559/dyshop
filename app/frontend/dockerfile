@@ -1,0 +1,9 @@
+FROM ubuntu:jammy
+
+WORKDIR /app
+
+COPY . .
+
+EXPOSE 10166
+
+ENTRYPOINT ["bin/frontend"]

@@ -1,6 +1,8 @@
 package hookx
 
 import (
+	"strings"
+
 	"github.com/asmile1559/dyshop/utils/logx"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -37,5 +39,10 @@ func loadConfig() error {
 	viper.SetConfigName("config") // 配置文件名，不需要扩展名
 	viper.SetConfigType("yaml")   // 配置文件类型
 	viper.AddConfigPath("conf")   // 配置文件路径
-	return viper.ReadInConfig()   // 读取配置文件
+	// env 覆盖
+	viper.AutomaticEnv()
+	replacer := strings.NewReplacer(".", "_")
+	viper.SetEnvKeyReplacer(replacer)
+
+	return viper.ReadInConfig() // 读取配置文件
 }

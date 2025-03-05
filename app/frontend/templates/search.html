@@ -40,7 +40,7 @@
                   <li><a class="dropdown-item" href="{{.PageRouter.CartPage}}">购物车</a></li>
                   <li><a class="dropdown-item" href="{{.PageRouter.OrderPage}}">订单</a></li>
                   <li><a class="dropdown-item" href="{{.PageRouter.PaymentPage}}">支付</a></li>
-                  <li><button class="dropdown-item">退出登录</button></li>
+                  <li><button class="dropdown-item" data-role="logout">退出登录</button></li>
                 </ul>
               </span>
             </div>
@@ -74,25 +74,25 @@
       <div class="product-list-nav gap-2">
         <div class="product-list-tabtitle">
           <ul>
-            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=comprehensive"
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=comprehensive&category={{.Category}}"
                 class="implicit-link {{if eq .Sort `comprehensive`}}active{{end}}">综合</a></li>
-            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=sold"
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=sold&category={{.Category}}"
                 class="implicit-link {{if eq .Sort `sold`}}active{{end}}">销量</a></li>
-            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=price"
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=price&category={{.Category}}"
                 class="implicit-link {{if eq .Sort `price`}}active{{end}}">价格</a></li>
-            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=latest"
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=latest&category={{.Category}}"
                 class="implicit-link {{if eq .Sort `latest`}}active{{end}}">新品</a></li>
-            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=score"
+            <li><a href="{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort=score&category={{.Category}}"
                 class="implicit-link {{if eq .Sort `score`}}active{{end}}">评分</a></li>
           </ul>
         </div>
         <div class="product-list-pagenav">
           <span><a
-              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}{{end}}"
+              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}&category={{.Category}}{{end}}"
               class="implicit-link {{if eq .CurPage 1}}disabled{{end}}">&lt;</a></span>
           <span class="cur-page">{{.CurPage}}</span><span>/</span><span class="tot-page">{{ .TotalPage }}</span>
           <span class=""><a
-              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}{{end}}"
+              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}&category={{.Category}}{{end}}"
               class="implicit-link {{if eq .CurPage .TotalPage}}disabled{{end}}">&gt;</a></span>
         </div>
       </div>
@@ -133,15 +133,15 @@
       <div class="container d-flex justify-content-center">
         <ul class="pagination">
           <li class="page-item"><a class="page-link {{if eq .CurPage 1}}disabled{{end}} "
-              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}{{end}}">上一页</a>
+              href="{{if ne .CurPage 1}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{subOne .CurPage}}&sort={{.Sort}}&category={{.Category}}{{end}}">上一页</a>
           </li>
           {{range $idx, $page := showPages .CurPage .TotalPage}}
           <li class="page-item"><a class="page-link {{if eq $.CurPage $page}} active {{end}}"
-              href="{{$.PageRouter.SearchPage}}?keyword={{$.Keyword}}&pg={{$page}}&sort={{$.Sort}}">{{$page}}</a>
+              href="{{$.PageRouter.SearchPage}}?keyword={{$.Keyword}}&pg={{$page}}&sort={{$.Sort}}&category={{$.Category}}">{{$page}}</a>
           </li>
           {{end}}
           <li class="page-item"><a class="page-link {{if eq .CurPage .TotalPage}}disabled{{end}}"
-              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}{{end}}">下一页</a>
+              href="{{if ne .CurPage .TotalPage}}{{.PageRouter.SearchPage}}?keyword={{.Keyword}}&pg={{addOne .CurPage}}&sort={{.Sort}}&category={{.Category}}{{end}}">下一页</a>
           </li>
         </ul>
       </div>

@@ -10,12 +10,17 @@ type OrderServiceServer struct {
 	pborder.UnimplementedOrderServiceServer
 }
 
+func (s *OrderServiceServer) GetOrder(ctx context.Context, req *pborder.GetOrderReq) (*pborder.GetOrderResp, error) {
+	resp, err := service.NewGetOrderService(ctx).Run(req)
+
+	return resp, err
+}
 func (s *OrderServiceServer) PlaceOrder(ctx context.Context, req *pborder.PlaceOrderReq) (*pborder.PlaceOrderResp, error) {
 	resp, err := service.NewPlaceOrderService(ctx).Run(req)
 
 	return resp, err
 }
-func (s *OrderServiceServer) ListOrder(ctx context.Context, req *pborder.ListOrderReq) (*pborder.ListOrderResp, error) {
+func (s *OrderServiceServer) ListOrders(ctx context.Context, req *pborder.ListOrderReq) (*pborder.ListOrderResp, error) {
 	resp, err := service.NewListOrdersService(ctx).Run(req)
 
 	return resp, err

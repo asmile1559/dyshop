@@ -34,14 +34,14 @@ func (l *LeastConnBalancer) Select(services map[string]string) string {
 
 	for instanceID, addr := range services {
 		connCount := GetConnectionCount(l.client, l.prefix, instanceID)
-		logrus.Infof("Instance: %s, Addr: %s, connCount: %d", instanceID, addr, connCount)
+		logrus.Debugf("Instance: %s, Addr: %s, connCount: %d", instanceID, addr, connCount)
 
 		if connCount < minConn {
 			minConn = connCount
 			selectedAddr = addr
 		}
 	}
-	logrus.Infof("LeastConn selected address: %s, with connCount = %d", selectedAddr, minConn)
+	logrus.Debugf("LeastConn selected address: %s, with connCount = %d", selectedAddr, minConn)
 	return selectedAddr
 }
 

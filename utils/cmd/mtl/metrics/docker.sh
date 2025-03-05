@@ -1,5 +1,5 @@
 #!/bin/sh
 cd /metrics
-/metrics/bin/docker-metrics &
+/metrics/bin/metrics &
 cd -
 /bin/prometheus "$@"

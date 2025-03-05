@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/asmile1559/dyshop/pb/frontend/product_page"
@@ -18,11 +19,17 @@ func NewCreateProductService(c context.Context) *CreateProductService {
 }
 
 func (s *CreateProductService) Run(req *product_page.CreateProductReq) (map[string]interface{}, error) {
-	resp, err := rpcclient.ProductClient.CreateProduct(s.Ctx, &pbproduct.CreateProductReq{
+	productClient, conn, err := rpcclient.GetProductClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := productClient.CreateProduct(s.Ctx, &pbproduct.CreateProductReq{
 		Name:        req.GetName(),
 		Description: req.Description,
 		Picture:     req.Picture,
 		Price:       req.Price,
+		Categories:  req.Categories,
 	})
 	if err != nil {
 		return nil, err
@@ -32,20 +39,26 @@ func (s *CreateProductService) Run(req *product_page.CreateProductReq) (map[stri
 
 // ModifyProductService 处理商品修改服务
 type ModifyProductService struct {
-	Ctx context.Context
+	c context.Context
 }
 
 func NewModifyProductService(c context.Context) *ModifyProductService {
-	return &ModifyProductService{Ctx: c}
+	return &ModifyProductService{c: c}
 }
 
 func (s *ModifyProductService) Run(req *product_page.ModifyProductReq) (map[string]interface{}, error) {
-	resp, err := rpcclient.ProductClient.ModifyProduct(s.Ctx, &pbproduct.ModifyProductReq{
+	productClient, conn, err := rpcclient.GetProductClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := productClient.ModifyProduct(s.c, &pbproduct.ModifyProductReq{
 		Id:          req.GetId(),
 		Name:        req.Name,
 		Description: req.Description,
 		Picture:     req.Picture,
 		Price:       req.Price,
+		Categories:  req.Categories,
 	})
 	if err != nil {
 		return nil, err
@@ -63,7 +76,12 @@ func NewDeleteProductService(c context.Context) *DeleteProductService {
 }
 
 func (s *DeleteProductService) Run(req *product_page.DeleteProductReq) (map[string]interface{}, error) {
-	resp, err := rpcclient.ProductClient.DeleteProduct(s.Ctx, &pbproduct.DeleteProductReq{
+	productClient, conn, err := rpcclient.GetProductClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := productClient.DeleteProduct(s.Ctx, &pbproduct.DeleteProductReq{
 		Id: req.GetId(),
 	})
 	if err != nil {

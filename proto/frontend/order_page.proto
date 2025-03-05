@@ -1,69 +1,86 @@
-syntax="proto3";
+syntax = "proto3";
 
 package order_page;
 
-option go_package="github.com/asmile1559/dyshop/pb/frontend/order_page;order_page";
+option go_package = "github.com/asmile1559/dyshop/pb/frontend/order_page;order_page";
 
 service OrderService {
-  rpc ListOrders (ListOrdersReq) returns (ListOrdersResp) {};
-  rpc PlaceOrder(PlaceOrderReq) returns (PlaceOrderResp) {};
-  rpc GetOrder (GetOrderReq) returns (GetOrderResp) {};
-  rpc ModifyOrder(ModifyOrderReq) returns (ModifyOrderResp) {};
-  rpc CancelOrder(CancelOrderReq) returns (CancelOrderResp) {};
-  rpc MarkOrderPaid (MarkOrderPaidReq) returns (MarkOrderPaidResp) {};
-}
-
-message ListOrdersReq {
-
-}
-
-message ListOrdersResp {
-
-}
-
-message OrderItem {
-  uint32 product_id = 1;
-  int32 quantity = 2;
-  float cost = 3;
+  rpc PlaceOrder(PlaceOrderReq) returns (PlaceOrderResp) {}
+  rpc ListOrders(ListOrderReq) returns (ListOrderResp) {} // 统一命名
+  rpc GetOrder(GetOrderReq) returns (GetOrderResp) {} // 新增 GetOrder 方法
+  rpc ModifyOrder(ModifyOrderReq) returns (ModifyOrderResp) {} // 新增 ModifyOrder 方法
+  rpc CancelOrder(CancelOrderReq) returns (CancelOrderResp) {} // 新增 CancelOrder 方法
+  rpc MarkOrderPaid(MarkOrderPaidReq) returns (MarkOrderPaidResp) {}
+  rpc SubmitOrder (SubmitOrderReq) returns (SubmitOrderResp) {}
 }
 
 message Address {
-  string street_address = 1;
-  string city = 2;
-  string state = 3;
-  string country = 4;
-  string zip_code = 5;
+  string AddressId = 1;
+  string Recipient = 2;
+  string Phone = 3;
+  string Province = 4;
+  string City = 5;
+  string District = 6;
+  string Street = 7;
+  string FullAddress = 8;
 }
 
 message PlaceOrderReq {
-  string user_currency = 1;
-  Address address = 2;
-  string email = 3;
-  repeated OrderItem order_items = 4;
+  int64 user_id = 1;
+  uint32 address_id = 2;
+  repeated uint32 product_ids = 3;
+  double price = 4;
 }
 
 message PlaceOrderResp {
   string order_id = 1;
 }
 
+message ListOrderReq {
+  int64 user_id = 1;
+}
+
 message Order {
-  repeated OrderItem order_items = 1;
+  repeated Product products = 1;
   string order_id = 2;
   uint32 user_id = 3;
   string user_currency = 4;
   Address address = 5;
   string email = 6;
   int32 created_at = 7;
+  string order_price = 8;
+  string order_postage = 9;
+  string order_discount = 10;
+  string order_final_price = 11;
 }
 
-message GetOrderReq{
-  string order_id = 1;
+message ListOrderResp {
+  repeated Order orders = 1;
+}
+
+// 定义AddressInfo消息类型，用于描述地址信息
+message AddressInfo {
+  bool default = 1;
+  repeated Address addresses = 2;
+}
+
+// 定义 GetOrderReq 和 GetOrderResp 消息类型
+message GetOrderReq {
+  //uint32 user_id = 1;
+  uint32 order_id = 1;
 }
 
 message GetOrderResp {
-  Order order = 1;
+  UserInfo user_info = 2; // 添加用户信息
+  AddressInfo address_info = 3; // 添加地址信息
+  repeated Product products = 4; // 添加产品信息
+  string order_price = 8;
+  string order_postage = 9;
+  string order_discount = 10;
+  string order_final_price = 11; // 添加消息字段用于返回状态信息
 }
 
+// 定义 ModifyOrderReq 和 ModifyOrderResp 消息类型
 message ModifyOrderReq {
   string order_id = 1;
   uint32 product_id = 2;
@@ -75,15 +92,16 @@ message ModifyOrderReq {
 }
 
 message ModifyOrderResp {
-
+  string message = 1; // 添加消息字段用于返回状态信息
 }
 
+// 定义 CancelOrderReq 和 CancelOrderResp 消息类型
 message CancelOrderReq {
-  uint32 order_id = 1;
+  string order_id = 1; // 修改为string类型以匹配提交订单的ID类型
 }
 
 message CancelOrderResp {
-
+  string message = 1; // 添加消息字段用于返回状态信息
 }
 
 message MarkOrderPaidReq {
@@ -91,5 +109,43 @@ message MarkOrderPaidReq {
 }
 
 message MarkOrderPaidResp {
+  Order order = 1;
+  string message = 2; // 添加消息字段用于返回状态信息
+}
 
+// 定义UserInfo消息类型，用于描述用户信息
+message UserInfo {
+  string name = 1;
+}
+
+// 定义Product消息类型，用于描述商品信息
+message Product {
+  uint32 product_id = 1;
+  string product_img = 2;
+  string product_name = 3;
+  ProductSpec product_spec = 4;
+  int32 quantity = 5;
+  string currency = 6;
+  double postage = 7;
+}
+
+// 定义ProductSpec消息类型，用于描述商品规格
+message ProductSpec {
+  string name = 1;
+  double price = 2;
+}
+
+message SubmitOrderReq{
+  uint32 user_id = 1;
+  string order_id = 2;
+  Address address = 3;
+  repeated Product products = 4;
+  double discount = 5;
+  double order_price = 6;
+  double order_postage = 7;
+  double order_final_price = 8;
+}
+
+message SubmitOrderResp{
+  string order_id = 1;
 }

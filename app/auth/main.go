@@ -1,16 +1,14 @@
 package main
 
 import (
-	"net"
+	"strings"
 
-	"github.com/asmile1559/dyshop/app/auth/utils/casbin"
 	pbauth "github.com/asmile1559/dyshop/pb/backend/auth"
 	"github.com/asmile1559/dyshop/utils/hookx"
-	// "github.com/asmile1559/dyshop/utils/mtl"
+	"github.com/asmile1559/dyshop/utils/mtl"
+
 	"github.com/asmile1559/dyshop/utils/registryx"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc"
 )
 
 type etcdServer struct {
@@ -25,18 +23,7 @@ func init() {
 }
 
 func main() {
-	if err := initCasbin("conf/model.conf", "conf/policy.csv"); err != nil {
-		logrus.Fatal(err)
-	}
-
-	/* // 获取 Etcd 配置
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]interface{})
-	if len(services) == 0 {
-		logrus.Fatalf("No services found in config")
-	}
-
+	prefix := viper.GetString("etcd.prefix.this")
 	// 注册 Metrics
 	host := viper.GetString("metrics.host")
 	port := viper.GetInt32("metrics.port")
@@ -53,9 +40,11 @@ func main() {
 	defer mtl.DeregisterMetrics(info)
 
 	// 启动多个服务实例并注册到 Etcd
+	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
+	services := map[string]any{"id": serviceId, "address": serviceAddr}
 	registryx.StartEtcdServices(
-		endpoints,
-		services,
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		[]any{services},
 		prefix,
 		pbauth.RegisterAuthServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbauth.AuthServiceServer {
@@ -65,24 +54,5 @@ func main() {
 				connCount:   0,
 			}
 		},
-	) */
-	cc, err := net.Listen("tcp", ":"+viper.GetString("server.port"))
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	
-	s := grpc.NewServer()
-
-	pbauth.RegisterAuthServiceServer(s, &AuthServiceServer{})
-	if err = s.Serve(cc); err != nil {
-		logrus.Fatal(err)
-	}
-}
-
-func initCasbin(modelConf, policyConf string) error {
-	err := casbin.InitEnforcer(modelConf, policyConf)
-	if err != nil {
-		return err
-	}
-	return nil
+	)
 }

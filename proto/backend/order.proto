@@ -2,69 +2,139 @@ syntax = "proto3";
 
 package order;
 
-import "cart.proto";
-
 option go_package = "github.com/asmile1559/dyshop/pb/backend/order;order";
 
 service OrderService {
   rpc PlaceOrder(PlaceOrderReq) returns (PlaceOrderResp) {}
-  rpc ListOrder(ListOrderReq) returns (ListOrderResp) {}
+  rpc ListOrders(ListOrderReq) returns (ListOrderResp) {} // 统一命名
+  rpc GetOrder(GetOrderReq) returns (GetOrderResp) {} // 新增 GetOrder 方法
+  rpc ModifyOrder(ModifyOrderReq) returns (ModifyOrderResp) {} // 新增 ModifyOrder 方法
+  rpc CancelOrder(CancelOrderReq) returns (CancelOrderResp) {} // 新增 CancelOrder 方法
   rpc MarkOrderPaid(MarkOrderPaidReq) returns (MarkOrderPaidResp) {}
+  rpc SubmitOrder (SubmitOrderReq) returns (SubmitOrderResp) {}
 }
 
 message Address {
-  string street_address = 1;
-  string city = 2;
-  string state = 3;
-  string country = 4;
-  string zip_code = 5;
+  uint32 id = 1;
+  int64 user_id = 2;
+  string recipient = 3;
+  string phone = 4;
+  string province = 5;
+  string city = 6;
+  string district = 7;
+  string street = 8;
+  string full_address = 9;
 }
 
 message PlaceOrderReq {
-  uint32 user_id = 1;
-  string user_currency = 2;
-
-  Address address = 3;
-  string email = 4;
-  repeated OrderItem order_items = 5;
-}
-
-message OrderItem {
-  cart.CartItem item = 1;
-  float cost = 2;
-}
-
-message OrderResult {
-  string order_id = 1;
+  int64 user_id = 1;
+  uint32 address_id = 2;
+  repeated uint32 product_ids = 3;
+  double price = 4;
 }
 
 message PlaceOrderResp {
-  OrderResult order = 1;
+  uint32 order_id = 1;
 }
 
 message ListOrderReq {
-  uint32 user_id = 1;
+  int64 user_id = 1;
 }
 
 message Order {
-  repeated OrderItem order_items = 1;
-  string order_id = 2;
-  uint32 user_id = 3;
-  string user_currency = 4;
-  Address address = 5;
-  string email = 6;
-  int32 created_at = 7;
+  uint32 id = 1;
+  int64 user_id = 2;
+  Address address = 3;
+  repeated uint32 product_ids = 4;
+  double price = 5;
 }
 
 message ListOrderResp {
   repeated Order orders = 1;
 }
 
+// 定义AddressInfo消息类型，用于描述地址信息
+message AddressInfo {
+  bool default = 1;
+  repeated Address addresses = 2;
+}
+
+// 定义 GetOrderReq 和 GetOrderResp 消息类型
+message GetOrderReq {
+  //uint32 user_id = 1;
+  uint32 order_id = 1;
+}
+
+message GetOrderResp {
+  Order order = 1;
+}
+
+// 定义 ModifyOrderReq 和 ModifyOrderResp 消息类型
+message ModifyOrderReq {
+  string order_id = 1;
+  uint32 product_id = 2;
+  optional int32 quantity = 3;
+  optional float cost = 4;
+  optional string user_currency = 5;
+  optional Address address = 6;
+  optional string email = 7;
+}
+
+message ModifyOrderResp {
+  string message = 1; // 添加消息字段用于返回状态信息
+}
+
+// 定义 CancelOrderReq 和 CancelOrderResp 消息类型
+message CancelOrderReq {
+  string order_id = 1; // 修改为string类型以匹配提交订单的ID类型
+}
+
+message CancelOrderResp {
+  string message = 1; // 添加消息字段用于返回状态信息
+}
+
 message MarkOrderPaidReq {
-  uint32 user_id = 1;
-  string order_id = 2;
+  string order_id = 1;
 }
 
 message MarkOrderPaidResp {
-  repeated Order orders = 1;
+  Order order = 1;
+  string message = 2; // 添加消息字段用于返回状态信息
+}
+
+// 定义UserInfo消息类型，用于描述用户信息
+message UserInfo {
+  string name = 1;
+}
+
+// 定义Product消息类型，用于描述商品信息
+message Product {
+  uint32 product_id = 1;
+  string product_img = 2;
+  string product_name = 3;
+  ProductSpec product_spec = 4;
+  int32 quantity = 5;
+  string currency = 6;
+  double postage = 7;
+}
+
+// 定义ProductSpec消息类型，用于描述商品规格
+message ProductSpec {
+  string name = 1;
+  double price = 2;
+}
+
+message SubmitOrderReq{
+  uint32 user_id = 1;
+  string order_id = 2;
+  Address address = 3;
+  repeated Product products = 4;
+  double discount = 5;
+  double order_price = 6;
+  double order_postage = 7;
+  double order_final_price = 8;
+}
+
+message SubmitOrderResp{
+  string order_id = 1;
 }

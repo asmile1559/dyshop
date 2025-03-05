@@ -1,39 +1,31 @@
 package model
 
-import (
-	"time"
+import "gorm.io/gorm"
 
-	"gorm.io/gorm"
-)
-
-type Order struct {
-	ID           uint64 `gorm:"primaryKey"`
-	UserId       uint64 `gorm:"index"`
-	UserCurrency string
-	Address      Address `gorm:"foreignKey:OrderId"`
-	Email        string
-	Paid         bool
-	OrderItems   []OrderItem `gorm:"foreignKey:OrderId"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	PaidAt       time.Time
-	DeletedAt    gorm.DeletedAt `gorm:"index"`
-}
-
+// Address 结构体，用于描述地址信息
 type Address struct {
-	ID            uint64 `gorm:"primaryKey"`
-	OrderId       uint64 `gorm:"Index"`
-	StreetAddress string
-	City          string
-	State         string
-	Country       string
-	ZipCode       string
+	gorm.Model
+	UserId      int64  `gorm:"column:uid"`
+	Phone       string `gorm:"column:phone"`     // 新增字段
+	Recipient   string `gorm:"column:recipient"` // 新增字段
+	Province    string `gorm:"column:province"`  // 新增字段
+	City        string `gorm:"column:city"`
+	District    string `gorm:"column:district"`     // 新增字段
+	Street      string `gorm:"column:street"`       // 新增字段
+	FullAddress string `gorm:"column:full_address"` // 新增字段
 }
 
-type OrderItem struct {
-	ID        uint64 `gorm:"primaryKey"`
-	OrderId   uint64 `gorm:"Index"`
-	ProductId uint64
-	Quantity  int
-	Cost      float64
+// ProductSpec 结构体，用于描述商品规格
+type ProductSpec struct {
+	Name  string  `gorm:"primaryKey,column:name"`
+	Price float64 `gorm:"column:price"`
+}
+
+// Order 结构体，用于描述订单信息
+type Order struct {
+	gorm.Model
+	UserId     int64   `gorm:"column:user_id"`
+	AddressId  uint32  `gorm:"column:address_id"`
+	Price      float64 `gorm:"column:price"`
+	ProductIDs string  `gorm:"column:product_ids"`
 }

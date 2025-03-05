@@ -22,11 +22,12 @@ message ListProductsReq{
 
 message Product {
   uint32 id = 1;
-  string name = 2;
-  string description = 3;
-  string picture = 4;
-  float price = 5;
-  repeated string categories = 6;
+  int64 uid = 2;
+  string name = 3;
+  string description = 4;
+  string picture = 5;
+  float price = 6;
+  repeated string categories = 7;
 }
 
 message ListProductsResp {
@@ -43,11 +44,14 @@ message GetProductResp {
 }
 
 message SearchProductsReq {
-  string query = 1;
+  string query = 1;        // 支持分类查询格式：category:<分类名>
+  int32 page = 2;          // 分页页码
+  int32 page_size = 3;     // 每页数量
 }
 
 message SearchProductsResp {
   repeated Product results = 1;
+  int32 total_pages = 2;   // 新增总页数字段
 }
 message CreateProductReq {
   string name = 1;

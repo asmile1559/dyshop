@@ -2,32 +2,93 @@ syntax="proto3";
 
 package checkout_page;
 
-import "payment_page.proto";
+//import "payment_page.proto";
 
 option go_package="github.com/asmile1559/dyshop/pb/frontend/checkout_page;checkout_page";
 
 service CheckoutService {
   rpc Checkout(CheckoutReq) returns (CheckoutResp) {}
+  rpc GetOrderWithItems (GetOrderReq) returns (GetOrderResp);
 }
 
 message Address {
-  string street_address = 1;
-  string city = 2;
-  string state = 3;
-  string country = 4;
-  string zip_code = 5;
+    string recipient = 1;
+    string phone = 2;
+    string province = 3;
+    string city = 4;
+    string district = 5;
+    string street = 6;
+    string full_address = 7;
 }
 
+message ProductSpec {
+    string name = 1;
+    string price = 2;
+}
+
+message Product {
+    string product_id = 1;
+    string product_img = 2;
+    string product_name = 3;
+    ProductSpec product_spec = 4;
+    uint32 quantity = 5;
+    string currency = 6;
+    double postage = 7;
+}
 
 message CheckoutReq {
-  string firstname = 1;
-  string lastname = 2;
-  string email = 3;
-  Address address = 4;
-  payment_page.CreditCardInfo credit_card = 5;
+  int64 user_id = 1;
+  string order_id = 2;
+  Address address = 3;
+  repeated Product products = 4;
+  double order_postage = 5;
+  double order_price = 6;
+  double order_final_price = 7;
 }
 
 message CheckoutResp {
   string order_id = 1;
   string transaction_id = 2;
+}
+
+// 订单商品信息
+message OrderItem {
+  string product_id = 1;
+  string product_img = 2;
+  string product_name = 3;
+  string spec_name = 4;
+  double spec_price = 5;
+  int32 quantity = 6;
+  double postage = 7;
+  string currency = 8;
+}
+
+// 订单详情
+message OrderRecord {
+  string order_id = 1;
+  int64 user_id = 2;
+  string transaction_id = 3;
+  string recipient = 4;
+  string phone = 5;
+  string province = 6;
+  string city = 7;
+  string district = 8;
+  string street = 9;
+  string full_address = 10;
+  int32 total_quantity = 11;
+  double total_price = 12;
+  double postage = 13;
+  double final_price = 14;
+  string created_at = 15;
+}
+
+// 查询订单请求
+message GetOrderReq {
+  string order_id = 1;
+}
+
+// 查询订单响应
+message GetOrderResp {
+  OrderRecord order = 1;
+  repeated OrderItem items = 2;
 }

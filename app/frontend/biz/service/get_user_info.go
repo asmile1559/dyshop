@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
@@ -20,16 +21,26 @@ func NewGetUserInfoService(c context.Context) *GetUserInfoService {
 }
 
 func (s *GetUserInfoService) Run(req *user_page.GetUserInfoReq) (map[string]interface{}, error) {
-    
-	resp, err := rpcclient.UserClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{
-		UserId: req.GetUserId(),
-	})  
-    if err != nil {
-        return nil, err
-    }
+	userClient, conn, err := rpcclient.GetUserClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := userClient.GetUserInfo(s.ctx, &pbuser.GetUserInfoReq{
+		UserId: req.UserId,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-    return gin.H{
-		"resp": resp,
+	birthday, _ := time.Parse("2006年1月2日", resp.Birthday)
+	return gin.H{
+		"Id":       resp.UserId,
+		"Name":     resp.Name,
+		"Sign":     resp.Sign,
+		"Img":      resp.Url,
+		"Role":     resp.Role,
+		"Gender":   resp.Gender,
+		"Birthday": birthday,
 	}, nil
-
 }

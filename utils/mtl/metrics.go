@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	pbmtl "github.com/asmile1559/dyshop/pb/backend/mtl"
 	"github.com/asmile1559/dyshop/utils/registryx"
@@ -21,12 +22,9 @@ type MetricsInfo struct {
 
 func RegisterMetrics(info MetricsInfo) {
 	// 向 Prometheus 配置中心注册地址
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prometheus := viper.GetString("prometheus")
-
 	client, conn, err := registryx.DiscoverEtcdServices(
-		endpoints,
-		prometheus,
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		viper.GetString("prometheus"),
 		pbmtl.NewMetricsServiceClient,
 	)
 	if err != nil {
@@ -60,12 +58,9 @@ func RegisterMetrics(info MetricsInfo) {
 
 func DeregisterMetrics(info MetricsInfo) {
 	// 向 Prometheus 配置中心注册地址
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prometheus := viper.GetString("prometheus")
-
 	client, conn, err := registryx.DiscoverEtcdServices(
-		endpoints,
-		prometheus,
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		viper.GetString("prometheus"),
 		pbmtl.NewMetricsServiceClient,
 	)
 	if err != nil {

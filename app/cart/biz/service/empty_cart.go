@@ -17,7 +17,7 @@ func NewEmptyCartService(c context.Context) *EmptyCartService {
 }
 
 func (s *EmptyCartService) Run(req *pbcart.EmptyCartReq) (*pbcart.EmptyCartResp, error) {
-	err := model.ClearCart(dal.DB, uint64(req.UserId))
+	err := model.ClearAllItems(dal.DB, uint64(req.UserId))
 	if err != nil {
 		return nil, err
 	}

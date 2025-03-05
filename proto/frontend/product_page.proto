@@ -21,7 +21,12 @@ message ListProductsReq {
 }
 
 message ListProductsResp {
-
+  uint32 id = 1;
+  string name = 2;
+  string description = 3;
+  string picture = 4;
+  float price = 5;
+  repeated string categories = 6;
 }
 
 message GetProductReq {
@@ -29,10 +34,15 @@ message GetProductReq {
 }
 
 message GetProductResp {
+
 }
 
 message SearchProductsReq {
-  string q = 1;
+  string query = 1;
+  string category = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+  string sort = 5;
 }
 
 message SearchProductsResp {
@@ -44,6 +54,7 @@ message CreateProductReq {
   string picture = 3;
   float price = 4;
   uint32 amount = 5;
+  repeated string categories = 6;
 }
 
 message CreateProductResp {
@@ -56,6 +67,7 @@ message ModifyProductReq {
   optional string picture = 4;
   optional float price = 5;
   optional uint32 amount = 6;
+  repeated string categories = 7;
 }
 
 message ModifyProductResp {

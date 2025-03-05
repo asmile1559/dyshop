@@ -113,7 +113,7 @@ func DiscoverEtcdServices[T any](
 	}
 	if len(services) == 0 {
 		logrus.WithField("prefix", prefix).Error("No services found for key")
-		return zero, nil, fmt.Errorf("No services found for key")
+		return zero, nil, fmt.Errorf("no services found for key")
 	}
 
 	// 初始化负载均衡策略
@@ -129,7 +129,7 @@ func DiscoverEtcdServices[T any](
 
 	// 使用负载均衡器选择服务地址
 	serviceAddress := balancer.Select(services)
-	logrus.WithField("serviceAddr", serviceAddress).Info("Selected service via balancer")
+	logrus.WithField("serviceAddr", serviceAddress).Debug("Selected service via balancer")
 
 	// 连接到 gRPC 服务
 	conn, err := grpc.NewClient(serviceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))

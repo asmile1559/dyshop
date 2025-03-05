@@ -35,3 +35,4 @@
 
 app/frontend/static/src/product/**
 app/frontend/static/src/user/**
+deploy/mysql

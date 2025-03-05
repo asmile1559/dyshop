@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/asmile1559/dyshop/app/user/biz/dal/mysql"
 	"github.com/asmile1559/dyshop/app/user/biz/model"
-	"github.com/asmile1559/dyshop/app/user/utils"
+	"github.com/asmile1559/dyshop/app/user/utils/bcrypt"
+	"github.com/asmile1559/dyshop/app/user/utils/snowflake"
 	pbuser "github.com/asmile1559/dyshop/pb/backend/user"
 	"github.com/sirupsen/logrus"
 )
@@ -26,23 +28,31 @@ func (s *RegisterService) Run(req *pbuser.RegisterReq) (*pbuser.RegisterResp, er
 	// 1. 检查邮箱是否已注册
 	existingUser, err := mysql.GetUserByEmail(req.Email)
 	if err == nil && existingUser != nil {
-		logrus.WithField("register_email",req.Email).Error("邮箱已被注册")
+		logrus.WithField("register_email", req.Email).Error("邮箱已被注册")
 		return nil, fmt.Errorf("邮箱已被注册")
 	}
 
 	// 2. 密码加密
-	hashedPassword, err := utils.HashPassword(req.Password)
+	hashedPassword, err := bcrypt.HashPassword(req.Password)
 	if err != nil {
 		logrus.WithError(err).Error("密码加密失败")
 		return nil, fmt.Errorf("密码加密失败: %v", err)
 	}
 
 	// 3. 存储用户信息到数据库
-	userID := utils.GenID()
+	userID := snowflake.GenID()
+	defaultBirthday, _ := time.Parse("2006年1月2日", "2006年1月2日")
 	newUser := &model.User{
-		UserID: userID,
+		UserID:   userID,
 		Email:    req.Email,
 		Password: hashedPassword,
+		Name:     "default",
+		Sign:     "该用户未写签名",
+		Url:      "/static/src/user/default.svg",
+		Role:     "role",
+		Gender:   "notshow",
+		Birthday: defaultBirthday,
+		Phone:    "13344445555",
 	}
 	err = mysql.CreateUser(newUser)
 	if err != nil {
@@ -54,5 +64,5 @@ func (s *RegisterService) Run(req *pbuser.RegisterReq) (*pbuser.RegisterResp, er
 	}
 	logrus.Info("register success")
 	// 4. 返回用户 ID
-	return &pbuser.RegisterResp{UserId: newUser.UserID}, nil
+	return &pbuser.RegisterResp{}, nil
 }

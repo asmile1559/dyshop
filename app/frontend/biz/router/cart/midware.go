@@ -28,3 +28,7 @@ func _emptyCartMw() []gin.HandlerFunc {
 func _getCartMw() []gin.HandlerFunc {
 	return nil
 }
+
+func _deleteCartMw() []gin.HandlerFunc {
+	return nil
+}

@@ -1,15 +1,17 @@
 package main
 
 import (
+	"html/template"
+	"io"
+	"net/http"
+	"os"
+	"unicode/utf8"
+
 	"github.com/asmile1559/dyshop/app/frontend/biz/handler/user"
 	"github.com/asmile1559/dyshop/utils/hookx"
 	"github.com/sirupsen/logrus"
-	"html/template"
-	"net/http"
-	"unicode/utf8"
 
 	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
-	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	feutils "github.com/asmile1559/dyshop/app/frontend/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -21,14 +23,16 @@ func init() {
 }
 
 func main() {
-	rpcclient.InitRPCClient()
-
 	//初始化gin框架内置的校验器翻译器
 	if err := user.InitTrans("zh"); err != nil {
 		logrus.Fatal(err)
 	}
 
 	router := gin.Default()
+	// 设置日志输出文件
+	f, _ := os.Create("logs/gin.log")
+	gin.DefaultWriter = io.MultiWriter(f)
+	router.Use(gin.Logger())
 	router.Use(cors.Default())
 	router.SetFuncMap(template.FuncMap{
 		"realLen":    utf8.RuneCountInString,
@@ -63,7 +67,7 @@ func main() {
 		// 2. 方式 2
 		c.HTML(http.StatusOK, "pong.html", gin.H{
 			"Code": http.StatusOK,
-			"Host": "192.168.191.130:10166",
+			"Host": "localhost:10166",
 			"Pong": "Pong",
 		})
 	})
@@ -80,5 +84,4 @@ func main() {
 	if err := router.Run(":" + viper.GetString("server.port")); err != nil {
 		logrus.Fatal(err)
 	}
-	//router.Run(":10166")
 }

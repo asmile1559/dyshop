@@ -108,18 +108,13 @@ func init() {
 
 func main() {
 	// 获取 Etcd 配置
-	endpoints := viper.GetStringSlice("etcd.endpoints")
-	prefix := viper.GetString("etcd.prefix")
-	services := viper.Get("services").([]any)
-	if len(services) == 0 {
-		logrus.Fatalf("No services found in config")
-	}
+	serviceId, serviceAddr := viper.GetString("service.id"), viper.GetString("service.address")
+	service := map[string]any{"id": serviceId, "address": serviceAddr}
 
-	// 启动多个服务实例并注册到 Etcd
 	registryx.StartEtcdServices(
-		endpoints,
-		services,
-		prefix,
+		strings.Split(viper.GetString("etcd.endpoints"), ","),
+		[]any{service},
+		viper.GetString("etcd.prefix"),
 		pbmtl.RegisterMetricsServiceServer,
 		func(instanceID string, etcdSvc *registryx.EtcdService) pbmtl.MetricsServiceServer {
 			return &server{
