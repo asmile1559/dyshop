@@ -6,7 +6,6 @@ import (
 
 	"github.com/asmile1559/dyshop/app/order/biz/model"
 	"github.com/asmile1559/dyshop/app/order/utils/db"
-	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	pborder "github.com/asmile1559/dyshop/pb/backend/order"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/sqlite"
@@ -26,7 +25,7 @@ func TestPlaceOrderService_Run(t *testing.T) {
 	}
 
 	// 自动迁移模型
-	err = db.DB.AutoMigrate(&model.Order{}, &model.Address{}, &model.OrderItem{})
+	err = db.DB.AutoMigrate(&model.Order{}, &model.Address{}, &model.Product{}, &model.ProductSpec{})
 	if err != nil {
 		t.Fatalf("failed to migrate models: %v", err)
 	}
@@ -36,29 +35,45 @@ func TestPlaceOrderService_Run(t *testing.T) {
 		UserId:       1,
 		UserCurrency: "USD",
 		Address: &pborder.Address{
-			StreetAddress: "123 Main St",
-			City:          "Anytown",
-			State:         "CA",
-			Country:       "USA",
-			ZipCode:       "12345",
+			Recipient:   "John Doe",
+			Phone:       "+123456789",
+			Province:    "CA",
+			City:        "Anytown",
+			District:    "",
+			Street:      "123 Main St",
+			FullAddress: "123 Main St, Anytown, CA",
 		},
 		Email: "test@example.com",
-		OrderItems: []*pborder.OrderItem{
+		Products: []*pborder.Product{
 			{
-				Item: &pbcart.CartItem{
-					ProductId: 101,
-					Quantity:  2,
+				ProductId:   101,
+				ProductImg:  "img1.jpg",
+				ProductName: "Product 1",
+				ProductSpec: &pborder.ProductSpec{
+					Name:  "Size S",
+					Price: 19.99,
 				},
-				Cost: 19.99,
+				Quantity: 2,
+				Currency: "USD",
+				Postage:  5.00,
 			},
-			/*{
-				Item: &pbcart.CartItem{
-					ProductId: 102,
-					Quantity:  1,
+			{
+				ProductId:   102,
+				ProductImg:  "img2.jpg",
+				ProductName: "Product 2",
+				ProductSpec: &pborder.ProductSpec{
+					Name:  "Size M",
+					Price: 29.99,
 				},
-				Cost: 29.99,
-			},*/
+				Quantity: 1,
+				Currency: "USD",
+				Postage:  5.00,
+			},
 		},
+		OrderPrice:      69.97,
+		OrderPostage:    5.00,
+		Discount:        0.00,
+		OrderFinalPrice: 74.97,
 	}
 
 	// 创建 PlaceOrderService 实例
@@ -72,20 +87,20 @@ func TestPlaceOrderService_Run(t *testing.T) {
 	}
 
 	// 验证响应
-	expectedOrderID := resp.GetOrder().GetOrderId()
+	expectedOrderID := resp.GetOrderId()
 	if expectedOrderID == "" {
 		t.Errorf("expected non-empty order ID, got empty")
 	}
 
 	// 查询数据库以验证订单是否已成功创建
 	var createdOrder model.Order
-	result := db.DB.Preload("Address").Preload("OrderItems").First(&createdOrder, expectedOrderID)
+	result := db.DB.Preload("Products").First(&createdOrder, "order_id = ?", expectedOrderID)
 	if result.Error != nil {
 		t.Errorf("expected order to be found in the database, got error: %v", result.Error)
 	}
 
 	// 验证订单字段
-	if createdOrder.UserId != uint64(req.GetUserId()) {
+	if createdOrder.UserId != uint32(req.GetUserId()) {
 		t.Errorf("expected UserId %d, got %d", req.GetUserId(), createdOrder.UserId)
 	}
 	if createdOrder.UserCurrency != req.GetUserCurrency() {
@@ -94,38 +109,63 @@ func TestPlaceOrderService_Run(t *testing.T) {
 	if createdOrder.Email != req.GetEmail() {
 		t.Errorf("expected Email %s, got %s", req.GetEmail(), createdOrder.Email)
 	}
-	if len(createdOrder.OrderItems) != len(req.GetOrderItems()) {
-		t.Errorf("expected %d OrderItems, got %d", len(req.GetOrderItems()), len(createdOrder.OrderItems))
+	if len(createdOrder.Products) != len(req.GetProducts()) {
+		t.Errorf("expected %d Products, got %d", len(req.GetProducts()), len(createdOrder.Products))
+	}
+	if createdOrder.OrderPrice != req.GetOrderPrice() {
+		t.Errorf("expected OrderPrice %.2f, got %.2f", req.GetOrderPrice(), createdOrder.OrderPrice)
+	}
+	if createdOrder.OrderPostage != req.GetOrderPostage() {
+		t.Errorf("expected OrderPostage %.2f, got %.2f", req.GetOrderPostage(), createdOrder.OrderPostage)
+	}
+	if createdOrder.OrderDiscount != req.GetDiscount() {
+		t.Errorf("expected Discount %.2f, got %.2f", req.GetDiscount(), createdOrder.OrderDiscount)
+	}
+	if createdOrder.OrderFinalPrice != req.GetOrderFinalPrice() {
+		t.Errorf("expected FinalPrice %.2f, got %.2f", req.GetOrderFinalPrice(), createdOrder.OrderFinalPrice)
 	}
 
 	// 验证地址字段
-	if createdOrder.Address.StreetAddress != req.GetAddress().GetStreetAddress() {
-		t.Errorf("expected StreetAddress %s, got %s", req.GetAddress().GetStreetAddress(), createdOrder.Address.StreetAddress)
+	address := req.GetAddress()
+	if createdOrder.Address.Recipient != address.GetRecipient() {
+		t.Errorf("expected Recipient %s, got %s", address.GetRecipient(), createdOrder.Address.Recipient)
 	}
-	if createdOrder.Address.City != req.GetAddress().GetCity() {
-		t.Errorf("expected City %s, got %s", req.GetAddress().GetCity(), createdOrder.Address.City)
+	if createdOrder.Address.Phone != address.GetPhone() {
+		t.Errorf("expected Phone %s, got %s", address.GetPhone(), createdOrder.Address.Phone)
 	}
-	if createdOrder.Address.State != req.GetAddress().GetState() {
-		t.Errorf("expected State %s, got %s", req.GetAddress().GetState(), createdOrder.Address.State)
+	if createdOrder.Address.Province != address.GetProvince() {
+		t.Errorf("expected Province %s, got %s", address.GetProvince(), createdOrder.Address.Province)
 	}
-	if createdOrder.Address.Country != req.GetAddress().GetCountry() {
-		t.Errorf("expected Country %s, got %s", req.GetAddress().GetCountry(), createdOrder.Address.Country)
+	if createdOrder.Address.City != address.GetCity() {
+		t.Errorf("expected City %s, got %s", address.GetCity(), createdOrder.Address.City)
 	}
-	if createdOrder.Address.ZipCode != req.GetAddress().GetZipCode() {
-		t.Errorf("expected ZipCode %s, got %s", req.GetAddress().GetZipCode(), createdOrder.Address.ZipCode)
+	if createdOrder.Address.Street != address.GetStreet() {
+		t.Errorf("expected Street %s, got %s", address.GetStreet(), createdOrder.Address.Street)
+	}
+	if createdOrder.Address.FullAddress != address.GetFullAddress() {
+		t.Errorf("expected FullAddress %s, got %s", address.GetFullAddress(), createdOrder.Address.FullAddress)
 	}
 
-	// 验证订单项字段
-	for i, item := range createdOrder.OrderItems {
-		expectedItem := req.GetOrderItems()[i].GetItem()
-		if item.ProductId != uint64(expectedItem.GetProductId()) {
-			t.Errorf("expected ProductId %d for item %d, got %d", expectedItem.GetProductId(), i, item.ProductId)
+	// 验证产品字段
+	for i, item := range createdOrder.Products {
+		expectedItem := req.GetProducts()[i]
+		if item.ProductID != uint64(expectedItem.GetProductId()) {
+			t.Errorf("expected ProductId %d for item %d, got %d", expectedItem.GetProductId(), i, item.ProductID)
+		}
+		if item.ProductName != expectedItem.GetProductName() {
+			t.Errorf("expected ProductName %s for item %d, got %s", expectedItem.GetProductName(), i, item.ProductName)
+		}
+		if item.ProductSpec.Name != expectedItem.GetProductSpec().GetName() {
+			t.Errorf("expected ProductSpec Name %s for item %d, got %s", expectedItem.GetProductSpec().GetName(), i, item.ProductSpec.Name)
 		}
 		if item.Quantity != int(expectedItem.GetQuantity()) {
 			t.Errorf("expected Quantity %d for item %d, got %d", expectedItem.GetQuantity(), i, item.Quantity)
 		}
-		if item.Cost != float64(req.GetOrderItems()[i].GetCost()) {
-			t.Errorf("expected Cost %.2f for item %d, got %.2f", req.GetOrderItems()[i].GetCost(), i, item.Cost)
+		if item.Currency != expectedItem.GetCurrency() {
+			t.Errorf("expected Currency %s for item %d, got %s", expectedItem.GetCurrency(), i, item.Currency)
+		}
+		if item.Postage != expectedItem.GetPostage() {
+			t.Errorf("expected Postage %.2f for item %d, got %.2f", expectedItem.GetPostage(), i, item.Postage)
 		}
 	}
 }

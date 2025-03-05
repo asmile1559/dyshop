@@ -35,44 +35,52 @@ func (s *PlaceOrderService) Run(req *pborder.PlaceOrderReq) (*pborder.PlaceOrder
 	if address == nil {
 		return nil, fmt.Errorf("address is nil")
 	}
-	modelAddress := model.PrePaidAddress{
-		StreetAddress: address.GetStreetAddress(),
-		City:          address.GetCity(),
-		State:         address.GetState(),
-		Country:       address.GetCountry(),
-		ZipCode:       address.GetZipCode(),
+	modelAddress := model.Address{
+		AddressId:   strconv.FormatUint(orderID, 10), // 使用唯一订单ID作为地址ID
+		Recipient:   address.GetRecipient(),
+		Phone:       address.GetPhone(),
+		Province:    address.GetProvince(),
+		City:        address.GetCity(),
+		District:    address.GetDistrict(),
+		Street:      address.GetStreet(),
+		FullAddress: address.GetFullAddress(),
 	}
 
-	orderItems := make([]model.PrePaidOrderItem, len(req.GetOrderItems()))
-	for i, item := range req.GetOrderItems() {
-		cartItem := item.GetItem()
-		if cartItem == nil {
-			return nil, fmt.Errorf("cart item is required")
+	products := make([]model.Product, len(req.GetProducts()))
+	for i, item := range req.GetProducts() {
+		spec := model.ProductSpec{
+			Name:  item.GetProductSpec().GetName(),
+			Price: item.GetProductSpec().GetPrice(),
 		}
-		orderItems[i] = model.PrePaidOrderItem{
-			ProductId: uint64(cartItem.GetProductId()),
-			Quantity:  int(cartItem.GetQuantity()),
-			Cost:      float64(item.GetCost()),
+		products[i] = model.Product{
+			ProductID:   uint64(item.GetProductId()),
+			ProductImg:  item.GetProductImg(),
+			ProductName: item.GetProductName(),
+			ProductSpec: spec,
+			Quantity:    int(item.GetQuantity()),
+			Currency:    item.GetCurrency(),
+			Postage:     item.GetPostage(),
 		}
 	}
 
-	newOrder := model.PrePaidOrder{
-		ID:           orderID,
-		UserId:       uint64(req.GetUserId()),
-		UserCurrency: req.GetUserCurrency(),
-		Address:      modelAddress,
-		Email:        req.GetEmail(),
-		Paid:         false,
-		OrderItems:   orderItems,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
-		PaidAt:       time.Now(),
+	newOrder := model.Order{
+		OrderID:         orderID,
+		UserId:          req.GetUserId(),
+		UserCurrency:    req.GetUserCurrency(),
+		Address:         modelAddress,
+		Email:           req.GetEmail(),
+		CreatedAt:       time.Now(),
+		OrderPrice:      req.GetOrderPrice(),
+		OrderPostage:    req.GetOrderPostage(),
+		OrderDiscount:   req.GetDiscount(),
+		OrderFinalPrice: req.GetOrderFinalPrice(),
+		Products:        products,
 	}
 
 	err := s.DB.Transaction(func(tx *gorm.DB) error {
-		// 创建预支付订单
+		// 创建订单
 		if err := tx.Create(&newOrder).Error; err != nil {
-			logrus.Error("Failed to create prepaid order:", err)
+			logrus.Error("Failed to create order:", err)
 			return err
 		}
 		return nil
@@ -81,9 +89,7 @@ func (s *PlaceOrderService) Run(req *pborder.PlaceOrderReq) (*pborder.PlaceOrder
 		return nil, err
 	}
 	resp := &pborder.PlaceOrderResp{
-		Order: &pborder.OrderResult{
-			OrderId: strconv.FormatUint(orderID, 10), // 使用 strconv 包将 uint64 转换为字符串
-		},
+		OrderId: strconv.FormatUint(orderID, 10), // 使用 strconv 包将 uint64 转换为字符串
 	}
 	return resp, nil
 }
@@ -101,7 +107,6 @@ func (s *PlaceOrderService) startDeleteUnpaidOrdersTask() {
 		select {
 		case <-ticker.C:
 			s.deleteUnpaidOrders(deleteCtx, interval)
-			return
 		case <-deleteCtx.Done():
 			logrus.Info("Stopping deleteUnpaidOrders task")
 			return
@@ -111,20 +116,20 @@ func (s *PlaceOrderService) startDeleteUnpaidOrdersTask() {
 
 func (s *PlaceOrderService) deleteUnpaidOrders(ctx context.Context, interval time.Duration) {
 	cutoffTime := time.Now().Add(-1 * interval) // 超过2分钟未支付的订单
-	var unpaidOrders []model.PrePaidOrder
+	var unpaidOrders []model.Order
 	if err := s.DB.WithContext(ctx).Where("paid = ? AND created_at < ?", false, cutoffTime).Find(&unpaidOrders).Error; err != nil {
 		logrus.Error("Failed to find unpaid orders:", err)
 		return
 	}
 	for _, order := range unpaidOrders {
-		logrus.Infof("Found unpaid order with ID: %v", order.ID)
+		logrus.Infof("Found unpaid order with ID: %v", order.OrderID)
 	}
 
-	/*for _, order := range unpaidOrders {//删除未支付且超时的订单
+	for _, order := range unpaidOrders { // 删除未支付且超时的订单
 		if err := s.DB.WithContext(ctx).Delete(&order).Error; err != nil {
 			logrus.Error("Failed to delete unpaid order:", err)
 		} else {
-			logrus.Infof("Delete unpaid order with ID: %v", order.ID)
+			logrus.Infof("Deleted unpaid order with ID: %v", order.OrderID)
 		}
-	}*/
+	}
 }
