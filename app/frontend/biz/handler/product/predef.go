@@ -5,14 +5,14 @@ import "github.com/gin-gonic/gin"
 var (
 	PageRouter = gin.H{
 		"HomePage":     "/",
-		"LoginPage":    "/example/user/login/",
-		"RegisterPage": "/example/user/register/",
-		"UserPage":     "/example/user/",
+		"LoginPage":    "/user/login/",
+		"RegisterPage": "/user/register/",
+		"UserPage":     "/user/",
 		"ProductPage":  "/product/",
-		"OrderPage":    "/example/order/",
-		"CartPage":     "/example/cart/",
+		"OrderPage":    "/order/",
+		"CartPage":     "/cart/",
 		"SearchPage":   "/search/",
-		"PaymentPage":  "/example/payment/",
+		"PaymentPage":  "/payment/",
 	}
 	CategoryList = [][]string{
 		{"家用电器"},
