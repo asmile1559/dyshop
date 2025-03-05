@@ -12,7 +12,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	bizrouter "github.com/asmile1559/dyshop/app/frontend/biz/router"
-	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	feutils "github.com/asmile1559/dyshop/app/frontend/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -24,8 +23,6 @@ func init() {
 }
 
 func main() {
-	rpcclient.InitRPCClient()
-
 	//初始化gin框架内置的校验器翻译器
 	if err := user.InitTrans("zh"); err != nil {
 		logrus.Fatal(err)

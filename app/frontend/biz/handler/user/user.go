@@ -2,9 +2,11 @@ package user
 
 import (
 	"io"
+	"strconv"
 
 	"github.com/asmile1559/dyshop/app/frontend/biz/model"
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
+	"github.com/asmile1559/dyshop/pb/frontend/product_page"
 	"github.com/asmile1559/dyshop/pb/frontend/user_page"
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
@@ -441,4 +443,61 @@ func Delete(c *gin.Context) {
 			"user_id": userId,
 		},
 	})
+}
+
+func GetProducts(c *gin.Context) {
+	var req product_page.SearchProductsReq
+	pg := c.Query("pg")
+	if pg == "" {
+		pg = "1"
+	}
+	sort := c.Query("sort")
+	if sort == "" {
+		sort = "comprehensive"
+	}
+	ps := c.Query("ps")
+	if ps == "" {
+		ps = "30"
+	}
+	curPage, err := strconv.Atoi(pg)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "page must be a number",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if curPage <= 0 {
+		curPage = 1
+	}
+	pagesize, _ := strconv.Atoi(ps)
+	//totalPage := 8
+	req.Page = int32(curPage)
+	req.Category = "all"
+	req.Sort = sort
+	req.PageSize = int32(pagesize)
+	resp, err := service.NewSearchProductService(c).Run(&req)
+	if err != nil {
+		c.String(http.StatusOK, "An error occurred: %v", err)
+		return
+	}
+	resp["UserInfo"].(gin.H)["Id"] = resp["UserInfo"].(gin.H)["UserId"]
+	delete(resp["UserInfo"].(gin.H), "UserId")
+
+	_uid, _ := c.Get("user_id")
+	uid := _uid.(int64)
+	ProductsWithUid := []gin.H{}
+	for _, p := range resp["Products"].([]gin.H) {
+		if p["uid"].(int64) != uid {
+			continue
+		}
+		ProductsWithUid = append(ProductsWithUid, p)
+	}
+	resp["Products"] = ProductsWithUid
+
+	resp["NoImg"] = "/static/src/basic/noimg.svg"
+	resp["CategoriesOptions"] = []string{}
+	logrus.Debug(resp)
+	c.HTML(http.StatusOK, "product-mana.html", &resp)
 }

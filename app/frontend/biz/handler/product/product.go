@@ -18,7 +18,7 @@ import (
 func GetProduct(c *gin.Context) {
 	var err error
 	var req product_page.GetProductReq
-	//userId, _ := c.Get("user_id")
+	userId, _ := c.Get("user_id")
 	productId := c.Query("product_id")
 
 	logrus.Debug("product_id:", productId)
@@ -40,8 +40,9 @@ func GetProduct(c *gin.Context) {
 		c.String(http.StatusOK, "An error occurred: %v", err)
 		return
 	}
+	resp["UserInfo"].(gin.H)["UserId"] = userId
 
-	logrus.Debug("resp:", resp)
+	logrus.Debug("resp:", resp["Product"])
 
 	c.HTML(http.StatusOK, "product-page.html", resp)
 }
@@ -90,11 +91,18 @@ func SearchProduct(c *gin.Context) {
 	req.Sort = sort
 	req.PageSize = int32(pagesize)
 	resp, err := service.NewSearchProductService(c).Run(&req)
-
 	if err != nil {
 		c.String(http.StatusOK, "An error occurred: %v", err)
 		return
 	}
+	logrus.Debug("resp:", resp)
+
+	resp["Keyword"] = kw
+	resp["Sort"] = sort
+	resp["CurPage"] = curPage
+	resp["pageSize"] = pagesize
+	resp["TotalPage"] = 1
+	resp["Category"] = category
 
 	c.HTML(http.StatusOK, "search.html", resp)
 }

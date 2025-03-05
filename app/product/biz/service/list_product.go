@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/asmile1559/dyshop/app/product/biz/dal"
 	"github.com/asmile1559/dyshop/app/product/biz/model"
@@ -34,7 +33,7 @@ func (s *ListProductService) Run(req *pbproduct.ListProductsReq) (*pbproduct.Lis
 		req.CategoryName,
 	)
 	if err != nil {
-		return nil, status.Error(codes.Internal, fmt.Sprintf("database error: %s", err.Error()))
+		return nil, status.Errorf(codes.Internal, "database error: %v", err)
 	}
 	// 转换数据到 Protobuf 格式
 	pbProducts := make([]*pbproduct.Product, 0, len(products))

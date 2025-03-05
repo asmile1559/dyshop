@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbcheckout "github.com/asmile1559/dyshop/pb/backend/checkout"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,12 @@ func NewGetOrderWithItemsService(ctx context.Context) *GetOrderWithItemsService 
 // Run 方法返回 gin.H 结构
 func (s *GetOrderWithItemsService) Run(orderId string) (gin.H, error) {
 	// 调用 gRPC 查询订单
-	resp, err := rpcclient.CheckoutClient.GetOrderWithItems(s.ctx, &pbcheckout.GetOrderReq{
+	checkoutClient, conn, err := rpcclient.GetCheckoutClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := checkoutClient.GetOrderWithItems(s.ctx, &pbcheckout.GetOrderReq{
 		OrderId: orderId,
 	})
 	if err != nil {
@@ -31,8 +37,8 @@ func (s *GetOrderWithItemsService) Run(orderId string) (gin.H, error) {
 
 	// 组装 gin.H 作为返回
 	return gin.H{
-		"OrderId":    resp.Order.OrderId,
-		"UserId":     resp.Order.UserId,
+		"OrderId":       resp.Order.OrderId,
+		"UserId":        resp.Order.UserId,
 		"TransactionId": resp.Order.TransactionId,
 		"Address": gin.H{
 			"Recipient":   resp.Order.Recipient,
@@ -43,7 +49,7 @@ func (s *GetOrderWithItemsService) Run(orderId string) (gin.H, error) {
 			"Street":      resp.Order.Street,
 			"FullAddress": resp.Order.FullAddress,
 		},
-		"Products": buildOrderItems(resp.Items),
+		"Products":        buildOrderItems(resp.Items),
 		"OrderQuantity":   resp.Order.TotalQuantity,
 		"OrderPostage":    resp.Order.Postage,
 		"OrderPrice":      resp.Order.TotalPrice,

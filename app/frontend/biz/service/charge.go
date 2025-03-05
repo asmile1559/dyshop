@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	
+
 	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbpayment "github.com/asmile1559/dyshop/pb/backend/payment"
 	"github.com/asmile1559/dyshop/pb/frontend/payment_page"
@@ -25,7 +25,12 @@ func (s *ChargeService) Run(req *payment_page.ChargeReq) (map[string]interface{}
 	// }
 	reqCred := req.GetCreditCard()
 
-	resp, err := rpcclient.PaymentClient.Charge(s.ctx, &pbpayment.ChargeReq{
+	paymentClient, conn, err := rpcclient.GetPaymentClient()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+	resp, err := paymentClient.Charge(s.ctx, &pbpayment.ChargeReq{
 		TransactionId: req.TransactionId,
 		CreditCard: &pbpayment.CreditCardInfo{
 			CreditCardNumber:          reqCred.GetCreditCardNumber(),

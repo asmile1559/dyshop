@@ -3,13 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/asmile1559/dyshop/app/order/biz/model"
 	"github.com/asmile1559/dyshop/app/order/utils/db"
-	pbcart "github.com/asmile1559/dyshop/pb/backend/cart"
 	pborder "github.com/asmile1559/dyshop/pb/backend/order"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 type ListOrdersService struct {
@@ -22,47 +22,45 @@ func NewListOrdersService(c context.Context) *ListOrdersService {
 }
 
 func (s *ListOrdersService) Run(req *pborder.ListOrderReq) (*pborder.ListOrderResp, error) {
-	var orders []model.Order
-	// 使用 Preload 加载关联的 Address 和 OrderItems
-	if err := s.DB.Preload("Address").Preload("OrderItems").Find(&orders).Error; err != nil {
-		logrus.Error("Failed to fetch orders:", err)
-		return nil, fmt.Errorf("failed to fetch orders: %v", err)
+	orders := []model.Order{}
+	err := s.DB.Find(&orders).Error
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
 	}
 
-	filteredOrders := make([]*pborder.Order, 0)
+	rpcOrders := []*pborder.Order{}
 	for _, order := range orders {
-		if uint32(order.UserId) == req.UserId { // 确保类型匹配
-			filteredOrders = append(filteredOrders, &pborder.Order{
-				OrderId:      strconv.FormatUint(order.ID, 10),
-				UserId:       uint32(order.UserId), // 确保类型匹配
-				UserCurrency: order.UserCurrency,
-				Address: &pborder.Address{
-					StreetAddress: order.Address.StreetAddress,
-					City:          order.Address.City,
-					State:         order.Address.State,
-					Country:       order.Address.Country,
-					ZipCode:       order.Address.ZipCode,
-				},
-				Email:     order.Email,
-				CreatedAt: int32(order.CreatedAt.Unix()), // 确保类型匹配
-				OrderItems: func() []*pborder.OrderItem {
-					items := make([]*pborder.OrderItem, len(order.OrderItems))
-					for i, item := range order.OrderItems {
-						items[i] = &pborder.OrderItem{
-							Item: &pbcart.CartItem{
-								ProductId: uint32(item.ProductId),
-								Quantity:  int32(item.Quantity),
-							},
-							Cost: float32(item.Cost), // 确保类型匹配
-						}
-					}
-					return items
-				}(),
-			})
+		addr := &model.Address{}
+		s.DB.Model(&model.Address{}).First(&addr, order.AddressId)
+		pids := []uint32{}
+		pidsStr := strings.Split(order.ProductIDs, ",")
+		for _, pidStr := range pidsStr {
+			pid := uint32(0)
+			fmt.Sscanf(pidStr, "%d", &pid)
+			pids = append(pids, pid)
 		}
+		rpcOrder := &pborder.Order{
+			Id:     uint32(order.ID),
+			UserId: order.UserId,
+			Address: &pborder.Address{
+				Id:          uint32(addr.ID),
+				UserId:      addr.UserId,
+				Street:      addr.Street,
+				District:    addr.District,
+				City:        addr.City,
+				Province:    addr.Province,
+				Phone:       addr.Phone,
+				Recipient:   addr.Recipient,
+				FullAddress: addr.FullAddress,
+			},
+			Price:      order.Price,
+			ProductIds: pids,
+		}
+		rpcOrders = append(rpcOrders, rpcOrder)
 	}
 
 	return &pborder.ListOrderResp{
-		Orders: filteredOrders,
+		Orders: rpcOrders,
 	}, nil
 }

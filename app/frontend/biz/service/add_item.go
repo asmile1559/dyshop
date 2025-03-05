@@ -19,7 +19,7 @@ func NewAddItemService(c context.Context) *AddItemService {
 }
 
 func (s *AddItemService) Run(req *cart_page.AddItemReq) (map[string]interface{}, error) {
-	id, ok := s.ctx.Value("user_id").(uint32)
+	id, ok := s.ctx.Value("user_id").(int64)
 	if !ok {
 		return nil, errors.New("no user id")
 	}
@@ -30,7 +30,7 @@ func (s *AddItemService) Run(req *cart_page.AddItemReq) (map[string]interface{},
 	}
 	defer conn.Close()
 	resp, err := cartClient.AddItem(s.ctx, &pbcart.AddItemReq{
-		UserId: id,
+		UserId: uint32(id),
 		Item: &pbcart.CartItem{
 			ProductId: req.GetProductId(),
 			Quantity:  req.GetQuantity(),

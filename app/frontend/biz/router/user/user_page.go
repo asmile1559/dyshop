@@ -59,5 +59,7 @@ func Register(e *gin.Engine) {
 		// GET /user/role/merchant
 		// 注册成为商户
 		_user.GET("/role/merchant", append(_registermerchantMw(), u.RegisterMerchant)...)
+
+		_user.GET("/product", append(_getuserinfoMw(), u.GetProducts)...)
 	}
 }

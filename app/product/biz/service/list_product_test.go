@@ -2,18 +2,15 @@ package service
 
 import (
 	"context"
+	"testing"
+
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
-	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"testing"
 )
 
-func init() {
-	rpcclient.InitRPCClient()
-}
 func TestListProductService_Run(t *testing.T) {
 	// 初始化基础上下文
 	ctx := context.Background()

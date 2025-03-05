@@ -1,32 +1,37 @@
 package order
 
 import (
+	"net/http"
+	"strconv"
+
 	o "github.com/asmile1559/dyshop/app/frontend/biz/service"
 	"github.com/asmile1559/dyshop/pb/frontend/order_page"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"github.com/sirupsen/logrus"
 )
 
 func ListOrders(c *gin.Context) {
-	//panic("DO NOT use the function! Use ListOrdersService directly")
-	var err error
-	var req order_page.ListOrdersReq
+	var req order_page.ListOrderReq
 
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.String(http.StatusBadRequest, "User ID not found in context")
+	orderId := c.Query("order_id")
+	oid, _ := strconv.Atoi(orderId)
+	if oid == 0 {
+		resp, err := o.NewListOrdersService(c).Run(&req)
+		if err != nil {
+			c.String(http.StatusOK, "An error occurred: %v", err)
+			return
+		}
+		c.HTML(http.StatusOK, "order.html", resp)
 		return
 	}
-
-	req.UserId = userID.(uint32)
-
-	resp, err := o.NewListOrdersService(c).Run(&req)
+	// get by order id
+	resp, err := o.NewGetOrderService(c).Run(&order_page.GetOrderReq{OrderId: uint32(oid)})
 	if err != nil {
 		c.String(http.StatusOK, "An error occurred: %v", err)
 		return
 	}
-
-	c.JSON(http.StatusOK, resp)
+	logrus.Debug("=>", resp)
+	c.HTML(http.StatusOK, "order.html", resp)
 }
 
 func PlaceOrder(c *gin.Context) {
