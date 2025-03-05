@@ -17,6 +17,7 @@ type Product struct {
 	// 与 proto 中 uint32 id=1 对应
 	// 使用自定义主键字段名（默认 gorm.Model 的 ID 是 uint，proto 中为 uint32）
 	ID          uint       `gorm:"primaryKey;autoIncrement;column:id"`
+	UID         int64      `gorm:"type:int"`
 	Name        string     `gorm:"type:varchar(255);not null"`
 	Description string     `gorm:"type:text"`
 	Picture     string     `gorm:"type:varchar(512)"`
@@ -225,6 +226,7 @@ func SearchProducts(db *gorm.DB, page int32, pageSize int32, keyword string) ([]
 func (p *Product) ToProto() *product.Product {
 	return &product.Product{
 		Id:          uint32(p.ID), // uint32 类型转换
+		Uid:         p.UID,
 		Name:        p.Name,
 		Description: p.Description,
 		Picture:     p.Picture,
@@ -236,6 +238,7 @@ func (p *Product) ToProto() *product.Product {
 // FromProto 从 Protobuf 结构转换（用于创建/更新操作）
 func (p *Product) FromProto(protoProduct *product.Product) {
 	p.ID = uint(protoProduct.Id) // 注意类型转换
+	p.UID = protoProduct.Uid
 	p.Name = protoProduct.Name
 	p.Description = protoProduct.Description
 	p.Picture = protoProduct.Picture

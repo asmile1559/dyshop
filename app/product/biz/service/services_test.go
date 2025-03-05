@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/asmile1559/dyshop/app/frontend/biz/service"
-	rpcclient "github.com/asmile1559/dyshop/app/frontend/rpc"
 	"github.com/asmile1559/dyshop/app/product/biz/dal"
 	"github.com/asmile1559/dyshop/app/product/biz/model"
 	pbproduct "github.com/asmile1559/dyshop/pb/backend/product"
@@ -19,7 +18,6 @@ import (
 )
 
 func init() {
-	rpcclient.InitRPCClient()
 	err := loadConfig()
 	if err != nil {
 		return
