@@ -2,14 +2,16 @@ package service
 
 import (
 	"context"
+	"strings"
+	"time"
+
 	"fmt"
+
 	"github.com/asmile1559/dyshop/app/order/biz/model"
 	"github.com/asmile1559/dyshop/app/order/utils/db"
 	pborder "github.com/asmile1559/dyshop/pb/backend/order"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"strconv"
-	"time"
 )
 
 type PlaceOrderService struct {
@@ -23,73 +25,32 @@ func NewPlaceOrderService(c context.Context) *PlaceOrderService {
 	return s
 }
 
-func generateUniqueOrderID() uint64 {
-	uniqueID := uint64(time.Now().UnixNano())
+func generateUniqueOrderID() uint32 {
+	uniqueID := uint32(time.Now().UnixNano())
 	return uniqueID
 }
 
 func (s *PlaceOrderService) Run(req *pborder.PlaceOrderReq) (*pborder.PlaceOrderResp, error) {
 	orderID := generateUniqueOrderID()
 
-	address := req.GetAddress()
-	if address == nil {
-		return nil, fmt.Errorf("address is nil")
+	pids := []string{}
+	for _, pid := range req.GetProductIds() {
+		pids = append(pids, fmt.Sprint(pid))
 	}
-	modelAddress := model.Address{
-		AddressId:   strconv.FormatUint(orderID, 10), // 使用唯一订单ID作为地址ID
-		Recipient:   address.GetRecipient(),
-		Phone:       address.GetPhone(),
-		Province:    address.GetProvince(),
-		City:        address.GetCity(),
-		District:    address.GetDistrict(),
-		Street:      address.GetStreet(),
-		FullAddress: address.GetFullAddress(),
-	}
-
-	products := make([]model.Product, len(req.GetProducts()))
-	for i, item := range req.GetProducts() {
-		spec := model.ProductSpec{
-			Name:  item.GetProductSpec().GetName(),
-			Price: item.GetProductSpec().GetPrice(),
-		}
-		products[i] = model.Product{
-			ProductID:   uint64(item.GetProductId()),
-			ProductImg:  item.GetProductImg(),
-			ProductName: item.GetProductName(),
-			ProductSpec: spec,
-			Quantity:    int(item.GetQuantity()),
-			Currency:    item.GetCurrency(),
-			Postage:     item.GetPostage(),
-		}
-	}
-
 	newOrder := model.Order{
-		OrderID:         orderID,
-		UserId:          req.GetUserId(),
-		UserCurrency:    req.GetUserCurrency(),
-		Address:         modelAddress,
-		Email:           req.GetEmail(),
-		CreatedAt:       time.Now(),
-		OrderPrice:      req.GetOrderPrice(),
-		OrderPostage:    req.GetOrderPostage(),
-		OrderDiscount:   req.GetDiscount(),
-		OrderFinalPrice: req.GetOrderFinalPrice(),
-		Products:        products,
+		Model:      gorm.Model{ID: uint(orderID)},
+		UserId:     req.GetUserId(),
+		AddressId:  req.GetAddressId(),
+		Price:      req.GetPrice(),
+		ProductIDs: strings.Join(pids, ","),
 	}
 
-	err := s.DB.Transaction(func(tx *gorm.DB) error {
-		// 创建订单
-		if err := tx.Create(&newOrder).Error; err != nil {
-			logrus.Error("Failed to create order:", err)
-			return err
-		}
-		return nil
-	})
+	err := db.DB.Create(&newOrder).Error
 	if err != nil {
 		return nil, err
 	}
 	resp := &pborder.PlaceOrderResp{
-		OrderId: strconv.FormatUint(orderID, 10), // 使用 strconv 包将 uint64 转换为字符串
+		OrderId: orderID,
 	}
 	return resp, nil
 }
@@ -122,14 +83,14 @@ func (s *PlaceOrderService) deleteUnpaidOrders(ctx context.Context, interval tim
 		return
 	}
 	for _, order := range unpaidOrders {
-		logrus.Infof("Found unpaid order with ID: %v", order.OrderID)
+		logrus.Infof("Found unpaid order with ID: %v", order.ID)
 	}
 
 	for _, order := range unpaidOrders { // 删除未支付且超时的订单
 		if err := s.DB.WithContext(ctx).Delete(&order).Error; err != nil {
 			logrus.Error("Failed to delete unpaid order:", err)
 		} else {
-			logrus.Infof("Deleted unpaid order with ID: %v", order.OrderID)
+			logrus.Infof("Deleted unpaid order with ID: %v", order.ID)
 		}
 	}
 }
