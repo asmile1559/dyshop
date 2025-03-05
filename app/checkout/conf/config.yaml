@@ -25,4 +25,4 @@ prometheus: "/services/prometheus"
 
 metrics:
   host: "127.0.0.1"
-  port: 16166 # 服务实例监控端口
+  port: 16167 # 服务实例监控端口

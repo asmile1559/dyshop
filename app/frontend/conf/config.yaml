@@ -35,4 +35,5 @@ etcd:
     product: "/services/product"
     order: "/services/order"
     checkout: "/services/checkout"
-    frontend: "/services/frontend"
+    payment: "/services/payment"
+    this: "/services/frontend"
